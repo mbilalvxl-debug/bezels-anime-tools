@@ -1,0 +1,106 @@
+      "protagonistTypes": [
+        "Ensemble",
+        "Unpredictable",
+        "Morally varied"
+      ],
+      "contentNotes": [
+        "Violence",
+        "Crime themes"
+      ]
+    },
+    {
+      "id": "samurai-champloo",
+      "title": "Samurai Champloo",
+      "year": 2004,
+      "episodes": 26,
+      "status": "Completed",
+      "genres": [
+        "Action",
+        "Adventure",
+        "Historical",
+        "Comedy"
+      ],
+      "moods": [
+        "Stylish",
+        "Funny",
+        "Relaxed"
+      ],
+      "storyTypes": [
+        "Road trip",
+        "Episodic adventure",
+        "Historical"
+      ],
+      "protagonistTypes": [
+        "Rebel",
+        "Skilled",
+        "Unconventional"
+      ],
+      "contentNotes": [
+        "Sword-fight violence",
+        "Mature themes"
+      ]
+    },
+    {
+      "id": "hellsing-ultimate",
+      "title": "Hellsing Ultimate",
+      "year": 2006,
+      "episodes": 10,
+      "status": "Completed",
+      "genres": [
+        "Action",
+        "Horror",
+        "Supernatural"
+      ],
+      "moods": [
+        "Dark",
+        "Intense",
+        "Gothic"
+      ],
+      "storyTypes": [
+        "Supernatural conflict",
+        "War",
+        "Horror"
+      ],
+      "protagonistTypes": [
+        "Overpowered",
+        "Antihero",
+        "Mysterious"
+      ],
+      "contentNotes": [
+        "Graphic violence",
+        "Horror"
+      ]
+    },
+    {
+      "id": "the-disastrous-life-of-saiki-k",
+      "title": "The Disastrous Life of Saiki K.",
+      "year": 2016,
+      "episodes": 120,
+      "status": "Main TV series completed (short segments grouped)",
+      "genres": [
+        "Comedy",
+        "Supernatural",
+        "Slice of Life"
+      ],
+      "moods": [
+        "Funny",
+        "Lighthearted",
+        "Fast-paced"
+      ],
+      "storyTypes": [
+        "School life",
+        "Episodic comedy",
+        "Parody"
+      ],
+      "protagonistTypes": [
+        "Overpowered",
+        "Introverted",
+        "Deadpan"
+      ],
+      "contentNotes": [
+        "Comedic situations",
+        "School-life themes"
+      ]
+    }
+  ]
+}
