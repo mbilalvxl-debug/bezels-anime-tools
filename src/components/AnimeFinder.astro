@@ -20,24 +20,24 @@ const animeList = animeData.anime as Anime[];
     <div class="filter-group">
       <h3>1. Choose your genres</h3>
       <div class="options">
-        {#each ["Action", "Adventure", "Fantasy", "Comedy", "Romance", "Mystery", "Sci-Fi", "Drama", "Sports", "Horror", "Psychological", "Supernatural"] as genre}
-          <label class="choice">
-            <input type="checkbox" name="genre" value={genre} />
-            <span>{genre}</span>
-          </label>
-        {/each}
+        {["Action", "Adventure", "Fantasy", "Comedy", "Romance", "Mystery", "Sci-Fi", "Drama", "Sports", "Horror", "Psychological", "Supernatural"].map((genre) => (
+  <label class="choice">
+    <input type="checkbox" name="genre" value={genre} />
+    <span>{genre}</span>
+  </label>
+))}
       </div>
     </div>
 
     <div class="filter-group">
       <h3>2. What's your mood?</h3>
       <div class="options">
-        {#each ["Exciting", "Emotional", "Funny", "Dark", "Suspenseful", "Heartwarming", "Motivational", "Relaxed", "Mind-bending"] as mood}
-          <label class="choice">
-            <input type="checkbox" name="mood" value={mood} />
-            <span>{mood}</span>
-          </label>
-        {/each}
+        {["Exciting", "Emotional", "Funny", "Dark", "Suspenseful", "Heartwarming", "Motivational", "Relaxed", "Mind-bending"].map((mood) => (
+  <label class="choice">
+    <input type="checkbox" name="mood" value={mood} />
+    <span>{mood}</span>
+  </label>
+))}
       </div>
     </div>
 
@@ -54,12 +54,12 @@ const animeList = animeData.anime as Anime[];
     <div class="filter-group">
       <h3>4. Choose your story preference</h3>
       <div class="options">
-        {#each ["Adventure", "Coming-of-age", "Mystery", "Revenge", "Survival", "Time travel", "Tournament", "School life", "Investigation"] as story}
-          <label class="choice">
-            <input type="checkbox" name="story" value={story} />
-            <span>{story}</span>
-          </label>
-        {/each}
+        {["Adventure", "Coming-of-age", "Mystery", "Revenge", "Survival", "Time travel", "Tournament", "School life", "Investigation"].map((story) => (
+  <label class="choice">
+    <input type="checkbox" name="story" value={story} />
+    <span>{story}</span>
+  </label>
+))}
       </div>
     </div>
 
