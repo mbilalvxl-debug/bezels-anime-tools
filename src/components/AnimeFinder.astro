@@ -75,6 +75,7 @@ const animeList = animeData.anime as Anime[];
   import animeData from "../data/anime.json";
 
   const animeList = animeData.anime as Anime[];
+  const posterCache = new Map<string, string | null>();
 
   function setupFinder() {
     const button = document.querySelector<HTMLButtonElement>("#findAnime");
@@ -91,7 +92,41 @@ const animeList = animeData.anime as Anime[];
       ).map((input) => input.value);
     }
 
-    button.addEventListener("click", () => {
+    async function getPoster(title: string): Promise<string | null> {
+      if (posterCache.has(title)) {
+        return posterCache.get(title) ?? null;
+      }
+
+      try {
+        const url = `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(title)}&limit=1&sfw=true`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          posterCache.set(title, null);
+          return null;
+        }
+
+        const data = await response.json();
+        const animeResult = data?.data?.[0];
+
+        const poster =
+          animeResult?.images?.webp?.large_image_url ||
+          animeResult?.images?.jpg?.large_image_url ||
+          animeResult?.images?.webp?.image_url ||
+          animeResult?.images?.jpg?.image_url ||
+          null;
+
+        posterCache.set(title, poster);
+        return poster;
+      } catch (error) {
+        console.error("Poster loading failed:", title, error);
+        posterCache.set(title, null);
+        return null;
+      }
+    }
+
+    button.addEventListener("click", async () => {
       const preferences = {
         genres: selectedValues("genre"),
         moods: selectedValues("mood"),
@@ -128,9 +163,39 @@ const animeList = animeData.anime as Anime[];
       const grid = document.createElement("div");
       grid.className = "result-grid";
 
+      const posterTasks: Promise<void>[] = [];
+
       recommendations.forEach((anime) => {
         const card = document.createElement("article");
         card.className = "result-card";
+
+        const posterBox = document.createElement("div");
+        posterBox.className = "poster-box";
+
+        const poster = document.createElement("img");
+        poster.className = "anime-poster";
+        poster.alt = `${anime.title} anime poster`;
+        poster.loading = "lazy";
+        poster.decoding = "async";
+
+        const fallback = document.createElement("div");
+        fallback.className = "poster-fallback";
+        fallback.textContent = "Poster unavailable";
+
+        posterBox.append(poster, fallback);
+
+        poster.addEventListener("load", () => {
+          poster.classList.add("loaded");
+          fallback.style.display = "none";
+        });
+
+        poster.addEventListener("error", () => {
+          poster.style.display = "none";
+          fallback.style.display = "flex";
+        });
+
+        const info = document.createElement("div");
+        info.className = "card-info";
 
         const title = document.createElement("h4");
         title.className = "card-title";
@@ -154,11 +219,35 @@ const animeList = animeData.anime as Anime[];
           ? `Why it matches: ${anime.reasons.join("; ")}`
           : "A possible match based on your selected preferences.";
 
-        card.append(title, meta, score, genres, reason);
+        info.append(title, meta, score, genres, reason);
+        card.append(posterBox, info);
         grid.append(card);
+
+        posterTasks.push(
+          (async () => {
+            const imageUrl = await getPoster(anime.title);
+
+            if (imageUrl) {
+              poster.src = imageUrl;
+            } else {
+              poster.style.display = "none";
+              fallback.style.display = "flex";
+            }
+          })()
+        );
       });
 
       results.append(heading, grid);
+
+      // Load posters one by one to reduce API rate-limit errors.
+      for (let i = 0; i < posterTasks.length; i++) {
+        await posterTasks[i];
+
+        if (i < posterTasks.length - 1) {
+          await new Promise((resolve) => setTimeout(resolve, 400));
+        }
+      }
+
       results.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }
@@ -299,19 +388,15 @@ const animeList = animeData.anime as Anime[];
 
   .finder .result-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 20px;
   }
 
   .finder .result-card {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    min-width: 0;
+    overflow: hidden;
     background: #111a2c;
     border: 1px solid #293650;
     border-radius: 14px;
-    padding: 22px;
     transition: transform 0.2s, border-color 0.2s;
   }
 
@@ -320,23 +405,60 @@ const animeList = animeData.anime as Anime[];
     border-color: #7965f5;
   }
 
-  .finder .result-card .card-title {
-    color: #ffffff;
-    font-size: 19px;
+  .finder .poster-box {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    background: #1b2740;
+    overflow: hidden;
+  }
+
+  .finder .anime-poster {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .finder .anime-poster.loaded {
+    opacity: 1;
+  }
+
+  .finder .poster-fallback {
+    display: none;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #aab2c6;
+    font-size: 13px;
+    padding: 15px;
+  }
+
+  .finder .card-info {
+    padding: 18px;
+  }
+
+  .finder .card-title {
+    color: white;
+    font-size: 18px;
     line-height: 1.4;
     margin: 0 0 9px;
   }
 
-  .finder .result-card .meta,
-  .finder .result-card .genres,
-  .finder .result-card .reason {
+  .finder .meta,
+  .finder .genres,
+  .finder .reason {
     color: #aab2c6;
     font-size: 13px;
     line-height: 1.7;
-    margin: 5px 0;
+    margin: 7px 0;
   }
 
-  .finder .result-card .score {
+  .finder .score {
     display: inline-block;
     color: #c2b7ff;
     background: #30285b;
@@ -356,6 +478,21 @@ const animeList = animeData.anime as Anime[];
       padding: 20px 15px;
     }
 
+    .finder .result-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .finder .card-info {
+      padding: 13px;
+    }
+
+    .finder .card-title {
+      font-size: 15px;
+    }
+  }
+
+  @media (max-width: 360px) {
     .finder .result-grid {
       grid-template-columns: 1fr;
     }
