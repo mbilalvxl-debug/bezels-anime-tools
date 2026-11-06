@@ -1,1 +1,150 @@
 
+
+---
+const title = "Bezels — Anime Recommendation Finder";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Discover your next favourite anime with Bezels. Find anime recommendations based on your mood, genres and preferences." />
+    <title>{title}</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        background: #090d18;
+        color: #f4f6ff;
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 25px 8%;
+        border-bottom: 1px solid #20283b;
+      }
+      .logo { font-size: 27px; font-weight: 800; color: #fff; }
+      .logo span { color: #8b7cff; }
+      nav a {
+        color: #b9bfd1;
+        text-decoration: none;
+        margin-left: 25px;
+        font-size: 14px;
+      }
+      .hero {
+        text-align: center;
+        padding: 115px 20px 85px;
+        max-width: 900px;
+        margin: auto;
+      }
+      .tag {
+        display: inline-block;
+        border: 1px solid #5548a9;
+        color: #b9aaff;
+        padding: 9px 16px;
+        border-radius: 30px;
+        font-size: 13px;
+        margin-bottom: 28px;
+      }
+      h1 {
+        font-size: clamp(42px, 7vw, 70px);
+        line-height: 1.08;
+        letter-spacing: -2px;
+        margin-bottom: 24px;
+      }
+      h1 span { color: #9685ff; }
+      .hero p {
+        color: #aab2c6;
+        font-size: 17px;
+        line-height: 1.8;
+        max-width: 650px;
+        margin: 0 auto 35px;
+      }
+      .cta {
+        display: inline-block;
+        background: #7965f5;
+        color: white;
+        padding: 16px 27px;
+        border-radius: 9px;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      .features {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        max-width: 1050px;
+        margin: 0 auto;
+        padding: 20px 25px 80px;
+      }
+      .feature {
+        background: #111a2c;
+        border: 1px solid #25304a;
+        border-radius: 15px;
+        padding: 28px;
+      }
+      .feature h2 { font-size: 19px; margin-bottom: 12px; }
+      .feature p { color: #aab2c6; line-height: 1.7; font-size: 14px; }
+      footer {
+        text-align: center;
+        border-top: 1px solid #20283b;
+        padding: 28px;
+        color: #828da5;
+        font-size: 13px;
+      }
+      @media (max-width: 650px) {
+        header { padding: 20px; }
+        nav a { margin-left: 12px; font-size: 12px; }
+        .hero { padding-top: 85px; }
+        .features { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">BEZELS<span>.</span></div>
+      <nav>
+        <a href="#features">Features</a>
+        <a href="#about">About</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="tag">YOUR NEXT ANIME STARTS HERE</div>
+        <h1>Find Your Next <span>Favourite Anime.</span></h1>
+        <p>
+          Not sure what to watch next? Discover anime that matches your mood,
+          interests and watching preferences. Your next great anime is just
+          around the corner.
+        </p>
+        <a class="cta" href="#features">Explore Bezels</a>
+      </section>
+
+      <section class="features" id="features">
+        <article class="feature">
+          <h2>🎯 Quick Filters</h2>
+          <p>Find anime by genre, mood, episode count and story preferences.</p>
+        </article>
+        <article class="feature">
+          <h2>🧩 Personalised Quiz</h2>
+          <p>Answer a few questions and discover anime suited to your taste.</p>
+        </article>
+        <article class="feature">
+          <h2>📌 Your Watchlist</h2>
+          <p>Keep track of anime you want to watch and titles you have completed.</p>
+        </article>
+      </section>
+
+      <section id="about" class="hero" style="padding-top:20px">
+        <h2>More Than Just Anime Recommendations</h2>
+        <p>Bezels is being built to make discovering your next anime easier.</p>
+      </section>
+    </main>
+
+    <footer>© 2026 Bezels. Made for anime fans.</footer>
+  </body>
+</html>
