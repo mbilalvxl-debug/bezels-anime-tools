@@ -75,7 +75,7 @@ const animeList = animeData.anime as Anime[];
   import animeData from "../data/anime.json";
 
   const animeList = animeData.anime as Anime[];
-  const posterCache = new Map<string, string | null>();
+  const posterCache = new Map<string, string>();
 
   function setupFinder() {
     const button = document.querySelector<HTMLButtonElement>("#findAnime");
@@ -92,38 +92,57 @@ const animeList = animeData.anime as Anime[];
       ).map((input) => input.value);
     }
 
+    function wait(ms: number) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
     async function getPoster(title: string): Promise<string | null> {
       if (posterCache.has(title)) {
-        return posterCache.get(title) ?? null;
+        return posterCache.get(title)!;
       }
 
-      try {
-        const url = `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(title)}&limit=1&sfw=true`;
+      const url =
+        `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(title)}&limit=1&sfw=true`;
 
-        const response = await fetch(url);
+      for (let attempt = 1; attempt <= 2; attempt++) {
+        try {
+          const response = await fetch(url);
 
-        if (!response.ok) {
-          posterCache.set(title, null);
+          if (response.status === 429 || response.status >= 500) {
+            if (attempt === 1) {
+              await wait(1800);
+              continue;
+            }
+            return null;
+          }
+
+          if (!response.ok) return null;
+
+          const data = await response.json();
+          const result = data?.data?.[0];
+
+          const image =
+            result?.images?.webp?.large_image_url ||
+            result?.images?.jpg?.large_image_url ||
+            result?.images?.webp?.image_url ||
+            result?.images?.jpg?.image_url;
+
+          if (image) {
+            posterCache.set(title, image);
+            return image;
+          }
+
           return null;
+        } catch (error) {
+          console.error("Poster API error:", title, error);
+
+          if (attempt === 1) {
+            await wait(1800);
+          }
         }
-
-        const data = await response.json();
-        const animeResult = data?.data?.[0];
-
-        const poster =
-          animeResult?.images?.webp?.large_image_url ||
-          animeResult?.images?.jpg?.large_image_url ||
-          animeResult?.images?.webp?.image_url ||
-          animeResult?.images?.jpg?.image_url ||
-          null;
-
-        posterCache.set(title, poster);
-        return poster;
-      } catch (error) {
-        console.error("Poster loading failed:", title, error);
-        posterCache.set(title, null);
-        return null;
       }
+
+      return null;
     }
 
     button.addEventListener("click", async () => {
@@ -156,6 +175,9 @@ const animeList = animeData.anime as Anime[];
         return;
       }
 
+      button.disabled = true;
+      button.textContent = "Loading anime posters...";
+
       const heading = document.createElement("h3");
       heading.className = "results-heading";
       heading.textContent = "Your Anime Recommendations";
@@ -163,7 +185,11 @@ const animeList = animeData.anime as Anime[];
       const grid = document.createElement("div");
       grid.className = "result-grid";
 
-      const posterTasks: Promise<void>[] = [];
+      const posterJobs: {
+        title: string;
+        image: HTMLImageElement;
+        fallback: HTMLDivElement;
+      }[] = [];
 
       recommendations.forEach((anime) => {
         const card = document.createElement("article");
@@ -180,9 +206,7 @@ const animeList = animeData.anime as Anime[];
 
         const fallback = document.createElement("div");
         fallback.className = "poster-fallback";
-        fallback.textContent = "Poster unavailable";
-
-        posterBox.append(poster, fallback);
+        fallback.textContent = "Loading poster...";
 
         poster.addEventListener("load", () => {
           poster.classList.add("loaded");
@@ -191,8 +215,11 @@ const animeList = animeData.anime as Anime[];
 
         poster.addEventListener("error", () => {
           poster.style.display = "none";
+          fallback.textContent = "Poster unavailable";
           fallback.style.display = "flex";
         });
+
+        posterBox.append(poster, fallback);
 
         const info = document.createElement("div");
         info.className = "card-info";
@@ -223,32 +250,35 @@ const animeList = animeData.anime as Anime[];
         card.append(posterBox, info);
         grid.append(card);
 
-        posterTasks.push(
-          (async () => {
-            const imageUrl = await getPoster(anime.title);
-
-            if (imageUrl) {
-              poster.src = imageUrl;
-            } else {
-              poster.style.display = "none";
-              fallback.style.display = "flex";
-            }
-          })()
-        );
+        posterJobs.push({
+          title: anime.title,
+          image: poster,
+          fallback,
+        });
       });
 
       results.append(heading, grid);
+      results.scrollIntoView({ behavior: "smooth", block: "start" });
 
-      // Load posters one by one to reduce API rate-limit errors.
-      for (let i = 0; i < posterTasks.length; i++) {
-        await posterTasks[i];
+      // Important: requests now start one by one, not all together.
+      for (let i = 0; i < posterJobs.length; i++) {
+        const job = posterJobs[i];
+        const imageUrl = await getPoster(job.title);
 
-        if (i < posterTasks.length - 1) {
-          await new Promise((resolve) => setTimeout(resolve, 400));
+        if (imageUrl) {
+          job.image.src = imageUrl;
+        } else {
+          job.fallback.textContent = "Poster unavailable";
+          job.fallback.style.display = "flex";
+        }
+
+        if (i < posterJobs.length - 1) {
+          await wait(1200);
         }
       }
 
-      results.scrollIntoView({ behavior: "smooth", block: "start" });
+      button.disabled = false;
+      button.textContent = "Find My Anime →";
     });
   }
 
@@ -370,6 +400,11 @@ const animeList = animeData.anime as Anime[];
     background: #6853e6;
   }
 
+  .finder #findAnime:disabled {
+    opacity: 0.7;
+    cursor: wait;
+  }
+
   .finder .hint {
     text-align: center;
     font-size: 12px;
@@ -428,6 +463,8 @@ const animeList = animeData.anime as Anime[];
 
   .finder .poster-fallback {
     display: none;
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     align-items: center;
