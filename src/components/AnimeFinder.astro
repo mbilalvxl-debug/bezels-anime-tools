@@ -1,0 +1,262 @@
+
+---
+import animeData from "../data/anime.json";
+import {
+  getRecommendations,
+  type Anime,
+} from "../lib/recommend";
+
+const animeList = animeData.anime as Anime[];
+---
+
+<section class="finder" id="anime-finder">
+  <div class="heading">
+    <span class="eyebrow">DISCOVER YOUR NEXT WATCH</span>
+    <h2>Find Anime That <span>Matches You.</span></h2>
+    <p>Choose what you enjoy and let Bezels find your next favourite anime.</p>
+  </div>
+
+  <div class="filter-panel">
+    <div class="filter-group">
+      <h3>1. Choose your genres</h3>
+      <div class="options">
+        {#each ["Action", "Adventure", "Fantasy", "Comedy", "Romance", "Mystery", "Sci-Fi", "Drama", "Sports", "Horror", "Psychological", "Supernatural"] as genre}
+          <label class="choice">
+            <input type="checkbox" name="genre" value={genre} />
+            <span>{genre}</span>
+          </label>
+        {/each}
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <h3>2. What's your mood?</h3>
+      <div class="options">
+        {#each ["Exciting", "Emotional", "Funny", "Dark", "Suspenseful", "Heartwarming", "Motivational", "Relaxed", "Mind-bending"] as mood}
+          <label class="choice">
+            <input type="checkbox" name="mood" value={mood} />
+            <span>{mood}</span>
+          </label>
+        {/each}
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <h3>3. How much time do you have?</h3>
+      <select id="episodeLength">
+        <option value="">Any episode count</option>
+        <option value="short">Short — 13 episodes or less</option>
+        <option value="medium">Medium — 14 to 26 episodes</option>
+        <option value="long">Long — more than 26 episodes</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <h3>4. Choose your story preference</h3>
+      <div class="options">
+        {#each ["Adventure", "Coming-of-age", "Mystery", "Revenge", "Survival", "Time travel", "Tournament", "School life", "Investigation"] as story}
+          <label class="choice">
+            <input type="checkbox" name="story" value={story} />
+            <span>{story}</span>
+          </label>
+        {/each}
+      </div>
+    </div>
+
+    <button id="findAnime" type="button">Find My Anime →</button>
+    <p class="hint">Select at least one preference to get recommendations.</p>
+  </div>
+
+  <div id="results" class="results" aria-live="polite"></div>
+</section>
+
+<script>
+  import {
+    getRecommendations,
+    type Anime,
+  } from "../lib/recommend";
+  import animeData from "../data/anime.json";
+
+  const animeList = animeData.anime as Anime[];
+
+  const button = document.querySelector<HTMLButtonElement>("#findAnime");
+  const results = document.querySelector<HTMLDivElement>("#results");
+
+  function selectedValues(name: string): string[] {
+    return Array.from(
+      document.querySelectorAll<HTMLInputElement>(
+        `input[name="${name}"]:checked`
+      )
+    ).map((input) => input.value);
+  }
+
+  button?.addEventListener("click", () => {
+    if (!results) return;
+
+    const preferences = {
+      genres: selectedValues("genre"),
+      moods: selectedValues("mood"),
+      storyTypes: selectedValues("story"),
+      episodeLength:
+        (document.querySelector<HTMLSelectElement>("#episodeLength")?.value ||
+          undefined) as "short" | "medium" | "long" | undefined,
+    };
+
+    const recommendations = getRecommendations(
+      animeList,
+      preferences,
+      10
+    );
+
+    results.replaceChildren();
+
+    if (!recommendations.length) {
+      results.textContent =
+        "Please select at least one preference to find anime.";
+      return;
+    }
+
+    const heading = document.createElement("h3");
+    heading.className = "results-heading";
+    heading.textContent = "Your Anime Recommendations";
+    results.append(heading);
+
+    const grid = document.createElement("div");
+    grid.className = "result-grid";
+
+    recommendations.forEach((anime) => {
+      const card = document.createElement("article");
+      card.className = "result-card";
+
+      const title = document.createElement("h4");
+      title.textContent = anime.title;
+
+      const year = document.createElement("p");
+      year.className = "meta";
+      year.textContent = `${anime.year} • ${anime.episodes} episodes`;
+
+      const score = document.createElement("span");
+      score.className = "score";
+      score.textContent = `${anime.matchScore}% match`;
+
+      const genres = document.createElement("p");
+      genres.className = "genres";
+      genres.textContent = anime.genres.join(" · ");
+
+      const reason = document.createElement("p");
+      reason.className = "reason";
+      reason.textContent = anime.reasons.length
+        ? `Why it matches: ${anime.reasons.join("; ")}`
+        : "A possible match based on your selected preferences.";
+
+      card.append(title, year, score, genres, reason);
+      grid.append(card);
+    });
+
+    results.append(grid);
+  });
+</script>
+
+<style>
+  .finder {
+    max-width: 1050px;
+    margin: 30px auto 90px;
+    padding: 35px 22px;
+  }
+
+  .heading { text-align: center; margin-bottom: 35px; }
+  .eyebrow { color: #a99aff; font-size: 12px; letter-spacing: 2px; }
+  .heading h2 { font-size: clamp(30px, 5vw, 43px); margin: 14px 0; }
+  .heading h2 span { color: #9685ff; }
+  .heading p, .hint { color: #aab2c6; line-height: 1.7; }
+
+  .filter-panel {
+    background: #111a2c;
+    border: 1px solid #25304a;
+    padding: 28px;
+    border-radius: 16px;
+  }
+
+  .filter-group { margin-bottom: 30px; }
+  .filter-group h3 { font-size: 17px; margin-bottom: 16px; }
+
+  .options { display: flex; flex-wrap: wrap; gap: 10px; }
+
+  .choice { cursor: pointer; }
+  .choice input { position: absolute; opacity: 0; }
+  .choice span {
+    display: block;
+    padding: 10px 15px;
+    background: #1b2740;
+    border: 1px solid #34415e;
+    border-radius: 8px;
+    color: #d4daeb;
+    font-size: 13px;
+  }
+
+  .choice input:checked + span {
+    background: #5544b9;
+    border-color: #a394ff;
+    color: white;
+  }
+
+  .choice input:focus-visible + span {
+    outline: 2px solid white;
+  }
+
+  select {
+    width: 100%;
+    padding: 14px;
+    border-radius: 8px;
+    background: #1b2740;
+    border: 1px solid #34415e;
+    color: white;
+  }
+
+  #findAnime {
+    width: 100%;
+    padding: 16px;
+    background: #7965f5;
+    border: 0;
+    border-radius: 9px;
+    color: white;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+  }
+
+  #findAnime:hover { background: #6853e6; }
+  .hint { text-align: center; font-size: 12px; margin-top: 13px; }
+
+  .results { margin-top: 35px; }
+  .results-heading { font-size: 24px; margin-bottom: 20px; }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  .result-card {
+    background: #111a2c;
+    border: 1px solid #293650;
+    border-radius: 12px;
+    padding: 22px;
+  }
+
+  .result-card h4 { font-size: 18px; margin-bottom: 9px; }
+  .meta, .genres, .reason { color: #aab2c6; font-size: 13px; line-height: 1.7; }
+  .score {
+    display: inline-block;
+    color: #c2b7ff;
+    background: #30285b;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    margin: 12px 0;
+  }
+
+  @media (max-width: 600px) {
+    .filter-panel { padding: 20px 15px; }
+  }
+</style>
