@@ -1,6 +1,7 @@
 
 ---
 import AnimeFinder from "../components/AnimeFinder.astro";
+import Footer from "../components/Footer.astro";
 
 const title = "Find Anime | Bezels";
 const description =
@@ -121,14 +122,6 @@ const description =
         margin-bottom: 20px;
       }
 
-      footer {
-        text-align: center;
-        border-top: 1px solid #20283b;
-        padding: 28px;
-        color: #828da5;
-        font-size: 13px;
-      }
-
       @media (max-width: 650px) {
         header {
           padding: 20px;
@@ -241,6 +234,6 @@ const description =
       </article>
     </main>
 
-    <footer>© 2026 Bezels. Made for anime fans.</footer>
+    <Footer />
   </body>
 </html>
