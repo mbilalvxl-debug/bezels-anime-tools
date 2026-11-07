@@ -1,0 +1,613 @@
+
+---
+import animeData from "../data/anime.json";
+import type { Anime } from "../lib/recommend";
+
+const animeList = animeData.anime as (Anime & { poster?: string })[];
+---
+
+<section class="detail-quiz" id="detailed-quiz">
+  <div class="quiz-heading">
+    <span class="quiz-eyebrow">THE BEZELS ANIME QUIZ</span>
+    <h2>Find Your <span>Perfect Anime.</span></h2>
+    <p>Answer 6 quick questions and get anime recommendations matched to your taste.</p>
+  </div>
+
+  <div class="quiz-panel">
+    <div class="progress-info">
+      <span id="quizStepLabel">STEP 1 OF 6</span>
+      <span id="quizProgressPercent">17%</span>
+    </div>
+
+    <div class="progress-track">
+      <div class="progress-fill" id="quizProgress"></div>
+    </div>
+
+    <div class="quiz-step active" data-step="0">
+      <h3>What genres do you enjoy?</h3>
+      <p class="step-description">Choose as many as you like.</p>
+      <div class="quiz-options">
+        {["Action", "Adventure", "Fantasy", "Comedy", "Romance", "Mystery", "Sci-Fi", "Drama", "Sports", "Horror", "Psychological", "Supernatural", "Thriller", "Slice of Life", "Historical", "Mecha", "Music"].map((item) => (
+          <button type="button" class="quiz-option" data-group="genres" data-value={item}>{item}</button>
+        ))}
+      </div>
+    </div>
+
+    <div class="quiz-step" data-step="1">
+      <h3>What kind of mood are you looking for?</h3>
+      <p class="step-description">Pick the vibes you want from your next anime.</p>
+      <div class="quiz-options">
+        {["Exciting", "Emotional", "Funny", "Dark", "Intense", "Suspenseful", "Heartwarming", "Motivational", "Relaxed", "Mind-bending", "Lighthearted", "Melancholic"].map((item) => (
+          <button type="button" class="quiz-option" data-group="moods" data-value={item}>{item}</button>
+        ))}
+      </div>
+    </div>
+
+    <div class="quiz-step" data-step="2">
+      <h3>What type of story interests you?</h3>
+      <p class="step-description">Choose the story elements you enjoy most.</p>
+      <div class="quiz-options">
+        {["Adventure", "Mystery", "Revenge", "Survival", "Time travel", "Tournament", "School life", "Coming-of-age", "War", "Friendship", "Investigation", "Mind games", "Romance", "Rebellion", "Competition", "World exploration", "Journey", "Escape"].map((item) => (
+          <button type="button" class="quiz-option" data-group="storyTypes" data-value={item}>{item}</button>
+        ))}
+      </div>
+    </div>
+
+    <div class="quiz-step" data-step="3">
+      <h3>What kind of main character do you prefer?</h3>
+      <p class="step-description">Select the protagonist types you enjoy watching.</p>
+      <div class="quiz-options">
+        {["Overpowered", "Underdog", "Intelligent", "Determined", "Unpredictable", "Kind-hearted", "Optimistic", "Strategic", "Conflicted", "Funny", "Introverted", "Mysterious", "Relatable", "Evolving", "Protective", "Competitive"].map((item) => (
+          <button type="button" class="quiz-option" data-group="protagonistTypes" data-value={item}>{item}</button>
+        ))}
+      </div>
+    </div>
+
+    <div class="quiz-step" data-step="4">
+      <h3>How long should the anime be?</h3>
+      <p class="step-description">Choose the episode count that suits you.</p>
+      <div class="quiz-options vertical-options">
+        <button type="button" class="quiz-option single-option" data-group="episodeLength" data-value="short">
+          <strong>Short</strong>
+          <small>13 episodes or less</small>
+        </button>
+        <button type="button" class="quiz-option single-option" data-group="episodeLength" data-value="medium">
+          <strong>Medium</strong>
+          <small>14 to 26 episodes</small>
+        </button>
+        <button type="button" class="quiz-option single-option" data-group="episodeLength" data-value="long">
+          <strong>Long</strong>
+          <small>More than 26 episodes</small>
+        </button>
+      </div>
+    </div>
+
+    <div class="quiz-step" data-step="5">
+      <h3>Which anime era do you prefer?</h3>
+      <p class="step-description">Choose the release period you want to explore.</p>
+      <div class="quiz-options vertical-options">
+        <button type="button" class="quiz-option single-option" data-group="releasePeriod" data-value="classic">
+          <strong>Classic anime</strong>
+          <small>Before 2010</small>
+        </button>
+        <button type="button" class="quiz-option single-option" data-group="releasePeriod" data-value="2010s">
+          <strong>2010s anime</strong>
+          <small>2010 to 2019</small>
+        </button>
+        <button type="button" class="quiz-option single-option" data-group="releasePeriod" data-value="2020s">
+          <strong>Modern anime</strong>
+          <small>2020 onwards</small>
+        </button>
+      </div>
+    </div>
+
+    <p class="quiz-error" id="quizError" aria-live="polite"></p>
+
+    <div class="quiz-navigation">
+      <button type="button" id="quizBack" class="quiz-back" disabled>← Back</button>
+      <button type="button" id="quizNext" class="quiz-next">Next Step →</button>
+    </div>
+  </div>
+
+  <div class="quiz-results" id="quizResults" aria-live="polite"></div>
+</section>
+
+<script>
+  import { getRecommendations, type Anime, type RecommendationPreferences } from "../lib/recommend";
+  import animeData from "../data/anime.json";
+
+  type QuizAnime = Anime & { poster?: string };
+  const animeList = animeData.anime as QuizAnime[];
+
+  function setupDetailedQuiz() {
+    const root = document.querySelector<HTMLElement>("#detailed-quiz");
+    if (!root || root.dataset.ready === "true") return;
+    root.dataset.ready = "true";
+
+    const steps = Array.from(root.querySelectorAll<HTMLElement>(".quiz-step"));
+    const nextButton = root.querySelector<HTMLButtonElement>("#quizNext");
+    const backButton = root.querySelector<HTMLButtonElement>("#quizBack");
+    const progress = root.querySelector<HTMLElement>("#quizProgress");
+    const stepLabel = root.querySelector<HTMLElement>("#quizStepLabel");
+    const percentLabel = root.querySelector<HTMLElement>("#quizProgressPercent");
+    const error = root.querySelector<HTMLElement>("#quizError");
+    const results = root.querySelector<HTMLElement>("#quizResults");
+
+    if (!nextButton || !backButton || !progress || !stepLabel || !percentLabel || !error || !results) return;
+
+    let currentStep = 0;
+
+    const answers: Record<string, string[]> = {
+      genres: [],
+      moods: [],
+      storyTypes: [],
+      protagonistTypes: [],
+      episodeLength: [],
+      releasePeriod: []
+    };
+
+    function updateStep() {
+      steps.forEach((step, index) => {
+        step.classList.toggle("active", index === currentStep);
+      });
+
+      const percentage = Math.round(((currentStep + 1) / steps.length) * 100);
+      progress.style.width = `${percentage}%`;
+      stepLabel.textContent = `STEP ${currentStep + 1} OF ${steps.length}`;
+      percentLabel.textContent = `${percentage}%`;
+      backButton.disabled = currentStep === 0;
+      nextButton.textContent = currentStep === steps.length - 1 ? "Find My Anime →" : "Next Step →";
+      error.textContent = "";
+    }
+
+    root.querySelectorAll<HTMLButtonElement>(".quiz-option").forEach((button) => {
+      button.addEventListener("click", () => {
+        const group = button.dataset.group;
+        const value = button.dataset.value;
+        if (!group || !value) return;
+
+        if (group === "episodeLength" || group === "releasePeriod") {
+          answers[group] = answers[group].includes(value) ? [] : [value];
+
+          root.querySelectorAll<HTMLButtonElement>(`.quiz-option[data-group="${group}"]`).forEach((option) => {
+            option.classList.toggle("selected", answers[group].includes(option.dataset.value || ""));
+          });
+        } else {
+          if (answers[group].includes(value)) {
+            answers[group] = answers[group].filter((item) => item !== value);
+          } else {
+            answers[group].push(value);
+          }
+
+          button.classList.toggle("selected", answers[group].includes(value));
+        }
+      });
+    });
+
+    backButton.addEventListener("click", () => {
+      if (currentStep > 0) {
+        currentStep--;
+        updateStep();
+      }
+    });
+
+    nextButton.addEventListener("click", () => {
+      if (currentStep < steps.length - 1) {
+        currentStep++;
+        updateStep();
+        return;
+      }
+
+      const hasAnswers = Object.values(answers).some((items) => items.length > 0);
+
+      if (!hasAnswers) {
+        error.textContent = "Please select at least one preference before finding your anime.";
+        return;
+      }
+
+      const preferences: RecommendationPreferences = {
+        genres: answers.genres,
+        moods: answers.moods,
+        storyTypes: answers.storyTypes,
+        protagonistTypes: answers.protagonistTypes,
+        episodeLength: answers.episodeLength[0] as "short" | "medium" | "long" | undefined,
+        releasePeriod: answers.releasePeriod[0] as "classic" | "2010s" | "2020s" | undefined
+      };
+
+      const recommendations = getRecommendations(animeList, preferences, 10)
+        .filter((anime) => anime.matchScore > 0);
+
+      showResults(recommendations);
+    });
+
+    function showResults(recommendations: ReturnType<typeof getRecommendations>) {
+      const heading = document.createElement("h3");
+      heading.className = "quiz-results-title";
+      heading.textContent = "Your Anime Recommendations";
+
+      const description = document.createElement("p");
+      description.className = "quiz-results-description";
+      description.textContent = "Based on your answers, here are the anime that best match your preferences.";
+
+      const grid = document.createElement("div");
+      grid.className = "quiz-result-grid";
+
+      if (!recommendations.length) {
+        const message = document.createElement("p");
+        message.className = "quiz-no-results";
+        message.textContent = "We couldn't find a close match. Try changing a few answers and take the quiz again.";
+        results.replaceChildren(heading, description, message);
+      } else {
+        recommendations.forEach((anime) => {
+          const card = document.createElement("article");
+          card.className = "quiz-result-card";
+
+          const posterBox = document.createElement("div");
+          posterBox.className = "quiz-poster-box";
+
+          if (anime.poster) {
+            const poster = document.createElement("img");
+            poster.src = anime.poster;
+            poster.alt = `${anime.title} anime poster`;
+            poster.loading = "lazy";
+            poster.onerror = () => {
+              poster.style.display = "none";
+              posterBox.textContent = "Poster unavailable";
+            };
+            posterBox.append(poster);
+          } else {
+            posterBox.textContent = "Poster unavailable";
+          }
+
+          const info = document.createElement("div");
+          info.className = "quiz-card-info";
+
+          const title = document.createElement("h4");
+          title.textContent = anime.title;
+
+          const meta = document.createElement("p");
+          meta.className = "quiz-meta";
+          meta.textContent = `${anime.year} • ${anime.episodes} episodes • ${anime.status}`;
+
+          const score = document.createElement("span");
+          score.className = "quiz-score";
+          score.textContent = `${anime.matchScore}% match`;
+
+          const genres = document.createElement("p");
+          genres.className = "quiz-genres";
+          genres.textContent = anime.genres.join(" · ");
+
+          const reason = document.createElement("p");
+          reason.className = "quiz-reason";
+          reason.textContent = anime.reasons.length
+            ? `Why it matches: ${anime.reasons.join("; ")}`
+            : "A possible match based on your preferences.";
+
+          info.append(title, meta, score, genres, reason);
+          card.append(posterBox, info);
+          grid.append(card);
+        });
+
+        results.replaceChildren(heading, description, grid);
+      }
+
+      results.scrollIntoView({ behavior: "smooth", block: "start" });
+      root.querySelector(".quiz-panel")?.classList.add("quiz-completed");
+    }
+
+    updateStep();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupDetailedQuiz, { once: true });
+  } else {
+    setupDetailedQuiz();
+  }
+</script>
+
+<style is:global>
+  .detail-quiz {
+    max-width: 1050px;
+    margin: 70px auto 90px;
+    padding: 35px 22px;
+    color: #f5f5ff;
+  }
+
+  .quiz-heading {
+    text-align: center;
+    margin-bottom: 35px;
+  }
+
+  .quiz-eyebrow {
+    color: #a99aff;
+    font-size: 12px;
+    letter-spacing: 2px;
+  }
+
+  .quiz-heading h2 {
+    font-size: clamp(30px, 5vw, 43px);
+    margin: 14px 0;
+  }
+
+  .quiz-heading h2 span {
+    color: #9685ff;
+  }
+
+  .quiz-heading p,
+  .step-description {
+    color: #aab2c6;
+    line-height: 1.7;
+  }
+
+  .quiz-panel {
+    background: #111a2c;
+    border: 1px solid #293650;
+    border-radius: 18px;
+    padding: 30px;
+  }
+
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    color: #bdb2ff;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .progress-track {
+    height: 7px;
+    background: #26324a;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 35px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 17%;
+    background: #8875ff;
+    border-radius: 20px;
+    transition: width 0.25s ease;
+  }
+
+  .quiz-step {
+    display: none;
+  }
+
+  .quiz-step.active {
+    display: block;
+  }
+
+  .quiz-step h3 {
+    font-size: clamp(20px, 3vw, 25px);
+    margin-bottom: 9px;
+  }
+
+  .step-description {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .quiz-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 11px;
+  }
+
+  .quiz-option {
+    border: 1px solid #34415e;
+    background: #1b2740;
+    color: #dce1f1;
+    border-radius: 9px;
+    padding: 11px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  .quiz-option:hover {
+    border-color: #8875ff;
+  }
+
+  .quiz-option.selected {
+    background: #5544b9;
+    border-color: #a394ff;
+    color: white;
+  }
+
+  .vertical-options {
+    flex-direction: column;
+  }
+
+  .single-option {
+    text-align: left;
+    width: 100%;
+    padding: 17px;
+  }
+
+  .single-option strong,
+  .single-option small {
+    display: block;
+  }
+
+  .single-option strong {
+    font-size: 15px;
+    margin-bottom: 5px;
+  }
+
+  .single-option small {
+    color: #aab2c6;
+    font-size: 12px;
+  }
+
+  .quiz-navigation {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-top: 35px;
+  }
+
+  .quiz-navigation button {
+    padding: 14px 22px;
+    border-radius: 9px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .quiz-back {
+    background: #1b2740;
+    border: 1px solid #34415e;
+    color: #dce1f1;
+  }
+
+  .quiz-back:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .quiz-next {
+    background: #7965f5;
+    border: 0;
+    color: white;
+    margin-left: auto;
+  }
+
+  .quiz-next:hover {
+    background: #6853e6;
+  }
+
+  .quiz-error {
+    color: #ff9b9b;
+    font-size: 13px;
+    margin-top: 15px;
+    min-height: 18px;
+  }
+
+  .quiz-results {
+    margin-top: 45px;
+    scroll-margin-top: 30px;
+  }
+
+  .quiz-results-title {
+    font-size: 26px;
+    margin-bottom: 10px;
+  }
+
+  .quiz-results-description {
+    color: #aab2c6;
+    font-size: 14px;
+    line-height: 1.7;
+    margin-bottom: 24px;
+  }
+
+  .quiz-result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 20px;
+  }
+
+  .quiz-result-card {
+    overflow: hidden;
+    background: #111a2c;
+    border: 1px solid #293650;
+    border-radius: 14px;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+
+  .quiz-result-card:hover {
+    transform: translateY(-4px);
+    border-color: #7965f5;
+  }
+
+  .quiz-poster-box {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    background: #1b2740;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #aab2c6;
+    font-size: 13px;
+    overflow: hidden;
+  }
+
+  .quiz-poster-box img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .quiz-card-info {
+    padding: 17px;
+  }
+
+  .quiz-card-info h4 {
+    font-size: 17px;
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+
+  .quiz-meta,
+  .quiz-genres,
+  .quiz-reason {
+    color: #aab2c6;
+    font-size: 12px;
+    line-height: 1.7;
+    margin: 7px 0;
+  }
+
+  .quiz-score {
+    display: inline-block;
+    color: #c2b7ff;
+    background: #30285b;
+    padding: 7px 11px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    margin: 10px 0;
+  }
+
+  .quiz-no-results {
+    color: #c3c9d9;
+    background: #1b2740;
+    border: 1px solid #34415e;
+    border-radius: 10px;
+    padding: 20px;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 600px) {
+    .detail-quiz {
+      padding: 25px 15px;
+    }
+
+    .quiz-panel {
+      padding: 22px 16px;
+    }
+
+    .quiz-navigation button {
+      padding: 13px 16px;
+    }
+
+    .quiz-result-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .quiz-card-info {
+      padding: 12px;
+    }
+
+    .quiz-card-info h4 {
+      font-size: 14px;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .quiz-result-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
