@@ -1,0 +1,246 @@
+
+---
+import AnimeFinder from "../components/AnimeFinder.astro";
+
+const title = "Find Anime | Bezels";
+const description =
+  "Discover anime based on your favourite genres, moods and story preferences with the Bezels Anime Finder.";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: #090d18;
+        color: #f4f6ff;
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 22px 8%;
+        border-bottom: 1px solid #20283b;
+      }
+
+      .logo {
+        font-size: 27px;
+        font-weight: 800;
+        color: white;
+        text-decoration: none;
+      }
+
+      .logo span {
+        color: #8b7cff;
+      }
+
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 22px;
+      }
+
+      nav a {
+        color: #b9bfd1;
+        text-decoration: none;
+        font-size: 14px;
+      }
+
+      nav a:hover,
+      nav a.active {
+        color: #a99aff;
+      }
+
+      .page-intro {
+        max-width: 850px;
+        margin: 0 auto;
+        padding: 75px 22px 35px;
+        text-align: center;
+      }
+
+      .eyebrow {
+        color: #a99aff;
+        font-size: 12px;
+        letter-spacing: 2px;
+      }
+
+      h1 {
+        font-size: clamp(36px, 6vw, 55px);
+        margin: 18px 0;
+      }
+
+      h1 span {
+        color: #9685ff;
+      }
+
+      .page-intro p {
+        color: #aab2c6;
+        line-height: 1.8;
+        font-size: 16px;
+      }
+
+      .article {
+        max-width: 850px;
+        margin: 60px auto;
+        padding: 0 22px;
+        color: #c5ccdc;
+        line-height: 1.9;
+      }
+
+      .article h2 {
+        color: white;
+        font-size: 25px;
+        margin: 35px 0 12px;
+      }
+
+      .article h3 {
+        color: #e6e2ff;
+        font-size: 19px;
+        margin: 25px 0 10px;
+      }
+
+      .article p {
+        margin-bottom: 16px;
+      }
+
+      .article ul {
+        padding-left: 24px;
+        margin-bottom: 20px;
+      }
+
+      footer {
+        text-align: center;
+        border-top: 1px solid #20283b;
+        padding: 28px;
+        color: #828da5;
+        font-size: 13px;
+      }
+
+      @media (max-width: 650px) {
+        header {
+          padding: 20px;
+          flex-direction: column;
+          gap: 18px;
+        }
+
+        nav {
+          justify-content: center;
+          gap: 14px;
+        }
+
+        nav a {
+          font-size: 12px;
+        }
+
+        .page-intro {
+          padding-top: 55px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <a class="logo" href="/">BEZELS<span>.</span></a>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/find-anime/" class="active">Find Anime</a>
+        <a href="/anime-quiz/">Anime Quiz</a>
+        <a href="/watchlist/">My Watchlist</a>
+        <a href="/articles/">Articles</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-intro">
+        <span class="eyebrow">BEZELS ANIME FINDER</span>
+        <h1>Find Your Next <span>Anime.</span></h1>
+        <p>
+          Not sure what to watch next? Use our anime finder to explore
+          recommendations based on genres, moods, episode counts and story
+          preferences.
+        </p>
+      </section>
+
+      <AnimeFinder />
+
+      <article class="article">
+        <h2>How to Find Anime That Matches Your Interests</h2>
+
+        <p>
+          Choosing a new anime can be difficult, especially when there are
+          hundreds of different shows available. Some viewers enjoy action
+          and adventure, while others prefer emotional stories, mystery,
+          comedy or fantasy.
+        </p>
+
+        <p>
+          The Bezels Anime Finder helps make that decision easier by letting
+          you explore anime using preferences that matter to you. Instead of
+          browsing random titles, you can narrow down your choices and
+          discover shows that match your interests.
+        </p>
+
+        <h2>Choose Your Favourite Genres</h2>
+
+        <p>
+          Genres are a useful starting point when searching for anime.
+          Action, romance, fantasy, thriller, comedy and science fiction
+          offer very different viewing experiences. Selecting genres you
+          enjoy helps the finder identify more relevant recommendations.
+        </p>
+
+        <h2>Find Anime Based on Your Mood</h2>
+
+        <p>
+          Your mood can influence what kind of story you want to watch.
+          Sometimes you may want something exciting and adventurous.
+          At other times, a relaxing comedy or an emotional drama might
+          be a better choice.
+        </p>
+
+        <h2>Consider the Episode Count</h2>
+
+        <p>
+          The length of an anime series is another important factor.
+          Shorter shows can be convenient when you have limited time,
+          while longer series offer more room for extended stories
+          and character development.
+        </p>
+
+        <h2>Explore Stories Beyond Popular Titles</h2>
+
+        <p>
+          Popular anime are not the only shows worth watching. Exploring
+          different genres, storytelling styles and types of protagonists
+          can help you discover series you might otherwise overlook.
+          Try different preferences and use the recommendations as a
+          starting point for your next watch.
+        </p>
+
+        <h2>Start Discovering Anime</h2>
+
+        <p>
+          Use the Bezels Anime Finder above to explore titles that fit
+          your preferences. You can experiment with different filters
+          whenever you want to discover something new.
+        </p>
+      </article>
+    </main>
+
+    <footer>© 2026 Bezels. Made for anime fans.</footer>
+  </body>
+</html>
