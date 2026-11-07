@@ -1,0 +1,440 @@
+
+---
+import animeData from "../data/anime.json";
+import type { Anime } from "../lib/recommend";
+
+const animeList = animeData.anime as (Anime & { poster?: string })[];
+---
+
+<section class="watchlist-section" id="watchlist">
+  <div class="watchlist-heading">
+    <span class="watchlist-eyebrow">YOUR PERSONAL COLLECTION</span>
+    <h2>My <span>Watchlist.</span></h2>
+    <p>Keep track of the anime you want to watch and the ones you have completed.</p>
+  </div>
+
+  <div class="watchlist-stats">
+    <div class="stat-card">
+      <span id="savedCount">0</span>
+      <p>Saved Anime</p>
+    </div>
+    <div class="stat-card">
+      <span id="watchedCount">0</span>
+      <p>Watched Anime</p>
+    </div>
+  </div>
+
+  <div class="watchlist-filters">
+    <button type="button" class="watchlist-filter active" data-filter="all">All Anime</button>
+    <button type="button" class="watchlist-filter" data-filter="unwatched">Want to Watch</button>
+    <button type="button" class="watchlist-filter" data-filter="watched">Watched</button>
+  </div>
+
+  <div id="watchlistGrid" class="watchlist-grid" aria-live="polite">
+    <p class="watchlist-empty">Your watchlist is empty. Save some anime recommendations first!</p>
+  </div>
+</section>
+
+<script>
+  import animeData from "../data/anime.json";
+  import type { Anime } from "../lib/recommend";
+
+  type WatchAnime = Anime & { poster?: string };
+
+  const animeList = animeData.anime as WatchAnime[];
+  const WATCHLIST_KEY = "bezels-watchlist";
+  const WATCHED_KEY = "bezels-watched";
+
+  function readIds(key: string): string[] {
+    try {
+      const value = localStorage.getItem(key);
+      const parsed = value ? JSON.parse(value) : [];
+      return Array.isArray(parsed)
+        ? parsed.filter((id): id is string => typeof id === "string")
+        : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function setupWatchlist() {
+    const root = document.querySelector<HTMLElement>("#watchlist");
+    if (!root || root.dataset.ready === "true") return;
+    root.dataset.ready = "true";
+
+    const grid = root.querySelector<HTMLElement>("#watchlistGrid");
+    const savedCount = root.querySelector<HTMLElement>("#savedCount");
+    const watchedCount = root.querySelector<HTMLElement>("#watchedCount");
+
+    if (!grid || !savedCount || !watchedCount) return;
+
+    let activeFilter = "all";
+
+    function renderWatchlist() {
+      const savedIds = readIds(WATCHLIST_KEY);
+      const watchedIds = readIds(WATCHED_KEY);
+
+      const savedAnime = savedIds
+        .map((id) => animeList.find((anime) => anime.id === id))
+        .filter((anime): anime is WatchAnime => Boolean(anime));
+
+      savedCount.textContent = String(savedAnime.length);
+      watchedCount.textContent = String(
+        savedAnime.filter((anime) => watchedIds.includes(anime.id)).length
+      );
+
+      const filteredAnime = savedAnime.filter((anime) => {
+        const isWatched = watchedIds.includes(anime.id);
+
+        if (activeFilter === "watched") return isWatched;
+        if (activeFilter === "unwatched") return !isWatched;
+        return true;
+      });
+
+      grid.replaceChildren();
+
+      if (filteredAnime.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "watchlist-empty";
+
+        if (savedAnime.length === 0) {
+          empty.textContent = "Your watchlist is empty. Save some anime recommendations first!";
+        } else if (activeFilter === "watched") {
+          empty.textContent = "You haven't marked any anime as watched yet.";
+        } else {
+          empty.textContent = "No anime left in your Want to Watch list.";
+        }
+
+        grid.append(empty);
+        return;
+      }
+
+      filteredAnime.forEach((anime) => {
+        const isWatched = watchedIds.includes(anime.id);
+
+        const card = document.createElement("article");
+        card.className = "watchlist-card";
+
+        const posterBox = document.createElement("div");
+        posterBox.className = "watchlist-poster-box";
+
+        if (anime.poster) {
+          const poster = document.createElement("img");
+          poster.src = anime.poster;
+          poster.alt = `${anime.title} poster`;
+          poster.loading = "lazy";
+
+          poster.addEventListener("error", () => {
+            poster.style.display = "none";
+            posterBox.textContent = "Poster unavailable";
+          });
+
+          posterBox.append(poster);
+        } else {
+          posterBox.textContent = "Poster unavailable";
+        }
+
+        const info = document.createElement("div");
+        info.className = "watchlist-card-info";
+
+        const title = document.createElement("h3");
+        title.textContent = anime.title;
+
+        const meta = document.createElement("p");
+        meta.className = "watchlist-meta";
+        meta.textContent = `${anime.year} • ${anime.episodes} episodes`;
+
+        const genres = document.createElement("p");
+        genres.className = "watchlist-genres";
+        genres.textContent = anime.genres.join(" · ");
+
+        const status = document.createElement("span");
+        status.className = isWatched ? "watch-status watched" : "watch-status";
+        status.textContent = isWatched ? "✓ Watched" : "Want to Watch";
+
+        const watchedButton = document.createElement("button");
+        watchedButton.type = "button";
+        watchedButton.className = "watched-button";
+        watchedButton.textContent = isWatched ? "Mark as Unwatched" : "Mark as Watched";
+
+        watchedButton.addEventListener("click", () => {
+          const currentWatched = readIds(WATCHED_KEY);
+          const updated = currentWatched.includes(anime.id)
+            ? currentWatched.filter((id) => id !== anime.id)
+            : [...currentWatched, anime.id];
+
+          localStorage.setItem(WATCHED_KEY, JSON.stringify(updated));
+          window.dispatchEvent(new CustomEvent("bezels-watchlist-updated"));
+          renderWatchlist();
+        });
+
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.className = "remove-button";
+        removeButton.textContent = "Remove from Watchlist";
+
+        removeButton.addEventListener("click", () => {
+          const updatedSaved = readIds(WATCHLIST_KEY).filter(
+            (id) => id !== anime.id
+          );
+
+          const updatedWatched = readIds(WATCHED_KEY).filter(
+            (id) => id !== anime.id
+          );
+
+          localStorage.setItem(WATCHLIST_KEY, JSON.stringify(updatedSaved));
+          localStorage.setItem(WATCHED_KEY, JSON.stringify(updatedWatched));
+
+          window.dispatchEvent(new CustomEvent("bezels-watchlist-updated"));
+          renderWatchlist();
+        });
+
+        info.append(title, meta, genres, status, watchedButton, removeButton);
+        card.append(posterBox, info);
+        grid.append(card);
+      });
+    }
+
+    root.querySelectorAll<HTMLButtonElement>(".watchlist-filter").forEach((button) => {
+      button.addEventListener("click", () => {
+        activeFilter = button.dataset.filter || "all";
+
+        root.querySelectorAll<HTMLButtonElement>(".watchlist-filter").forEach((item) => {
+          item.classList.toggle("active", item === button);
+        });
+
+        renderWatchlist();
+      });
+    });
+
+    window.addEventListener("bezels-watchlist-updated", renderWatchlist);
+    window.addEventListener("storage", renderWatchlist);
+
+    renderWatchlist();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupWatchlist, { once: true });
+  } else {
+    setupWatchlist();
+  }
+</script>
+
+<style is:global>
+  .watchlist-section {
+    max-width: 1050px;
+    margin: 70px auto 90px;
+    padding: 35px 22px;
+    color: #f5f5ff;
+  }
+
+  .watchlist-heading {
+    text-align: center;
+    margin-bottom: 35px;
+  }
+
+  .watchlist-eyebrow {
+    color: #a99aff;
+    font-size: 12px;
+    letter-spacing: 2px;
+  }
+
+  .watchlist-heading h2 {
+    font-size: clamp(30px, 5vw, 43px);
+    margin: 14px 0;
+  }
+
+  .watchlist-heading h2 span {
+    color: #9685ff;
+  }
+
+  .watchlist-heading p {
+    color: #aab2c6;
+    line-height: 1.7;
+  }
+
+  .watchlist-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    text-align: center;
+    padding: 22px;
+    background: #111a2c;
+    border: 1px solid #293650;
+    border-radius: 13px;
+  }
+
+  .stat-card span {
+    display: block;
+    color: #a99aff;
+    font-size: 30px;
+    font-weight: 800;
+  }
+
+  .stat-card p {
+    color: #aab2c6;
+    font-size: 13px;
+    margin-top: 7px;
+  }
+
+  .watchlist-filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .watchlist-filter {
+    padding: 11px 17px;
+    background: #1b2740;
+    color: #dce1f1;
+    border: 1px solid #34415e;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+
+  .watchlist-filter.active {
+    background: #5544b9;
+    border-color: #a394ff;
+    color: white;
+  }
+
+  .watchlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 20px;
+  }
+
+  .watchlist-card {
+    overflow: hidden;
+    background: #111a2c;
+    border: 1px solid #293650;
+    border-radius: 14px;
+  }
+
+  .watchlist-poster-box {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    background: #1b2740;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #aab2c6;
+    font-size: 13px;
+    overflow: hidden;
+  }
+
+  .watchlist-poster-box img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .watchlist-card-info {
+    padding: 17px;
+  }
+
+  .watchlist-card-info h3 {
+    font-size: 17px;
+    line-height: 1.4;
+    margin-bottom: 9px;
+  }
+
+  .watchlist-meta,
+  .watchlist-genres {
+    color: #aab2c6;
+    font-size: 12px;
+    line-height: 1.7;
+    margin: 7px 0;
+  }
+
+  .watch-status {
+    display: inline-block;
+    padding: 7px 10px;
+    margin: 10px 0;
+    border-radius: 20px;
+    background: #30285b;
+    color: #c2b7ff;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .watch-status.watched {
+    background: #183b35;
+    color: #a8f0d5;
+  }
+
+  .watched-button,
+  .remove-button {
+    width: 100%;
+    padding: 11px;
+    margin-top: 9px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .watched-button {
+    background: #5544b9;
+    color: white;
+    border: 1px solid #7965f5;
+  }
+
+  .remove-button {
+    background: transparent;
+    color: #ffaaaa;
+    border: 1px solid #71404b;
+  }
+
+  .watched-button:hover {
+    background: #6853e6;
+  }
+
+  .remove-button:hover {
+    background: #3b202b;
+  }
+
+  .watchlist-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 35px 20px;
+    background: #111a2c;
+    border: 1px solid #293650;
+    border-radius: 13px;
+    color: #aab2c6;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 600px) {
+    .watchlist-section {
+      padding: 25px 15px;
+    }
+
+    .watchlist-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .watchlist-card-info {
+      padding: 12px;
+    }
+
+    .watchlist-card-info h3 {
+      font-size: 14px;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .watchlist-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
