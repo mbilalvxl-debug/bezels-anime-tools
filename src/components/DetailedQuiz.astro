@@ -8,7 +8,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
 <section class="detail-quiz" id="detailed-quiz">
   <div class="quiz-heading">
-    <span class="quiz-eyebrow">THE BEZELS ANIME QUIZ</span>
+    <span class="quiz-eyebrow">✦ THE BEZELS ANIME QUIZ</span>
     <h2>Find Your <span>Perfect Anime.</span></h2>
     <p>Answer 6 quick questions and discover anime matched to your taste.</p>
   </div>
@@ -364,9 +364,9 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 <style is:global>
   .detail-quiz {
     max-width: 1050px;
-    margin: 70px auto 90px;
-    padding: 35px 22px;
-    color: #f5f5ff;
+    margin: 35px auto 60px;
+    padding: 15px 0 30px;
+    color: #f8f6ff;
   }
 
   .quiz-heading {
@@ -375,56 +375,67 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
   }
 
   .quiz-eyebrow {
-    color: #a99aff;
-    font-size: 12px;
+    color: #b28aff;
+    font-size: 11px;
+    font-weight: 800;
     letter-spacing: 2px;
   }
 
   .quiz-heading h2 {
-    font-size: clamp(30px, 5vw, 43px);
-    margin: 14px 0;
+    font-size: clamp(29px, 5vw, 41px);
+    margin: 15px 0;
+    letter-spacing: -1px;
   }
 
   .quiz-heading h2 span {
-    color: #9685ff;
+    color: #b48aff;
+    text-shadow: 0 0 18px rgba(168, 105, 255, 0.4);
   }
 
   .quiz-heading p,
   .step-description {
-    color: #aab2c6;
-    line-height: 1.7;
+    color: #aaa0bd;
+    line-height: 1.8;
+    font-size: 14px;
   }
 
+  /* QUIZ PANEL */
+
   .quiz-panel {
-    background: #111a2c;
-    border: 1px solid #293650;
-    border-radius: 18px;
-    padding: 30px;
+    background: linear-gradient(145deg, #191326, #110e1c);
+    border: 1px solid rgba(153, 112, 224, 0.25);
+    border-radius: 15px;
+    padding: 32px;
+    box-shadow:
+      0 0 30px rgba(111, 49, 196, 0.09),
+      inset 0 0 25px rgba(140, 85, 220, 0.025);
   }
 
   .progress-info {
     display: flex;
     justify-content: space-between;
-    color: #bdb2ff;
-    font-size: 12px;
-    font-weight: 700;
-    margin-bottom: 12px;
+    color: #c5a5ff;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-bottom: 13px;
   }
 
   .progress-track {
     height: 7px;
-    background: #26324a;
+    background: rgba(255, 255, 255, 0.08);
     border-radius: 20px;
     overflow: hidden;
-    margin-bottom: 35px;
+    margin-bottom: 38px;
   }
 
   .progress-fill {
     height: 100%;
     width: 17%;
-    background: #8875ff;
+    background: linear-gradient(90deg, #7138d8, #bd83ff);
     border-radius: 20px;
-    transition: width 0.25s ease;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 13px rgba(173, 112, 255, 0.6);
   }
 
   .quiz-step {
@@ -433,29 +444,41 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
   .quiz-step.active {
     display: block;
+    animation: quizFadeIn 0.25s ease;
+  }
+
+  @keyframes quizFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(7px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .quiz-step h3 {
     font-size: clamp(20px, 3vw, 25px);
-    margin-bottom: 9px;
+    color: #f4edff;
+    margin: 0 0 9px;
   }
 
   .step-description {
-    font-size: 14px;
-    margin-bottom: 24px;
+    margin-bottom: 25px;
   }
 
   .quiz-options {
     display: flex;
     flex-wrap: wrap;
-    gap: 11px;
+    gap: 10px;
   }
 
   .quiz-option {
-    border: 1px solid #34415e;
-    background: #1b2740;
-    color: #dce1f1;
-    border-radius: 9px;
+    border: 1px solid rgba(163, 127, 216, 0.23);
+    background: rgba(255, 255, 255, 0.035);
+    color: #cfc5df;
+    border-radius: 8px;
     padding: 11px 16px;
     font-size: 13px;
     cursor: pointer;
@@ -463,13 +486,16 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
   }
 
   .quiz-option:hover {
-    border-color: #8875ff;
+    border-color: rgba(180, 138, 255, 0.7);
+    color: white;
+    background: rgba(137, 76, 255, 0.1);
   }
 
   .quiz-option.selected {
-    background: #5544b9;
-    border-color: #a394ff;
+    background: linear-gradient(110deg, #7138d8, #9055e8);
+    border-color: #c09aff;
     color: white;
+    box-shadow: 0 0 16px rgba(139, 75, 255, 0.28);
   }
 
   .vertical-options {
@@ -488,33 +514,49 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
   }
 
   .single-option strong {
+    color: #f4edff;
     font-size: 15px;
     margin-bottom: 5px;
   }
 
   .single-option small {
-    color: #aab2c6;
+    color: #aaa0bd;
     font-size: 12px;
   }
+
+  .single-option.selected small {
+    color: #e1d1ff;
+  }
+
+  /* NAVIGATION */
 
   .quiz-navigation {
     display: flex;
     justify-content: space-between;
     gap: 15px;
-    margin-top: 35px;
+    margin-top: 38px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(163, 127, 216, 0.14);
   }
 
   .quiz-navigation button {
     padding: 14px 22px;
-    border-radius: 9px;
+    border-radius: 8px;
     font-weight: 700;
+    font-size: 13px;
     cursor: pointer;
+    transition: 0.2s;
   }
 
   .quiz-back {
-    background: #1b2740;
-    border: 1px solid #34415e;
-    color: #dce1f1;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(163, 127, 216, 0.25);
+    color: #d3c8e5;
+  }
+
+  .quiz-back:hover:not(:disabled) {
+    border-color: #a77aff;
+    background: rgba(137, 76, 255, 0.12);
   }
 
   .quiz-back:disabled {
@@ -523,22 +565,26 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
   }
 
   .quiz-next {
-    background: #7965f5;
-    border: 0;
+    background: linear-gradient(110deg, #7138d8, #a15dff);
+    border: 1px solid rgba(210, 179, 255, 0.35);
     color: white;
     margin-left: auto;
+    box-shadow: 0 0 18px rgba(139, 75, 255, 0.2);
   }
 
   .quiz-next:hover {
-    background: #6853e6;
+    transform: translateY(-2px);
+    box-shadow: 0 0 27px rgba(157, 91, 255, 0.4);
   }
 
   .quiz-error {
-    color: #ff9b9b;
+    color: #ff9baf;
     font-size: 13px;
     margin-top: 15px;
     min-height: 18px;
   }
+
+  /* RESULTS */
 
   .quiz-results {
     margin-top: 45px;
@@ -546,12 +592,14 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
   }
 
   .quiz-results-title {
-    font-size: 26px;
+    font-size: 25px;
+    color: #f7f1ff;
     margin-bottom: 10px;
+    text-shadow: 0 0 17px rgba(150, 90, 255, 0.2);
   }
 
   .quiz-results-description {
-    color: #aab2c6;
+    color: #aaa0bd;
     font-size: 14px;
     line-height: 1.7;
     margin-bottom: 24px;
@@ -565,25 +613,27 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
   .quiz-result-card {
     overflow: hidden;
-    background: #111a2c;
-    border: 1px solid #293650;
-    border-radius: 14px;
-    transition: transform 0.2s, border-color 0.2s;
+    background: linear-gradient(145deg, #191326, #110e1c);
+    border: 1px solid rgba(153, 112, 224, 0.22);
+    border-radius: 13px;
+    transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
   }
 
   .quiz-result-card:hover {
-    transform: translateY(-4px);
-    border-color: #7965f5;
+    transform: translateY(-5px);
+    border-color: rgba(181, 137, 255, 0.7);
+    box-shadow: 0 10px 30px rgba(111, 49, 196, 0.2);
   }
 
   .quiz-poster-box {
     width: 100%;
     aspect-ratio: 2 / 3;
-    background: #1b2740;
+    background: radial-gradient(circle, #35234f, #171020);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #aab2c6;
+    text-align: center;
+    color: #b99aff;
     font-size: 13px;
     overflow: hidden;
   }
@@ -596,19 +646,20 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
   }
 
   .quiz-card-info {
-    padding: 17px;
+    padding: 18px;
   }
 
   .quiz-card-info h4 {
+    color: #f7f1ff;
     font-size: 17px;
     line-height: 1.4;
-    margin-bottom: 8px;
+    margin: 0 0 8px;
   }
 
   .quiz-meta,
   .quiz-genres,
   .quiz-reason {
-    color: #aab2c6;
+    color: #aaa0bd;
     font-size: 12px;
     line-height: 1.7;
     margin: 7px 0;
@@ -616,23 +667,25 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
   .quiz-score {
     display: inline-block;
-    color: #c2b7ff;
-    background: #30285b;
+    color: #d6c1ff;
+    background: rgba(145, 86, 255, 0.16);
+    border: 1px solid rgba(174, 128, 255, 0.3);
     padding: 7px 11px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: 700;
     margin: 10px 0;
+    box-shadow: 0 0 12px rgba(133, 74, 230, 0.1);
   }
 
   .quiz-watchlist-button {
     width: 100%;
     margin-top: 12px;
     padding: 12px;
-    border: 1px solid #7965f5;
+    border: 1px solid rgba(174, 128, 255, 0.45);
     border-radius: 8px;
-    background: #30285b;
-    color: white;
+    background: rgba(145, 86, 255, 0.13);
+    color: #d6c1ff;
     font-size: 13px;
     font-weight: bold;
     cursor: pointer;
@@ -640,20 +693,24 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
   }
 
   .quiz-watchlist-button:hover {
-    background: #5544b9;
+    background: #7138d8;
+    border-color: #c09aff;
+    color: white;
+    box-shadow: 0 0 18px rgba(139, 75, 255, 0.22);
   }
 
   .quiz-watchlist-button.is-saved {
-    background: #183b35;
-    border-color: #3b9b7d;
+    background: rgba(31, 105, 82, 0.2);
+    border-color: #398d71;
     color: #a8f0d5;
     cursor: default;
+    box-shadow: none;
   }
 
   .quiz-no-results {
-    color: #c3c9d9;
-    background: #1b2740;
-    border: 1px solid #34415e;
+    color: #cfc5df;
+    background: #191326;
+    border: 1px solid rgba(153, 112, 224, 0.25);
     border-radius: 10px;
     padding: 20px;
     line-height: 1.7;
@@ -661,7 +718,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
   @media (max-width: 600px) {
     .detail-quiz {
-      padding: 25px 15px;
+      padding: 10px 0 20px;
     }
 
     .quiz-panel {
@@ -683,6 +740,10 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
     .quiz-card-info h4 {
       font-size: 14px;
+    }
+
+    .quiz-option {
+      padding: 10px 13px;
     }
   }
 
