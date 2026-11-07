@@ -1,6 +1,7 @@
 
 ---
 import Watchlist from "../components/Watchlist.astro";
+import Footer from "../components/Footer.astro";
 
 const title = "My Anime Watchlist | Bezels";
 const description =
@@ -111,14 +112,6 @@ const description =
         margin-bottom: 16px;
       }
 
-      footer {
-        text-align: center;
-        border-top: 1px solid #20283b;
-        padding: 28px;
-        color: #828da5;
-        font-size: 13px;
-      }
-
       @media (max-width: 650px) {
         header {
           padding: 20px;
@@ -222,6 +215,6 @@ const description =
       </article>
     </main>
 
-    <footer>© 2026 Bezels. Made for anime fans.</footer>
+    <Footer />
   </body>
 </html>
