@@ -112,6 +112,28 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
   type QuizAnime = Anime & { poster?: string };
   const animeList = animeData.anime as QuizAnime[];
+  const WATCHLIST_KEY = "bezels-watchlist";
+
+  function getSavedIds(): string[] {
+    try {
+      const saved = localStorage.getItem(WATCHLIST_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveAnime(id: string): boolean {
+    const savedIds = getSavedIds();
+
+    if (savedIds.includes(id)) return false;
+
+    savedIds.push(id);
+    localStorage.setItem(WATCHLIST_KEY, JSON.stringify(savedIds));
+
+    window.dispatchEvent(new CustomEvent("bezels-watchlist-updated"));
+    return true;
+  }
 
   function setupDetailedQuiz() {
     const root = document.querySelector<HTMLElement>("#detailed-quiz");
@@ -280,7 +302,31 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
             ? `Why it matches: ${anime.reasons.join("; ")}`
             : "This anime matches some of your selected preferences.";
 
-          info.append(title, meta, score, genres, reason);
+          const saveButton = document.createElement("button");
+          saveButton.type = "button";
+          saveButton.className = "quiz-watchlist-button";
+
+          function updateSaveButton() {
+            const isSaved = getSavedIds().includes(anime.id);
+            saveButton.textContent = isSaved
+              ? "✓ Saved to Watchlist"
+              : "+ Save to Watchlist";
+            saveButton.classList.toggle("is-saved", isSaved);
+          }
+
+          updateSaveButton();
+
+          saveButton.addEventListener("click", () => {
+            if (getSavedIds().includes(anime.id)) {
+              saveButton.textContent = "✓ Already Saved";
+              return;
+            }
+
+            saveAnime(anime.id);
+            updateSaveButton();
+          });
+
+          info.append(title, meta, score, genres, reason, saveButton);
           card.append(posterBox, info);
           grid.append(card);
         });
@@ -291,6 +337,19 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
       panel?.classList.add("quiz-completed");
       results.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+
+    window.addEventListener("bezels-watchlist-updated", () => {
+      results.querySelectorAll<HTMLButtonElement>(".quiz-watchlist-button").forEach((button) => {
+        const card = button.closest(".quiz-result-card");
+        const title = card?.querySelector("h4")?.textContent;
+        const anime = animeList.find((item) => item.title === title);
+
+        if (anime && getSavedIds().includes(anime.id)) {
+          button.textContent = "✓ Saved to Watchlist";
+          button.classList.add("is-saved");
+        }
+      });
+    });
 
     updateStep();
   }
@@ -564,6 +623,31 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
     font-size: 12px;
     font-weight: 700;
     margin: 10px 0;
+  }
+
+  .quiz-watchlist-button {
+    width: 100%;
+    margin-top: 12px;
+    padding: 12px;
+    border: 1px solid #7965f5;
+    border-radius: 8px;
+    background: #30285b;
+    color: white;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  .quiz-watchlist-button:hover {
+    background: #5544b9;
+  }
+
+  .quiz-watchlist-button.is-saved {
+    background: #183b35;
+    border-color: #3b9b7d;
+    color: #a8f0d5;
+    cursor: default;
   }
 
   .quiz-no-results {
