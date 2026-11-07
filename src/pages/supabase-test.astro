@@ -1,0 +1,52 @@
+
+---
+const title = "Supabase Connection Test";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{title}</title>
+  </head>
+
+  <body>
+    <main>
+      <h1>Bezels Supabase Test</h1>
+      <p id="status">Checking database connection...</p>
+    </main>
+  </body>
+</html>
+
+<script>
+  import { testSupabaseConnection } from "../lib/test-supabase";
+
+  const status = document.querySelector("#status");
+
+  testSupabaseConnection().then((success) => {
+    if (status) {
+      status.textContent = success
+        ? "SUCCESS: Supabase database connected!"
+        : "FAILED: Check the browser console for details.";
+    }
+  });
+</script>
+
+<style>
+  body {
+    background: #0b0714;
+    color: white;
+    font-family: Arial, sans-serif;
+    padding: 40px;
+  }
+
+  main {
+    max-width: 600px;
+    margin: auto;
+    padding: 30px;
+    background: #191126;
+    border: 1px solid #8050bd;
+    border-radius: 14px;
+  }
+</style>

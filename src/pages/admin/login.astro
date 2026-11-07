@@ -1,0 +1,266 @@
+
+---
+const title = "Admin Login | Bezels";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>{title}</title>
+</head>
+
+<body>
+  <main class="login-page">
+    <a href="/" class="brand">BEZELS<span>.</span></a>
+
+    <section class="login-card">
+      <div class="eyebrow">BEZELS CONTROL PANEL</div>
+      <h1>Welcome Back</h1>
+      <p class="subtitle">Sign in to manage your anime database and articles.</p>
+
+      <form id="login-form">
+        <label for="email">Admin Email</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          placeholder="Enter your admin email"
+          autocomplete="username"
+          required
+        />
+
+        <label for="password">Password</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          placeholder="Enter your password"
+          autocomplete="current-password"
+          required
+        />
+
+        <button id="login-button" type="submit">Sign In</button>
+        <p id="login-message" role="status"></p>
+      </form>
+
+      <a href="/" class="back-link">← Back to Bezels</a>
+    </section>
+
+    <footer>© 2026 Bezels. Admin access only.</footer>
+  </main>
+</body>
+</html>
+
+<script>
+  import { supabase } from "../../lib/supabase";
+
+  const form = document.querySelector<HTMLFormElement>("#login-form");
+  const button = document.querySelector<HTMLButtonElement>("#login-button");
+  const message = document.querySelector<HTMLParagraphElement>("#login-message");
+
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (!form || !button || !message) return;
+
+    const formData = new FormData(form);
+    const email = String(formData.get("email") || "").trim();
+    const password = String(formData.get("password") || "");
+
+    button.disabled = true;
+    button.textContent = "Checking...";
+    message.textContent = "";
+    message.className = "";
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error || !data.user) {
+        message.textContent = error?.message || "Login failed. Please try again.";
+        message.className = "error";
+        return;
+      }
+
+      const { data: admin, error: adminError } = await supabase
+        .from("admin_users")
+        .select("user_id")
+        .eq("user_id", data.user.id)
+        .maybeSingle();
+
+      if (adminError || !admin) {
+        await supabase.auth.signOut();
+        message.textContent = "Access denied. This account is not an authorized Bezels admin.";
+        message.className = "error";
+        return;
+      }
+
+      message.textContent = "Admin verified successfully!";
+      message.className = "success";
+      button.textContent = "Verified";
+
+    } catch {
+      message.textContent = "Something went wrong. Please try again.";
+      message.className = "error";
+    } finally {
+      button.disabled = false;
+
+      if (button.textContent === "Checking...") {
+        button.textContent = "Sign In";
+      }
+    }
+  });
+</script>
+
+<style is:global>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: #090611;
+    color: #fff;
+    font-family: Arial, sans-serif;
+  }
+
+  .login-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 20px;
+    background:
+      radial-gradient(ellipse at 50% 35%, rgba(126, 62, 201, 0.18), transparent 55%),
+      #090611;
+  }
+
+  .brand {
+    margin-bottom: 32px;
+    color: #fff;
+    font-size: 27px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-decoration: none;
+  }
+
+  .brand span {
+    color: #bd83ff;
+  }
+
+  .login-card {
+    width: 100%;
+    max-width: 440px;
+    padding: 38px;
+    border: 1px solid rgba(174, 111, 255, 0.35);
+    border-radius: 20px;
+    background: rgba(24, 16, 38, 0.94);
+    box-shadow: 0 0 45px rgba(126, 62, 201, 0.13);
+  }
+
+  .eyebrow {
+    color: #bd83ff;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+  }
+
+  h1 {
+    margin: 15px 0 9px;
+    font-size: 32px;
+  }
+
+  .subtitle {
+    margin: 0 0 30px;
+    color: #a69ab8;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  label {
+    display: block;
+    margin: 19px 0 9px;
+    color: #e8def5;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  input {
+    width: 100%;
+    padding: 14px 15px;
+    border: 1px solid #39294e;
+    border-radius: 10px;
+    outline: none;
+    background: #100b1a;
+    color: #fff;
+    font-size: 14px;
+  }
+
+  input:focus {
+    border-color: #a66aff;
+    box-shadow: 0 0 0 3px rgba(166, 106, 255, 0.12);
+  }
+
+  button {
+    width: 100%;
+    margin-top: 25px;
+    padding: 15px;
+    border: 0;
+    border-radius: 10px;
+    background: linear-gradient(100deg, #8b45df, #bd75ff);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  button:disabled {
+    opacity: 0.65;
+    cursor: wait;
+  }
+
+  #login-message {
+    min-height: 20px;
+    margin: 14px 0 0;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  #login-message.error {
+    color: #ff7777;
+  }
+
+  #login-message.success {
+    color: #8ee6ae;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-top: 22px;
+    color: #b994e8;
+    font-size: 13px;
+    text-decoration: none;
+  }
+
+  footer {
+    margin-top: 30px;
+    color: #746982;
+    font-size: 12px;
+  }
+
+  @media (max-width: 480px) {
+    .login-card {
+      padding: 27px 22px;
+    }
+
+    h1 {
+      font-size: 27px;
+    }
+  }
+</style>

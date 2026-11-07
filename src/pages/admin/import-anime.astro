@@ -1,0 +1,334 @@
+
+---
+const title = "Import Anime | Bezels Admin";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>{title}</title>
+</head>
+
+<body>
+  <main class="page">
+    <a href="/admin/dashboard/" class="back">← Back to Dashboard</a>
+
+    <section class="panel">
+      <div class="eyebrow">BEZELS DATABASE TOOLS</div>
+      <h1>Import Existing Anime</h1>
+      <p class="description">
+        Transfer your existing anime collection from anime.json into your Supabase database.
+      </p>
+
+      <div class="info">
+        <strong>How this works</strong>
+        <p>
+          Existing anime records will be matched by their ID. If an ID already exists,
+          its record will be updated instead of creating a duplicate.
+        </p>
+      </div>
+
+      <div class="count">
+        <span>Anime found in JSON</span>
+        <strong id="source-count">Loading...</strong>
+      </div>
+
+      <button id="import-button" disabled>Import Anime to Database</button>
+
+      <p id="status" role="status">Checking admin access...</p>
+      <div id="result"></div>
+    </section>
+  </main>
+</body>
+</html>
+
+<script>
+  import animeData from "../../data/anime.json";
+  import { supabase } from "../../lib/supabase";
+
+  type SourceAnime = {
+    id: string;
+    title: string;
+    year?: number | null;
+    episodes?: number | null;
+    status?: string | null;
+    genres?: string[];
+    moods?: string[];
+    storyTypes?: string[];
+    story_types?: string[];
+    protagonistTypes?: string[];
+    protagonist_types?: string[];
+    contentNotes?: string[];
+    content_notes?: string[];
+    description?: string | null;
+    poster?: string | null;
+  };
+
+  const sourceAnime = (animeData as { anime: SourceAnime[] }).anime;
+
+  const sourceCount = document.querySelector<HTMLElement>("#source-count");
+  const importButton = document.querySelector<HTMLButtonElement>("#import-button");
+  const status = document.querySelector<HTMLElement>("#status");
+  const result = document.querySelector<HTMLElement>("#result");
+
+  let authorized = false;
+
+  if (sourceCount) {
+    sourceCount.textContent = String(sourceAnime.length);
+  }
+
+  async function checkAdmin() {
+    const { data: sessionData, error: sessionError } =
+      await supabase.auth.getSession();
+
+    const user = sessionData.session?.user;
+
+    if (sessionError || !user) {
+      window.location.replace("/admin/login/");
+      return;
+    }
+
+    const { data: admin, error: adminError } = await supabase
+      .from("admin_users")
+      .select("user_id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (adminError || !admin) {
+      await supabase.auth.signOut();
+      window.location.replace("/admin/login/");
+      return;
+    }
+
+    authorized = true;
+
+    if (status) {
+      status.textContent = `Admin verified. ${sourceAnime.length} anime ready to import.`;
+      status.className = "success";
+    }
+
+    if (importButton) {
+      importButton.disabled = false;
+    }
+  }
+
+  importButton?.addEventListener("click", async () => {
+    if (!authorized || !importButton || !status || !result) return;
+
+    const confirmed = window.confirm(
+      `Import ${sourceAnime.length} anime into Supabase? Existing records with matching IDs will be updated.`
+    );
+
+    if (!confirmed) return;
+
+    importButton.disabled = true;
+    importButton.textContent = "Importing...";
+    status.textContent = "Please wait. Import is in progress...";
+    status.className = "";
+
+    const records = sourceAnime.map((anime) => ({
+      id: anime.id,
+      title: anime.title,
+      year: anime.year ?? null,
+      episodes: anime.episodes ?? null,
+      status: anime.status ?? null,
+      genres: anime.genres ?? [],
+      moods: anime.moods ?? [],
+      story_types: anime.story_types ?? anime.storyTypes ?? [],
+      protagonist_types: anime.protagonist_types ?? anime.protagonistTypes ?? [],
+      content_notes: anime.content_notes ?? anime.contentNotes ?? [],
+      description: anime.description ?? null,
+      poster: anime.poster ?? null,
+    }));
+
+    try {
+      const { data, error } = await supabase
+        .from("anime")
+        .upsert(records, { onConflict: "id" })
+        .select("id");
+
+      if (error) {
+        throw error;
+      }
+
+      const importedCount = data?.length ?? records.length;
+
+      status.textContent = "Import completed successfully!";
+      status.className = "success";
+
+      result.innerHTML = `
+        <div class="success-card">
+          <strong>${importedCount} anime records processed successfully.</strong>
+          <p>Your Supabase anime database has been updated.</p>
+        </div>
+      `;
+
+      importButton.textContent = "Import Completed";
+    } catch (error) {
+      console.error("Anime import failed:", error);
+
+      status.textContent = "Import failed. Please check the error below.";
+      status.className = "error";
+
+      result.textContent =
+        error instanceof Error ? error.message : "An unknown error occurred.";
+
+      importButton.disabled = false;
+      importButton.textContent = "Try Import Again";
+    }
+  });
+
+  checkAdmin();
+</script>
+
+<style is:global>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: #0b0713;
+    color: #fff;
+    font-family: Arial, sans-serif;
+  }
+
+  .page {
+    width: 100%;
+    max-width: 850px;
+    margin: auto;
+    padding: 45px 20px;
+  }
+
+  .back {
+    display: inline-block;
+    margin-bottom: 25px;
+    color: #c49aff;
+    text-decoration: none;
+    font-size: 13px;
+  }
+
+  .panel {
+    padding: 35px;
+    border: 1px solid #50316f;
+    border-radius: 17px;
+    background: #171020;
+    box-shadow: 0 0 40px rgba(130, 65, 190, 0.12);
+  }
+
+  .eyebrow {
+    color: #c49aff;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+  }
+
+  h1 {
+    margin: 15px 0 10px;
+    font-size: 30px;
+  }
+
+  .description,
+  .info p {
+    color: #aa9bbd;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .info {
+    margin-top: 28px;
+    padding: 18px;
+    border: 1px solid #3d2b51;
+    border-radius: 11px;
+    background: #211630;
+  }
+
+  .info strong {
+    color: #d8b9ff;
+    font-size: 13px;
+  }
+
+  .info p {
+    margin-bottom: 0;
+  }
+
+  .count {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-top: 25px;
+    padding: 18px;
+    border: 1px solid #342543;
+    border-radius: 10px;
+    color: #c7b8d6;
+    font-size: 13px;
+  }
+
+  .count strong {
+    color: #d0a8ff;
+    font-size: 22px;
+  }
+
+  button {
+    width: 100%;
+    margin-top: 22px;
+    padding: 15px;
+    border: 0;
+    border-radius: 9px;
+    background: linear-gradient(100deg, #8744d7, #b66dff);
+    color: white;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  #status {
+    margin-top: 20px;
+    color: #a99ab9;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  #status.success {
+    color: #8ee6ae;
+  }
+
+  #status.error {
+    color: #ff8585;
+  }
+
+  .success-card {
+    margin-top: 15px;
+    padding: 18px;
+    border: 1px solid #316747;
+    border-radius: 10px;
+    background: #14271d;
+    color: #a9edbd;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .success-card p {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 500px) {
+    .panel {
+      padding: 24px 18px;
+    }
+
+    h1 {
+      font-size: 25px;
+    }
+  }
+</style>

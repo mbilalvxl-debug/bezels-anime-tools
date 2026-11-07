@@ -1,0 +1,781 @@
+
+---
+const title = "Anime Manager | Bezels Admin";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>{title}</title>
+</head>
+
+<body>
+  <main class="page">
+    <header class="topbar">
+      <div>
+        <a href="/admin/dashboard/" class="back">← Dashboard</a>
+        <div class="eyebrow">BEZELS CONTENT MANAGEMENT</div>
+        <h1>Anime Manager</h1>
+        <p class="subtitle">Add, edit and manage your anime database.</p>
+      </div>
+      <div class="total-box">
+        <span>Total Anime</span>
+        <strong id="total-count">—</strong>
+      </div>
+    </header>
+
+    <section class="editor">
+      <div class="editor-heading">
+        <div>
+          <h2 id="form-heading">Add New Anime</h2>
+          <p>Add anime information to your Bezels database.</p>
+        </div>
+        <button type="button" id="reset-button" class="secondary">Clear Form</button>
+      </div>
+
+      <form id="anime-form">
+        <div class="form-grid">
+          <div class="field">
+            <label for="anime-id">Anime ID / Slug *</label>
+            <input id="anime-id" name="id" placeholder="e.g. attack-on-titan" required />
+          </div>
+
+          <div class="field">
+            <label for="anime-title">Anime Title *</label>
+            <input id="anime-title" name="title" placeholder="e.g. Attack on Titan" required />
+          </div>
+
+          <div class="field">
+            <label for="anime-year">Release Year</label>
+            <input id="anime-year" name="year" type="number" min="1900" max="2100" placeholder="2013" />
+          </div>
+
+          <div class="field">
+            <label for="anime-episodes">Episodes</label>
+            <input id="anime-episodes" name="episodes" type="number" min="0" placeholder="25" />
+          </div>
+
+          <div class="field">
+            <label for="anime-status">Status</label>
+            <input id="anime-status" name="status" placeholder="e.g. Finished, Airing" />
+          </div>
+
+          <div class="field full">
+            <label for="anime-poster">Poster Image URL</label>
+            <input id="anime-poster" name="poster" type="url" placeholder="https://example.com/poster.jpg" />
+          </div>
+
+          <div class="field full">
+            <label for="anime-genres">Genres</label>
+            <input id="anime-genres" name="genres" placeholder="Action, Adventure, Fantasy" />
+            <small>Separate each value with a comma.</small>
+          </div>
+
+          <div class="field full">
+            <label for="anime-moods">Moods</label>
+            <input id="anime-moods" name="moods" placeholder="Dark, Emotional, Exciting" />
+          </div>
+
+          <div class="field full">
+            <label for="anime-story-types">Story Types</label>
+            <input id="anime-story-types" name="storyTypes" placeholder="Revenge, Survival, Mystery" />
+          </div>
+
+          <div class="field full">
+            <label for="anime-protagonist-types">Protagonist Types</label>
+            <input id="anime-protagonist-types" name="protagonistTypes" placeholder="Overpowered, Underdog, Anti-Hero" />
+          </div>
+
+          <div class="field full">
+            <label for="anime-content-notes">Content Notes</label>
+            <input id="anime-content-notes" name="contentNotes" placeholder="Violence, Mature Themes" />
+          </div>
+
+          <div class="field full">
+            <label for="anime-description">Description</label>
+            <textarea id="anime-description" name="description" rows="4" placeholder="Write a short anime description..."></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" id="save-button" class="primary">Save Anime</button>
+          <button type="button" id="cancel-button" class="secondary">Cancel Editing</button>
+        </div>
+        <p id="form-message" role="status"></p>
+      </form>
+    </section>
+
+    <section class="library">
+      <div class="library-heading">
+        <div>
+          <h2>Anime Library</h2>
+          <p>All anime currently stored in your database.</p>
+        </div>
+        <input id="search-input" class="search" type="search" placeholder="Search anime..." />
+      </div>
+
+      <p id="list-message" role="status">Checking admin access...</p>
+      <div id="anime-list" class="anime-grid"></div>
+    </section>
+  </main>
+</body>
+</html>
+
+<script>
+  import { supabase } from "../../lib/supabase";
+
+  type AnimeRecord = {
+    id: string;
+    title: string;
+    year: number | null;
+    episodes: number | null;
+    status: string | null;
+    genres: string[] | null;
+    moods: string[] | null;
+    story_types: string[] | null;
+    protagonist_types: string[] | null;
+    content_notes: string[] | null;
+    description: string | null;
+    poster: string | null;
+  };
+
+  const form = document.querySelector<HTMLFormElement>("#anime-form");
+  const list = document.querySelector<HTMLDivElement>("#anime-list");
+  const formMessage = document.querySelector<HTMLElement>("#form-message");
+  const listMessage = document.querySelector<HTMLElement>("#list-message");
+  const totalCount = document.querySelector<HTMLElement>("#total-count");
+  const searchInput = document.querySelector<HTMLInputElement>("#search-input");
+  const saveButton = document.querySelector<HTMLButtonElement>("#save-button");
+  const formHeading = document.querySelector<HTMLElement>("#form-heading");
+  const cancelButton = document.querySelector<HTMLButtonElement>("#cancel-button");
+
+  let animeRecords: AnimeRecord[] = [];
+  let editingId: string | null = null;
+  let authorized = false;
+
+  const getInput = (name: string) =>
+    form?.elements.namedItem(name) as HTMLInputElement | HTMLTextAreaElement | null;
+
+  const getText = (name: string) => getInput(name)?.value.trim() ?? "";
+
+  const getArray = (name: string) =>
+    getText(name).split(",").map((item) => item.trim()).filter(Boolean);
+
+  const escapeHTML = (value: unknown) =>
+    String(value ?? "").replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    })[char] ?? char);
+
+  function resetForm() {
+    form?.reset();
+    editingId = null;
+
+    const idInput = getInput("id") as HTMLInputElement | null;
+    if (idInput) idInput.disabled = false;
+
+    if (formHeading) formHeading.textContent = "Add New Anime";
+    if (saveButton) saveButton.textContent = "Save Anime";
+    if (cancelButton) cancelButton.style.display = "none";
+    if (formMessage) {
+      formMessage.textContent = "";
+      formMessage.className = "";
+    }
+  }
+
+  function showMessage(message: string, type: "success" | "error" = "success") {
+    if (!formMessage) return;
+    formMessage.textContent = message;
+    formMessage.className = type;
+  }
+
+  function renderAnime(records: AnimeRecord[]) {
+    if (!list || !totalCount) return;
+
+    totalCount.textContent = String(animeRecords.length);
+
+    if (!records.length) {
+      list.innerHTML = '<div class="empty">No anime found. Add your first anime using the form above.</div>';
+      return;
+    }
+
+    list.innerHTML = records.map((anime) => {
+      const poster = anime.poster && /^https?:\/\//i.test(anime.poster)
+        ? `<img src="${escapeHTML(anime.poster)}" alt="${escapeHTML(anime.title)} poster" loading="lazy" />`
+        : '<div class="no-poster">NO POSTER</div>';
+
+      return `
+        <article class="anime-card">
+          <div class="poster">${poster}</div>
+          <div class="anime-info">
+            <h3>${escapeHTML(anime.title)}</h3>
+            <p>${escapeHTML(anime.year ?? "Year unknown")} · ${escapeHTML(anime.episodes ?? "Episodes unknown")} episodes</p>
+            <div class="genres">${escapeHTML((anime.genres ?? []).slice(0, 3).join(" · ") || "No genres added")}</div>
+            <div class="card-actions">
+              <button type="button" class="edit-button" data-action="edit" data-id="${escapeHTML(anime.id)}">Edit</button>
+              <button type="button" class="delete-button" data-action="delete" data-id="${escapeHTML(anime.id)}">Delete</button>
+            </div>
+          </div>
+        </article>
+      `;
+    }).join("");
+  }
+
+  function filterAnime() {
+    const query = searchInput?.value.trim().toLowerCase() ?? "";
+    const filtered = animeRecords.filter((anime) =>
+      anime.title.toLowerCase().includes(query) ||
+      anime.id.toLowerCase().includes(query)
+    );
+    renderAnime(filtered);
+  }
+
+  async function loadAnime() {
+    if (!listMessage) return;
+
+    listMessage.textContent = "Loading anime...";
+    const { data, error } = await supabase
+      .from("anime")
+      .select("*")
+      .order("title", { ascending: true });
+
+    if (error) {
+      listMessage.textContent = `Could not load anime: ${error.message}`;
+      listMessage.className = "error";
+      return;
+    }
+
+    animeRecords = (data ?? []) as AnimeRecord[];
+    listMessage.textContent = `${animeRecords.length} anime loaded from Supabase.`;
+    listMessage.className = "success";
+    filterAnime();
+  }
+
+  function startEditing(id: string) {
+    const anime = animeRecords.find((item) => item.id === id);
+    if (!anime || !form) return;
+
+    const values: Record<string, string> = {
+      id: anime.id,
+      title: anime.title,
+      year: anime.year == null ? "" : String(anime.year),
+      episodes: anime.episodes == null ? "" : String(anime.episodes),
+      status: anime.status ?? "",
+      poster: anime.poster ?? "",
+      genres: (anime.genres ?? []).join(", "),
+      moods: (anime.moods ?? []).join(", "),
+      storyTypes: (anime.story_types ?? []).join(", "),
+      protagonistTypes: (anime.protagonist_types ?? []).join(", "),
+      contentNotes: (anime.content_notes ?? []).join(", "),
+      description: anime.description ?? "",
+    };
+
+    for (const [name, value] of Object.entries(values)) {
+      const input = getInput(name);
+      if (input) input.value = value;
+    }
+
+    editingId = id;
+
+    const idInput = getInput("id") as HTMLInputElement | null;
+    if (idInput) idInput.disabled = true;
+
+    if (formHeading) formHeading.textContent = `Editing: ${anime.title}`;
+    if (saveButton) saveButton.textContent = "Update Anime";
+    if (cancelButton) cancelButton.style.display = "inline-block";
+
+    showMessage("Editing anime. Make your changes and select Update Anime.");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function deleteAnime(id: string) {
+    const anime = animeRecords.find((item) => item.id === id);
+    if (!anime) return;
+
+    if (!window.confirm(`Are you sure you want to delete "${anime.title}"? This cannot be undone.`)) {
+      return;
+    }
+
+    const { error } = await supabase
+      .from("anime")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      if (listMessage) {
+        listMessage.textContent = `Delete failed: ${error.message}`;
+        listMessage.className = "error";
+      }
+      return;
+    }
+
+    if (editingId === id) resetForm();
+
+    if (listMessage) {
+      listMessage.textContent = `${anime.title} deleted successfully.`;
+      listMessage.className = "success";
+    }
+
+    await loadAnime();
+  }
+
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (!authorized || !saveButton) return;
+
+    const id = editingId ?? getText("id");
+    const title = getText("title");
+
+    if (!id || !title) {
+      showMessage("Anime ID and title are required.", "error");
+      return;
+    }
+
+    const yearText = getText("year");
+    const episodesText = getText("episodes");
+
+    const record = {
+      id,
+      title,
+      year: yearText ? Number(yearText) : null,
+      episodes: episodesText ? Number(episodesText) : null,
+      status: getText("status") || null,
+      poster: getText("poster") || null,
+      genres: getArray("genres"),
+      moods: getArray("moods"),
+      story_types: getArray("storyTypes"),
+      protagonist_types: getArray("protagonistTypes"),
+      content_notes: getArray("contentNotes"),
+      description: getText("description") || null,
+    };
+
+    if (
+      (record.year !== null && !Number.isInteger(record.year)) ||
+      (record.episodes !== null && !Number.isInteger(record.episodes))
+    ) {
+      showMessage("Year and episodes must be whole numbers.", "error");
+      return;
+    }
+
+    saveButton.disabled = true;
+    saveButton.textContent = editingId ? "Updating..." : "Saving...";
+
+    try {
+      const result = editingId
+        ? await supabase.from("anime").update(record).eq("id", editingId)
+        : await supabase.from("anime").insert(record);
+
+      if (result.error) throw result.error;
+
+      showMessage(editingId ? "Anime updated successfully!" : "Anime added successfully!");
+      resetForm();
+      await loadAnime();
+    } catch (error) {
+      showMessage(
+        error instanceof Error ? error.message : "Could not save anime.",
+        "error"
+      );
+    } finally {
+      saveButton.disabled = false;
+      if (!editingId) saveButton.textContent = "Save Anime";
+    }
+  });
+
+  list?.addEventListener("click", async (event) => {
+    const target = event.target as HTMLElement;
+    const button = target.closest<HTMLButtonElement>("button[data-action]");
+    if (!button) return;
+
+    const id = button.dataset.id;
+    const action = button.dataset.action;
+    if (!id) return;
+
+    if (action === "edit") startEditing(id);
+    if (action === "delete") await deleteAnime(id);
+  });
+
+  searchInput?.addEventListener("input", filterAnime);
+  document.querySelector("#reset-button")?.addEventListener("click", resetForm);
+  cancelButton?.addEventListener("click", resetForm);
+
+  async function initialize() {
+    const { data: sessionData, error: sessionError } =
+      await supabase.auth.getSession();
+
+    const user = sessionData.session?.user;
+
+    if (sessionError || !user) {
+      window.location.replace("/admin/login/");
+      return;
+    }
+
+    const { data: admin, error: adminError } = await supabase
+      .from("admin_users")
+      .select("user_id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (adminError || !admin) {
+      await supabase.auth.signOut();
+      window.location.replace("/admin/login/");
+      return;
+    }
+
+    authorized = true;
+    await loadAnime();
+  }
+
+  if (saveButton) saveButton.textContent = "Save Anime";
+  if (cancelButton) cancelButton.style.display = "none";
+
+  initialize();
+</script>
+
+<style is:global>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: #0b0713;
+    color: #f7f1ff;
+    font-family: Arial, sans-serif;
+  }
+
+  .page {
+    width: 100%;
+    max-width: 1450px;
+    margin: auto;
+    padding: 40px 28px 70px;
+  }
+
+  .topbar,
+  .editor-heading,
+  .library-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .back {
+    display: inline-block;
+    margin-bottom: 25px;
+    color: #c49aff;
+    font-size: 13px;
+    text-decoration: none;
+  }
+
+  .eyebrow {
+    color: #bd83ff;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+  }
+
+  h1 {
+    margin: 10px 0;
+    font-size: 32px;
+  }
+
+  .subtitle,
+  .editor-heading p,
+  .library-heading p {
+    margin: 0;
+    color: #a99bb9;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .total-box {
+    min-width: 125px;
+    padding: 15px 20px;
+    border: 1px solid #39264f;
+    border-radius: 12px;
+    background: #171020;
+    text-align: center;
+  }
+
+  .total-box span {
+    display: block;
+    color: #a99bb9;
+    font-size: 11px;
+  }
+
+  .total-box strong {
+    display: block;
+    margin-top: 7px;
+    color: #d0a8ff;
+    font-size: 25px;
+  }
+
+  .editor,
+  .library {
+    margin-top: 30px;
+    padding: 28px;
+    border: 1px solid #352344;
+    border-radius: 16px;
+    background: #151020;
+  }
+
+  h2 {
+    margin: 0 0 7px;
+    font-size: 20px;
+  }
+
+  .secondary,
+  .primary,
+  .edit-button,
+  .delete-button {
+    border: 0;
+    border-radius: 8px;
+    padding: 11px 15px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .secondary {
+    border: 1px solid #51376c;
+    background: transparent;
+    color: #d1b4f1;
+  }
+
+  .primary {
+    padding: 13px 22px;
+    background: linear-gradient(100deg, #8744d7, #b66dff);
+    color: white;
+  }
+
+  button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 25px;
+  }
+
+  .field {
+    min-width: 0;
+  }
+
+  .field.full {
+    grid-column: 1 / -1;
+  }
+
+  .field label {
+    display: block;
+    margin-bottom: 8px;
+    color: #e1d4ee;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .field input,
+  .field textarea,
+  .search {
+    width: 100%;
+    padding: 12px 13px;
+    border: 1px solid #3c2a50;
+    border-radius: 8px;
+    outline: none;
+    background: #0e0a17;
+    color: white;
+    font: inherit;
+    font-size: 13px;
+  }
+
+  .field input:focus,
+  .field textarea:focus,
+  .search:focus {
+    border-color: #a66aff;
+    box-shadow: 0 0 0 3px rgba(166, 106, 255, 0.1);
+  }
+
+  .field textarea {
+    resize: vertical;
+  }
+
+  .field small {
+    display: block;
+    margin-top: 6px;
+    color: #897b9b;
+    font-size: 10px;
+  }
+
+  .form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 22px;
+  }
+
+  #form-message,
+  #list-message {
+    color: #a99bb9;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  #form-message.success,
+  #list-message.success {
+    color: #8ee6ae;
+  }
+
+  #form-message.error,
+  #list-message.error {
+    color: #ff8585;
+  }
+
+  .search {
+    max-width: 270px;
+  }
+
+  .anime-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 17px;
+    margin-top: 20px;
+  }
+
+  .anime-card {
+    overflow: hidden;
+    border: 1px solid #352344;
+    border-radius: 12px;
+    background: #1b1426;
+  }
+
+  .poster {
+    height: 175px;
+    background: #100b18;
+  }
+
+  .poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 25%;
+  }
+
+  .no-poster {
+    display: grid;
+    height: 100%;
+    place-items: center;
+    color: #766687;
+    font-size: 11px;
+  }
+
+  .anime-info {
+    padding: 15px;
+  }
+
+  .anime-info h3 {
+    margin: 0;
+    font-size: 15px;
+  }
+
+  .anime-info p {
+    margin: 8px 0;
+    color: #a99bb9;
+    font-size: 11px;
+  }
+
+  .genres {
+    min-height: 17px;
+    color: #c49aff;
+    font-size: 10px;
+  }
+
+  .card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .edit-button {
+    flex: 1;
+    background: #56377b;
+    color: white;
+  }
+
+  .delete-button {
+    flex: 1;
+    background: #542b3a;
+    color: #ffc1ca;
+  }
+
+  .empty {
+    grid-column: 1 / -1;
+    padding: 30px;
+    border: 1px dashed #51376c;
+    border-radius: 12px;
+    color: #aa9bbd;
+    text-align: center;
+    font-size: 13px;
+  }
+
+  @media (max-width: 650px) {
+    .page {
+      padding: 25px 15px 50px;
+    }
+
+    .topbar,
+    .editor-heading,
+    .library-heading {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .editor,
+    .library {
+      padding: 20px 16px;
+    }
+
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .field.full {
+      grid-column: auto;
+    }
+
+    .search {
+      max-width: none;
+    }
+
+    .anime-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .poster {
+      height: 145px;
+    }
+
+    .anime-info {
+      padding: 11px;
+    }
+
+    .anime-info h3 {
+      font-size: 13px;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .anime-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

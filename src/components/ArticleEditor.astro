@@ -1,0 +1,223 @@
+
+<div class="article-editor">
+  <div class="editor-toolbar">
+    <button type="button" data-command="paragraph">Paragraph</button>
+    <button type="button" data-command="h1">H1</button>
+    <button type="button" data-command="h2">H2</button>
+    <button type="button" data-command="h3">H3</button>
+    <span class="toolbar-divider"></span>
+    <button type="button" data-command="bold"><strong>B</strong></button>
+    <button type="button" data-command="italic"><em>I</em></button>
+    <button type="button" data-command="strike"><s>S</s></button>
+    <span class="toolbar-divider"></span>
+    <button type="button" data-command="bullet">• List</button>
+    <button type="button" data-command="ordered">1. List</button>
+    <button type="button" data-command="blockquote">Quote</button>
+    <button type="button" data-command="undo">↶</button>
+    <button type="button" data-command="redo">↷</button>
+  </div>
+
+  <div id="article-editor-content" class="editor-content"></div>
+  <input type="hidden" id="article-editor-json" name="content" value="" />
+  <p class="editor-help">Start writing your article here. Use the toolbar to format your content.</p>
+</div>
+
+<script>
+  import { Editor } from "@tiptap/core";
+  import StarterKit from "@tiptap/starter-kit";
+
+  const editorElement = document.querySelector("#article-editor-content");
+  const contentInput = document.querySelector<HTMLInputElement>("#article-editor-json");
+  const toolbar = document.querySelector(".editor-toolbar");
+
+  if (editorElement && contentInput && toolbar) {
+    const editor = new Editor({
+      element: editorElement,
+      extensions: [StarterKit],
+      content: "<p>Start writing your article here...</p>",
+      onUpdate: ({ editor }) => {
+        contentInput.value = JSON.stringify(editor.getJSON());
+      },
+    });
+
+    contentInput.value = JSON.stringify(editor.getJSON());
+
+    toolbar.addEventListener("click", (event) => {
+      const target = event.target as HTMLElement;
+      const button = target.closest<HTMLButtonElement>("button[data-command]");
+
+      if (!button) return;
+
+      const command = button.dataset.command;
+      const chain = editor.chain().focus();
+
+      switch (command) {
+        case "paragraph":
+          chain.setParagraph().run();
+          break;
+        case "h1":
+          chain.toggleHeading({ level: 1 }).run();
+          break;
+        case "h2":
+          chain.toggleHeading({ level: 2 }).run();
+          break;
+        case "h3":
+          chain.toggleHeading({ level: 3 }).run();
+          break;
+        case "bold":
+          chain.toggleBold().run();
+          break;
+        case "italic":
+          chain.toggleItalic().run();
+          break;
+        case "strike":
+          chain.toggleStrike().run();
+          break;
+        case "bullet":
+          chain.toggleBulletList().run();
+          break;
+        case "ordered":
+          chain.toggleOrderedList().run();
+          break;
+        case "blockquote":
+          chain.toggleBlockquote().run();
+          break;
+        case "undo":
+          chain.undo().run();
+          break;
+        case "redo":
+          chain.redo().run();
+          break;
+      }
+    });
+
+    window.addEventListener("bezels-set-article-content", (event) => {
+      const customEvent = event as CustomEvent;
+      if (customEvent.detail) {
+        editor.commands.setContent(customEvent.detail);
+      }
+    });
+  }
+</script>
+
+<style is:global>
+  .article-editor {
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid #39264f;
+    border-radius: 12px;
+    background: #100b1b;
+  }
+
+  .editor-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    padding: 12px;
+    border-bottom: 1px solid #39264f;
+    background: #171020;
+  }
+
+  .editor-toolbar button {
+    min-width: 34px;
+    padding: 8px 10px;
+    border: 1px solid #49325e;
+    border-radius: 6px;
+    background: #21162e;
+    color: #e4d2fa;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .editor-toolbar button:hover {
+    border-color: #bd83ff;
+    background: #352044;
+  }
+
+  .toolbar-divider {
+    width: 1px;
+    margin: 3px 2px;
+    background: #49325e;
+  }
+
+  .editor-content {
+    min-height: 350px;
+    padding: 22px;
+    color: #eee5f8;
+    font-size: 15px;
+    line-height: 1.8;
+    outline: none;
+  }
+
+  .editor-content .tiptap {
+    min-height: 300px;
+    outline: none;
+  }
+
+  .editor-content .tiptap p {
+    margin: 0 0 15px;
+    color: #d0c3df;
+  }
+
+  .editor-content .tiptap h1,
+  .editor-content .tiptap h2,
+  .editor-content .tiptap h3 {
+    margin: 22px 0 12px;
+    color: #d7b4ff;
+    line-height: 1.35;
+  }
+
+  .editor-content .tiptap h1 {
+    font-size: 30px;
+  }
+
+  .editor-content .tiptap h2 {
+    font-size: 24px;
+  }
+
+  .editor-content .tiptap h3 {
+    font-size: 19px;
+  }
+
+  .editor-content .tiptap ul,
+  .editor-content .tiptap ol {
+    padding-left: 25px;
+    margin-bottom: 16px;
+    color: #d0c3df;
+  }
+
+  .editor-content .tiptap blockquote {
+    margin: 18px 0;
+    padding: 10px 18px;
+    border-left: 3px solid #bd83ff;
+    background: #1c1328;
+    color: #cdb6e8;
+  }
+
+  .editor-content .tiptap strong {
+    color: #fff;
+  }
+
+  .editor-help {
+    margin: 0;
+    padding: 10px 18px;
+    border-top: 1px solid #30213f;
+    color: #897a9a;
+    font-size: 11px;
+  }
+
+  @media (max-width: 600px) {
+    .editor-content {
+      padding: 15px;
+    }
+
+    .editor-toolbar {
+      gap: 5px;
+      padding: 9px;
+    }
+
+    .editor-toolbar button {
+      padding: 7px 8px;
+    }
+  }
+</style>

@@ -1,0 +1,904 @@
+
+---
+import ArticleEditor from "../../components/ArticleEditor.astro";
+
+const title = "Article Manager | Bezels";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>{title}</title>
+</head>
+
+<body>
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <a href="/" class="brand">BEZELS<span>.</span></a>
+
+      <div class="sidebar-label">MAIN MENU</div>
+      <a href="/admin/dashboard/" class="nav-link">▦ Dashboard</a>
+
+      <div class="sidebar-label">CONTENT</div>
+      <a href="/admin/anime/" class="nav-link">◈ Anime Manager</a>
+      <a href="/admin/articles/" class="nav-link active">▤ Article Manager</a>
+
+      <div class="sidebar-bottom">
+        <a href="/" class="website-link">↗ Visit Website</a>
+        <button id="logout-button" class="logout-button">↪ Logout</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">BEZELS CONTROL PANEL</div>
+          <h1>Article Manager</h1>
+          <p class="subtitle">Create and manage your anime articles.</p>
+        </div>
+        <a href="/admin/dashboard/" class="back-link">← Dashboard</a>
+      </header>
+
+      <div id="page-message" class="message" role="status">Verifying admin access...</div>
+
+      <section class="editor-panel">
+        <div class="panel-heading">
+          <div>
+            <h2 id="form-heading">Create New Article</h2>
+            <p>Write, format and manage your article content.</p>
+          </div>
+          <span class="panel-icon">✦</span>
+        </div>
+
+        <form id="article-form">
+          <div class="form-grid">
+            <div class="field full">
+              <label for="article-title">Article Title *</label>
+              <input id="article-title" type="text" required placeholder="Enter article title" />
+            </div>
+
+            <div class="field">
+              <label for="article-slug">URL Slug *</label>
+              <input id="article-slug" type="text" required placeholder="your-article-url" />
+              <small>Example: black-butler-netflix-return</small>
+            </div>
+
+            <div class="field">
+              <label for="article-category">Category</label>
+              <input id="article-category" type="text" placeholder="Anime News, Reviews..." />
+            </div>
+
+            <div class="field full">
+              <label for="article-excerpt">Article Excerpt</label>
+              <textarea id="article-excerpt" rows="3" placeholder="A short introduction to your article..."></textarea>
+            </div>
+
+            <div class="field full">
+              <label for="article-image">Featured Image URL</label>
+              <input id="article-image" type="url" placeholder="https://example.com/image.jpg" />
+            </div>
+
+            <div class="field full">
+              <label>Article Content *</label>
+              <ArticleEditor />
+            </div>
+
+            <div class="field full">
+              <label for="article-tags">Tags</label>
+              <input id="article-tags" type="text" placeholder="Anime, News, Netflix, Black Butler" />
+              <small>Separate tags with commas.</small>
+            </div>
+          </div>
+
+          <div class="seo-section">
+            <h3>SEO Settings</h3>
+
+            <div class="field">
+              <label for="seo-title">SEO Title</label>
+              <input id="seo-title" type="text" maxlength="70" placeholder="SEO title for search engines" />
+            </div>
+
+            <div class="field">
+              <label for="meta-description">Meta Description</label>
+              <textarea id="meta-description" rows="3" maxlength="170" placeholder="Write a search-friendly description..."></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" id="cancel-edit" class="secondary-button" hidden>Cancel Edit</button>
+            <button type="submit" id="draft-button" class="secondary-button">Save Draft</button>
+            <button type="submit" id="publish-button" class="primary-button">Publish Article</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="articles-panel">
+        <div class="panel-heading">
+          <div>
+            <h2>Your Articles</h2>
+            <p>View, edit and delete saved articles.</p>
+          </div>
+          <span id="article-total" class="total-count">0 Articles</span>
+        </div>
+
+        <div id="article-list" class="article-list">
+          <p class="empty-state">Loading articles...</p>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
+
+<script>
+  import { supabase } from "../../lib/supabase";
+
+  const message = document.querySelector<HTMLElement>("#page-message");
+  const form = document.querySelector<HTMLFormElement>("#article-form");
+  const articleList = document.querySelector<HTMLElement>("#article-list");
+  const articleTotal = document.querySelector<HTMLElement>("#article-total");
+  const formHeading = document.querySelector<HTMLElement>("#form-heading");
+
+  const titleInput = document.querySelector<HTMLInputElement>("#article-title");
+  const slugInput = document.querySelector<HTMLInputElement>("#article-slug");
+  const categoryInput = document.querySelector<HTMLInputElement>("#article-category");
+  const excerptInput = document.querySelector<HTMLTextAreaElement>("#article-excerpt");
+  const imageInput = document.querySelector<HTMLInputElement>("#article-image");
+  const tagsInput = document.querySelector<HTMLInputElement>("#article-tags");
+  const seoTitleInput = document.querySelector<HTMLInputElement>("#seo-title");
+  const metaDescriptionInput = document.querySelector<HTMLTextAreaElement>("#meta-description");
+  const contentInput = document.querySelector<HTMLInputElement>("#article-editor-json");
+
+  const draftButton = document.querySelector<HTMLButtonElement>("#draft-button");
+  const publishButton = document.querySelector<HTMLButtonElement>("#publish-button");
+  const cancelButton = document.querySelector<HTMLButtonElement>("#cancel-edit");
+  const logoutButton = document.querySelector<HTMLButtonElement>("#logout-button");
+
+  let editingId: string | null = null;
+  let isAdmin = false;
+
+  function showMessage(text: string, type = "info") {
+    if (!message) return;
+    message.textContent = text;
+    message.className = `message ${type}`;
+  }
+
+  function escapeHtml(value: unknown): string {
+    return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;",
+    })[char] ?? char);
+  }
+
+  function makeSlug(value: string): string {
+    return value
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+  titleInput?.addEventListener("input", () => {
+    if (!editingId && slugInput && !slugInput.dataset.manuallyEdited) {
+      slugInput.value = makeSlug(titleInput.value);
+    }
+  });
+
+  slugInput?.addEventListener("input", () => {
+    if (slugInput) slugInput.dataset.manuallyEdited = "true";
+  });
+
+  function resetForm() {
+    form?.reset();
+    editingId = null;
+
+    if (formHeading) formHeading.textContent = "Create New Article";
+    if (draftButton) draftButton.textContent = "Save Draft";
+    if (publishButton) publishButton.textContent = "Publish Article";
+    if (cancelButton) cancelButton.hidden = true;
+
+    if (slugInput) {
+      slugInput.dataset.manuallyEdited = "";
+    }
+
+    window.dispatchEvent(
+      new CustomEvent("bezels-set-article-content", {
+        detail: "<p>Start writing your article here...</p>",
+      })
+    );
+  }
+
+  function renderArticles(articles: any[]) {
+    if (!articleList || !articleTotal) return;
+
+    articleTotal.textContent = `${articles.length} Article${articles.length === 1 ? "" : "s"}`;
+
+    if (articles.length === 0) {
+      articleList.innerHTML = '<p class="empty-state">No articles yet. Create your first article above.</p>';
+      return;
+    }
+
+    articleList.innerHTML = articles.map((article) => {
+      const statusClass = article.status === "published" ? "published" : "draft";
+      const date = article.published_at || article.created_at;
+      const formattedDate = date
+        ? new Date(date).toLocaleDateString()
+        : "Date unavailable";
+
+      return `
+        <div class="article-row">
+          <div class="article-info">
+            <h3>${escapeHtml(article.title)}</h3>
+            <p>/${escapeHtml(article.slug)}/</p>
+            <div class="article-meta">
+              <span class="status-label ${statusClass}">${escapeHtml(article.status)}</span>
+              <span>${escapeHtml(article.category || "Uncategorized")}</span>
+              <span>${escapeHtml(formattedDate)}</span>
+            </div>
+          </div>
+          <div class="article-actions">
+            <button type="button" class="edit-button" data-edit="${escapeHtml(article.id)}">Edit</button>
+            <button type="button" class="delete-button" data-delete="${escapeHtml(article.id)}">Delete</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  async function loadArticles() {
+    const { data, error } = await supabase
+      .from("articles")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      showMessage(`Could not load articles: ${error.message}`, "error");
+      return;
+    }
+
+    renderArticles(data ?? []);
+  }
+
+  async function verifyAdmin() {
+    const { data: sessionData, error: sessionError } =
+      await supabase.auth.getSession();
+
+    const user = sessionData.session?.user;
+
+    if (sessionError || !user) {
+      window.location.replace("/admin/login/");
+      return;
+    }
+
+    const { data: admin, error: adminError } = await supabase
+      .from("admin_users")
+      .select("user_id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (adminError || !admin) {
+      await supabase.auth.signOut();
+      window.location.replace("/admin/login/");
+      return;
+    }
+
+    isAdmin = true;
+    showMessage(`Admin verified: ${user.email}`, "success");
+    await loadArticles();
+  }
+
+  async function saveArticle(status: "draft" | "published") {
+    if (!isAdmin) return;
+
+    const title = titleInput?.value.trim() ?? "";
+    const slug = makeSlug(slugInput?.value ?? "");
+    const rawContent = contentInput?.value ?? "";
+
+    if (!title || !slug) {
+      showMessage("Please enter an article title and URL slug.", "error");
+      return;
+    }
+
+    let content;
+
+    try {
+      content = JSON.parse(rawContent);
+    } catch {
+      showMessage("Article content could not be read. Please try again.", "error");
+      return;
+    }
+
+    const now = new Date().toISOString();
+
+    const record = {
+      title,
+      slug,
+      excerpt: excerptInput?.value.trim() || null,
+      content,
+      featured_image: imageInput?.value.trim() || null,
+      category: categoryInput?.value.trim() || null,
+      tags: (tagsInput?.value ?? "")
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter(Boolean),
+      seo_title: seoTitleInput?.value.trim() || null,
+      meta_description: metaDescriptionInput?.value.trim() || null,
+      status,
+      published_at: status === "published" ? now : null,
+    };
+
+    const activeButton = status === "draft" ? draftButton : publishButton;
+
+    if (draftButton) draftButton.disabled = true;
+    if (publishButton) publishButton.disabled = true;
+
+    if (activeButton) {
+      activeButton.textContent = "Saving...";
+    }
+
+    const result = editingId
+      ? await supabase.from("articles").update(record).eq("id", editingId)
+      : await supabase.from("articles").insert(record);
+
+    if (draftButton) draftButton.disabled = false;
+    if (publishButton) publishButton.disabled = false;
+    if (draftButton) draftButton.textContent = "Save Draft";
+    if (publishButton) publishButton.textContent = "Publish Article";
+
+    if (result.error) {
+      showMessage(`Save failed: ${result.error.message}`, "error");
+      return;
+    }
+
+    showMessage(
+      status === "published" ? "Article published successfully!" : "Draft saved successfully!",
+      "success"
+    );
+
+    resetForm();
+    await loadArticles();
+  }
+
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const submitter = (event as SubmitEvent).submitter as HTMLButtonElement | null;
+    const status = submitter?.id === "draft-button" ? "draft" : "published";
+
+    await saveArticle(status);
+  });
+
+  cancelButton?.addEventListener("click", () => {
+    resetForm();
+    showMessage("Editing cancelled.", "info");
+  });
+
+  articleList?.addEventListener("click", async (event) => {
+    const target = event.target as HTMLElement;
+    const editButton = target.closest<HTMLButtonElement>("[data-edit]");
+    const deleteButton = target.closest<HTMLButtonElement>("[data-delete]");
+
+    if (editButton) {
+      const id = editButton.dataset.edit;
+      if (!id) return;
+
+      const { data: article, error } = await supabase
+        .from("articles")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error || !article) {
+        showMessage("Could not load this article for editing.", "error");
+        return;
+      }
+
+      editingId = article.id;
+
+      if (titleInput) titleInput.value = article.title ?? "";
+      if (slugInput) {
+        slugInput.value = article.slug ?? "";
+        slugInput.dataset.manuallyEdited = "true";
+      }
+      if (categoryInput) categoryInput.value = article.category ?? "";
+      if (excerptInput) excerptInput.value = article.excerpt ?? "";
+      if (imageInput) imageInput.value = article.featured_image ?? "";
+      if (tagsInput) tagsInput.value = (article.tags ?? []).join(", ");
+      if (seoTitleInput) seoTitleInput.value = article.seo_title ?? "";
+      if (metaDescriptionInput) metaDescriptionInput.value = article.meta_description ?? "";
+
+      window.dispatchEvent(
+        new CustomEvent("bezels-set-article-content", {
+          detail: article.content,
+        })
+      );
+
+      if (formHeading) formHeading.textContent = "Edit Article";
+      if (draftButton) draftButton.textContent = "Update Draft";
+      if (publishButton) publishButton.textContent = "Update & Publish";
+      if (cancelButton) cancelButton.hidden = false;
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      showMessage(`Editing: ${article.title}`, "info");
+    }
+
+    if (deleteButton) {
+      const id = deleteButton.dataset.delete;
+      if (!id) return;
+
+      const confirmed = window.confirm("Are you sure you want to delete this article?");
+      if (!confirmed) return;
+
+      const { error } = await supabase
+        .from("articles")
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        showMessage(`Delete failed: ${error.message}`, "error");
+        return;
+      }
+
+      if (editingId === id) resetForm();
+
+      showMessage("Article deleted successfully.", "success");
+      await loadArticles();
+    }
+  });
+
+  logoutButton?.addEventListener("click", async () => {
+    logoutButton.disabled = true;
+    logoutButton.textContent = "Signing out...";
+
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      alert("Logout failed. Please try again.");
+      logoutButton.disabled = false;
+      logoutButton.textContent = "↪ Logout";
+      return;
+    }
+
+    window.location.replace("/admin/login/");
+  });
+
+  verifyAdmin();
+</script>
+
+<style is:global>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: #0b0713;
+    color: #f7f1ff;
+    font-family: Arial, sans-serif;
+  }
+
+  .admin-layout {
+    min-height: 100vh;
+    display: flex;
+  }
+
+  .sidebar {
+    width: 250px;
+    min-height: 100vh;
+    padding: 30px 18px;
+    display: flex;
+    flex-direction: column;
+    background: #100b1b;
+    border-right: 1px solid #2c1d40;
+    flex-shrink: 0;
+  }
+
+  .brand {
+    margin: 0 0 48px 10px;
+    color: #fff;
+    font-size: 25px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-decoration: none;
+  }
+
+  .brand span {
+    color: #bd83ff;
+  }
+
+  .sidebar-label {
+    margin: 15px 10px 12px;
+    color: #766787;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.8px;
+  }
+
+  .nav-link {
+    display: block;
+    padding: 13px 12px;
+    margin-bottom: 6px;
+    border-radius: 9px;
+    color: #b7a9c8;
+    font-size: 13px;
+    text-decoration: none;
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    background: rgba(156, 91, 227, 0.17);
+    color: #d4afff;
+  }
+
+  .nav-link.active {
+    border: 1px solid rgba(171, 110, 242, 0.22);
+  }
+
+  .sidebar-bottom {
+    margin-top: auto;
+    display: grid;
+    gap: 10px;
+  }
+
+  .website-link,
+  .logout-button {
+    padding: 12px;
+    border: 1px solid #39264f;
+    border-radius: 9px;
+    background: transparent;
+    color: #cdb6e8;
+    text-align: center;
+    text-decoration: none;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .logout-button {
+    color: #ffaaaa;
+    border-color: #58313e;
+  }
+
+  .main-content {
+    width: calc(100% - 250px);
+    max-width: 1500px;
+    padding: 42px;
+  }
+
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+  }
+
+  .eyebrow {
+    color: #b987f0;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+  }
+
+  h1 {
+    margin: 10px 0 7px;
+    font-size: 32px;
+  }
+
+  .subtitle,
+  .panel-heading p {
+    margin: 0;
+    color: #a99bb9;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .back-link {
+    padding: 11px 15px;
+    border: 1px solid #49325e;
+    border-radius: 8px;
+    color: #d4afff;
+    text-decoration: none;
+    font-size: 12px;
+  }
+
+  .message {
+    margin: 18px 0;
+    color: #b9a8cc;
+    font-size: 12px;
+  }
+
+  .message.success {
+    color: #8ee6ae;
+  }
+
+  .message.error {
+    color: #ff9999;
+  }
+
+  .editor-panel,
+  .articles-panel {
+    margin-top: 24px;
+    padding: 27px;
+    border: 1px solid #30213f;
+    border-radius: 15px;
+    background: #151020;
+  }
+
+  .panel-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+
+  .panel-heading h2 {
+    margin: 0 0 7px;
+    font-size: 20px;
+  }
+
+  .panel-icon {
+    color: #c18bff;
+    font-size: 28px;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 19px;
+  }
+
+  .field {
+    min-width: 0;
+  }
+
+  .field.full {
+    grid-column: 1 / -1;
+  }
+
+  .field label {
+    display: block;
+    margin-bottom: 9px;
+    color: #d7c8e8;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .field input,
+  .field textarea {
+    width: 100%;
+    padding: 13px 14px;
+    border: 1px solid #49325e;
+    border-radius: 8px;
+    outline: none;
+    background: #0e0a16;
+    color: #f4eaff;
+    font: inherit;
+    font-size: 13px;
+  }
+
+  .field input:focus,
+  .field textarea:focus {
+    border-color: #b987f0;
+    box-shadow: 0 0 0 3px rgba(185, 135, 240, 0.1);
+  }
+
+  .field textarea {
+    resize: vertical;
+    line-height: 1.6;
+  }
+
+  .field small {
+    display: block;
+    margin-top: 7px;
+    color: #8d7d9e;
+    font-size: 10px;
+  }
+
+  .seo-section {
+    display: grid;
+    gap: 18px;
+    margin-top: 30px;
+    padding-top: 24px;
+    border-top: 1px solid #30213f;
+  }
+
+  .seo-section h3 {
+    margin: 0;
+    color: #d7b4ff;
+    font-size: 16px;
+  }
+
+  .form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+  }
+
+  .primary-button,
+  .secondary-button,
+  .edit-button,
+  .delete-button {
+    padding: 12px 17px;
+    border: 1px solid #65418a;
+    border-radius: 8px;
+    background: #29183a;
+    color: #e8d5ff;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .primary-button {
+    border-color: #a66be0;
+    background: linear-gradient(110deg, #8246bd, #a35bd4);
+    color: #fff;
+  }
+
+  .primary-button:hover,
+  .secondary-button:hover,
+  .edit-button:hover {
+    filter: brightness(1.2);
+  }
+
+  button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
+  .total-count {
+    color: #c18bff;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .article-list {
+    display: grid;
+    gap: 12px;
+  }
+
+  .article-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 18px;
+    border: 1px solid #30213f;
+    border-radius: 10px;
+    background: #100b1b;
+  }
+
+  .article-info {
+    min-width: 0;
+  }
+
+  .article-info h3 {
+    margin: 0 0 7px;
+    color: #eee2ff;
+    font-size: 15px;
+    overflow-wrap: anywhere;
+  }
+
+  .article-info p {
+    margin: 0 0 10px;
+    color: #9281a5;
+    font-size: 11px;
+    overflow-wrap: anywhere;
+  }
+
+  .article-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    color: #9f90ae;
+    font-size: 10px;
+  }
+
+  .status-label {
+    text-transform: capitalize;
+    font-weight: 700;
+  }
+
+  .status-label.published {
+    color: #8ee6ae;
+  }
+
+  .status-label.draft {
+    color: #e9c17c;
+  }
+
+  .article-actions {
+    display: flex;
+    flex-shrink: 0;
+    gap: 8px;
+  }
+
+  .edit-button,
+  .delete-button {
+    padding: 9px 12px;
+  }
+
+  .delete-button {
+    border-color: #663544;
+    background: #29151e;
+    color: #ffaaaa;
+  }
+
+  .empty-state {
+    padding: 25px;
+    color: #9c8eac;
+    text-align: center;
+    font-size: 13px;
+  }
+
+  @media (max-width: 850px) {
+    .sidebar {
+      width: 205px;
+    }
+
+    .main-content {
+      width: calc(100% - 205px);
+      padding: 25px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .admin-layout {
+      display: block;
+    }
+
+    .sidebar {
+      width: 100%;
+      min-height: auto;
+      padding: 18px;
+      border-right: 0;
+      border-bottom: 1px solid #2c1d40;
+    }
+
+    .brand {
+      display: block;
+      margin: 0 0 15px 5px;
+    }
+
+    .sidebar-bottom {
+      margin-top: 15px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .main-content {
+      width: 100%;
+      padding: 22px 15px;
+    }
+
+    .topbar {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .editor-panel,
+    .articles-panel {
+      padding: 18px;
+    }
+
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .field.full {
+      grid-column: auto;
+    }
+
+    .article-row {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+</style>

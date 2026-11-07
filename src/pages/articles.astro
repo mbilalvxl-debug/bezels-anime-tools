@@ -1,6 +1,9 @@
 
 ---
 import Footer from "../components/Footer.astro";
+import { getPublishedArticles } from "../lib/articles";
+
+const articles = await getPublishedArticles();
 
 const title = "Anime Articles & Guides | Bezels";
 const description =
@@ -13,6 +16,7 @@ const description =
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    <link rel="canonical" href="https://bezels.site/articles/" />
     <title>{title}</title>
 
     <style>
@@ -23,8 +27,8 @@ const description =
       }
 
       body {
-        background: #090d18;
-        color: #f4f6ff;
+        background: #090714;
+        color: #f4f0ff;
         font-family: Arial, sans-serif;
         min-height: 100vh;
       }
@@ -34,7 +38,7 @@ const description =
         justify-content: space-between;
         align-items: center;
         padding: 22px 8%;
-        border-bottom: 1px solid #20283b;
+        border-bottom: 1px solid #292044;
       }
 
       .logo {
@@ -44,7 +48,7 @@ const description =
         text-decoration: none;
       }
 
-      .logo span { color: #8b7cff; }
+      .logo span { color: #a58aff; }
 
       nav {
         display: flex;
@@ -53,13 +57,13 @@ const description =
       }
 
       nav a {
-        color: #b9bfd1;
+        color: #c1b8d8;
         text-decoration: none;
         font-size: 14px;
       }
 
       nav a:hover,
-      nav a.active { color: #a99aff; }
+      nav a.active { color: #b69cff; }
 
       .intro {
         max-width: 850px;
@@ -69,7 +73,7 @@ const description =
       }
 
       .eyebrow {
-        color: #a99aff;
+        color: #b69cff;
         font-size: 12px;
         letter-spacing: 2px;
       }
@@ -79,16 +83,16 @@ const description =
         margin: 18px 0;
       }
 
-      h1 span { color: #9685ff; }
+      h1 span { color: #a58aff; }
 
       .intro p {
-        color: #aab2c6;
+        color: #b8afcc;
         line-height: 1.8;
         font-size: 16px;
       }
 
       .articles {
-        max-width: 1050px;
+        max-width: 1100px;
         margin: 0 auto 90px;
         padding: 0 22px;
       }
@@ -100,19 +104,37 @@ const description =
 
       .article-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 22px;
       }
 
       .article-card {
-        background: #111a2c;
-        border: 1px solid #293650;
-        border-radius: 14px;
-        padding: 25px;
+        overflow: hidden;
+        background: linear-gradient(145deg, #17112b, #100d1e);
+        border: 1px solid #38275e;
+        border-radius: 16px;
+        transition: transform 0.25s, border-color 0.25s;
       }
 
-      .article-card span {
-        color: #a99aff;
+      .article-card:hover {
+        transform: translateY(-5px);
+        border-color: #a58aff;
+      }
+
+      .article-image {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        object-fit: cover;
+        display: block;
+        background: #201638;
+      }
+
+      .article-content {
+        padding: 23px;
+      }
+
+      .category {
+        color: #b69cff;
         font-size: 11px;
         letter-spacing: 1px;
         text-transform: uppercase;
@@ -125,16 +147,37 @@ const description =
       }
 
       .article-card p {
-        color: #aab2c6;
+        color: #b8afcc;
         font-size: 14px;
         line-height: 1.8;
       }
 
-      .coming-soon {
+      .article-date {
+        display: block;
+        color: #9187a8;
+        font-size: 12px;
+        margin-top: 15px;
+      }
+
+      .read-link {
         display: inline-block;
         margin-top: 18px;
-        color: #b9aaff;
-        font-size: 12px;
+        color: #c0aaff;
+        font-size: 13px;
+        font-weight: bold;
+        text-decoration: none;
+      }
+
+      .read-link:hover { color: white; }
+
+      .empty-state {
+        padding: 45px 20px;
+        text-align: center;
+        background: #151025;
+        border: 1px solid #38275e;
+        border-radius: 16px;
+        color: #b8afcc;
+        line-height: 1.8;
       }
 
       @media (max-width: 650px) {
@@ -179,39 +222,62 @@ const description =
       </section>
 
       <section class="articles">
-        <h2>Explore Our Topics</h2>
+        <h2>Latest Articles</h2>
 
-        <div class="article-grid">
-          <article class="article-card">
-            <span>Anime Discovery</span>
-            <h3>How to Find Anime That Matches Your Interests</h3>
-            <p>
-              Learn how genres, moods and storytelling preferences
-              can help you discover your next anime.
-            </p>
-            <a class="coming-soon" href="/find-anime/">Explore Anime Finder →</a>
-          </article>
+        {articles.length > 0 ? (
+          <div class="article-grid">
+            {articles.map((article) => (
+              <article class="article-card">
+                {article.featured_image && (
+                  <img
+                    class="article-image"
+                    src={article.featured_image}
+                    alt={article.title}
+                    loading="lazy"
+                  />
+                )}
 
-          <article class="article-card">
-            <span>Anime Quiz</span>
-            <h3>How Anime Recommendation Quizzes Work</h3>
-            <p>
-              Understand how your viewing preferences can be used
-              to find anime worth exploring.
-            </p>
-            <a class="coming-soon" href="/anime-quiz/">Try the Anime Quiz →</a>
-          </article>
+                <div class="article-content">
+                  <span class="category">
+                    {article.category || "Anime Guide"}
+                  </span>
 
-          <article class="article-card">
-            <span>Watchlist Guides</span>
-            <h3>Why Every Anime Fan Can Benefit From a Watchlist</h3>
+                  <h3>{article.title}</h3>
+
+                  <p>
+                    {article.excerpt || "Explore this anime article on Bezels."}
+                  </p>
+
+                  {article.published_at && (
+                    <time class="article-date" datetime={article.published_at}>
+                      {new Date(article.published_at).toLocaleDateString("en", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        timeZone: "UTC"
+                      })}
+                    </time>
+                  )}
+
+                  <a
+                    class="read-link"
+                    href={`/articles/${article.slug}/`}
+                  >
+                    Read Article →
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div class="empty-state">
+            <h3>No published articles yet</h3>
             <p>
-              Discover simple ways to organise anime you plan
-              to watch and series you have completed.
+              New anime guides and articles will appear here
+              once they are published.
             </p>
-            <a class="coming-soon" href="/watchlist/">Open Your Watchlist →</a>
-          </article>
-        </div>
+          </div>
+        )}
       </section>
     </main>
 
