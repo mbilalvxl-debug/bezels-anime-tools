@@ -1,0 +1,274 @@
+
+---
+const title = "Disclaimer | Bezels";
+const description =
+  "Read the Bezels disclaimer covering anime recommendations, website information, third-party content and external links.";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        background: #090d18;
+        color: #f4f6ff;
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 22px 8%;
+        border-bottom: 1px solid #20283b;
+      }
+
+      .logo {
+        color: white;
+        font-size: 27px;
+        font-weight: 800;
+        text-decoration: none;
+      }
+
+      .logo span { color: #8b7cff; }
+
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      nav a {
+        color: #b9bfd1;
+        text-decoration: none;
+        font-size: 14px;
+      }
+
+      nav a:hover { color: #a99aff; }
+
+      main {
+        max-width: 850px;
+        margin: auto;
+        padding: 70px 22px 90px;
+      }
+
+      .eyebrow {
+        color: #a99aff;
+        font-size: 12px;
+        letter-spacing: 2px;
+      }
+
+      h1 {
+        font-size: clamp(36px, 6vw, 52px);
+        margin: 18px 0;
+      }
+
+      h1 span { color: #9685ff; }
+
+      .updated {
+        color: #828da5;
+        font-size: 13px;
+        margin-bottom: 30px;
+      }
+
+      .intro {
+        color: #b9bfd1;
+        font-size: 16px;
+        line-height: 1.9;
+        margin-bottom: 35px;
+      }
+
+      .disclaimer-section { margin-top: 30px; }
+
+      .disclaimer-section h2 {
+        font-size: 21px;
+        margin-bottom: 12px;
+      }
+
+      .disclaimer-section p {
+        color: #aab2c6;
+        font-size: 14px;
+        line-height: 1.9;
+      }
+
+      .disclaimer-section a {
+        color: #b9aaff;
+        overflow-wrap: anywhere;
+      }
+
+      footer {
+        text-align: center;
+        border-top: 1px solid #20283b;
+        padding: 28px 20px;
+        color: #828da5;
+        font-size: 13px;
+      }
+
+      footer a {
+        color: #a99aff;
+        text-decoration: none;
+        margin: 0 8px;
+      }
+
+      @media (max-width: 650px) {
+        header {
+          padding: 20px;
+          flex-direction: column;
+          gap: 18px;
+        }
+
+        nav {
+          justify-content: center;
+          gap: 13px;
+        }
+
+        nav a { font-size: 12px; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <a class="logo" href="/">BEZELS<span>.</span></a>
+
+      <nav>
+        <a href="/">Home</a>
+        <a href="/find-anime/">Find Anime</a>
+        <a href="/anime-quiz/">Anime Quiz</a>
+        <a href="/watchlist/">My Watchlist</a>
+        <a href="/articles/">Articles</a>
+      </nav>
+    </header>
+
+    <main>
+      <span class="eyebrow">IMPORTANT INFORMATION</span>
+
+      <h1>Website <span>Disclaimer.</span></h1>
+
+      <p class="updated">Last updated: November 7, 2026</p>
+
+      <p class="intro">
+        The information and tools available on Bezels are
+        provided for general informational and entertainment
+        purposes. This Disclaimer explains the limitations
+        of our website content and services.
+      </p>
+
+      <section class="disclaimer-section">
+        <h2>1. General Information</h2>
+        <p>
+          We aim to provide useful and accurate anime-related
+          information. However, anime details, release
+          information, episode counts and other information
+          may change or contain errors. We do not guarantee
+          that every piece of information is always complete,
+          current or accurate.
+        </p>
+      </section>
+
+      <section class="disclaimer-section">
+        <h2>2. Anime Recommendations</h2>
+        <p>
+          Bezels provides anime recommendations based on
+          preferences selected by visitors and information
+          available in our database. These recommendations
+          are suggestions, not guarantees. Personal taste
+          differs, so a recommended anime may not suit
+          everyone.
+        </p>
+      </section>
+
+      <section class="disclaimer-section">
+        <h2>3. Reviews and Opinions</h2>
+        <p>
+          Any opinions, descriptions or commentary published
+          on Bezels represent general editorial views. They
+          should not be treated as official statements from
+          anime studios, publishers, streaming platforms
+          or creators.
+        </p>
+      </section>
+
+      <section class="disclaimer-section">
+        <h2>4. Copyright and Trademarks</h2>
+        <p>
+          Anime titles, characters, artwork, logos and other
+          third-party materials may be protected by copyright
+          and trademark laws. Their respective owners retain
+          their rights. Bezels is an independent anime
+          discovery website and does not claim ownership
+          of third-party properties.
+        </p>
+      </section>
+
+      <section class="disclaimer-section">
+        <h2>5. External Links</h2>
+        <p>
+          Our website may contain links to third-party
+          websites. These links are provided for convenience
+          and additional information. Bezels does not control
+          external websites and is not responsible for their
+          content, services or privacy practices.
+        </p>
+      </section>
+
+      <section class="disclaimer-section">
+        <h2>6. Advertising and Affiliate Disclosure</h2>
+        <p>
+          Bezels may display advertisements or include
+          affiliate links in the future. If affiliate
+          relationships are introduced, relevant content
+          will be identified where required. Advertisements
+          and third-party services are subject to their
+          own terms and policies.
+        </p>
+      </section>
+
+      <section class="disclaimer-section">
+        <h2>7. Use at Your Own Discretion</h2>
+        <p>
+          Visitors are responsible for how they use
+          information provided on Bezels. We encourage
+          visitors to verify important details through
+          official sources, especially when checking
+          release dates, availability or viewing information.
+        </p>
+      </section>
+
+      <section class="disclaimer-section">
+        <h2>8. Changes to This Disclaimer</h2>
+        <p>
+          This Disclaimer may be updated as our website,
+          content and features develop. Any revised version
+          will be published on this page with an updated date.
+        </p>
+      </section>
+
+      <section class="disclaimer-section">
+        <h2>9. Contact Us</h2>
+        <p>
+          If you have questions about this Disclaimer,
+          contact us at
+          <a href="mailto:mbilalvxl@gmail.com">mbilalvxl@gmail.com</a>.
+        </p>
+      </section>
+    </main>
+
+    <footer>
+      <p>© 2026 Bezels. Made for anime fans.</p>
+      <p style="margin-top: 12px;">
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+        <a href="/privacy-policy/">Privacy Policy</a>
+      </p>
+    </footer>
+  </body>
+</html>
