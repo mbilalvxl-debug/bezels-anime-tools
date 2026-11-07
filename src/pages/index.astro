@@ -13,6 +13,7 @@ const description =
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#080916" />
     <title>{title}</title>
 
     <style>
@@ -22,208 +23,684 @@ const description =
         padding: 0;
       }
 
-      body {
-        background: #090d18;
-        color: #f4f6ff;
-        font-family: Arial, sans-serif;
-        min-height: 100vh;
+      html {
+        scroll-behavior: smooth;
       }
 
+      body {
+        background: #080916;
+        color: #f5f4ff;
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -2;
+        pointer-events: none;
+        background:
+          radial-gradient(ellipse at 15% 15%, rgba(92, 55, 190, 0.15), transparent 35%),
+          radial-gradient(ellipse at 85% 35%, rgba(34, 91, 190, 0.13), transparent 38%),
+          radial-gradient(ellipse at 50% 90%, rgba(116, 49, 180, 0.10), transparent 40%);
+      }
+
+      a {
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      /* NAVBAR */
+
       header {
+        position: relative;
+        z-index: 10;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 23px 8%;
-        border-bottom: 1px solid #20283b;
+        padding: 21px 7%;
+        background: rgba(8, 9, 22, 0.78);
+        border-bottom: 1px solid rgba(151, 132, 255, 0.13);
+        backdrop-filter: blur(18px);
       }
 
       .logo {
         color: white;
-        font-size: 27px;
-        font-weight: 800;
+        font-size: 28px;
+        font-weight: 900;
+        letter-spacing: 2px;
         text-decoration: none;
       }
 
-      .logo span { color: #8b7cff; }
+      .logo span {
+        color: #9c83ff;
+        text-shadow: 0 0 15px rgba(156, 131, 255, 0.8);
+      }
 
       nav {
         display: flex;
         flex-wrap: wrap;
-        gap: 23px;
+        align-items: center;
+        gap: 27px;
       }
 
       nav a {
-        color: #b9bfd1;
+        color: #b9b8d0;
         text-decoration: none;
-        font-size: 14px;
+        font-size: 13px;
+        transition: color 0.25s;
       }
 
-      nav a:hover { color: #a99aff; }
+      nav a:hover {
+        color: #b5a2ff;
+      }
+
+      /* HERO */
 
       .hero {
-        max-width: 950px;
+        position: relative;
+        min-height: 650px;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        padding: 90px 8%;
+        background:
+          linear-gradient(90deg, rgba(8, 9, 22, 0.98) 0%, rgba(8, 9, 22, 0.87) 48%, rgba(8, 9, 22, 0.42) 100%),
+          radial-gradient(ellipse at 78% 45%, rgba(101, 67, 225, 0.30), transparent 45%),
+          linear-gradient(135deg, #11102c, #101b37 55%, #17102b);
+        border-bottom: 1px solid rgba(151, 132, 255, 0.14);
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: 0.16;
+        background-image:
+          linear-gradient(rgba(170, 153, 255, 0.12) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(170, 153, 255, 0.12) 1px, transparent 1px);
+        background-size: 55px 55px;
+        mask-image: linear-gradient(to right, transparent, black);
+      }
+
+      .hero::after {
+        content: "";
+        position: absolute;
+        width: 480px;
+        height: 480px;
+        right: 7%;
+        top: 50%;
+        transform: translateY(-50%);
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(117, 79, 255, 0.24), rgba(48, 100, 222, 0.09) 45%, transparent 70%);
+        filter: blur(8px);
+        pointer-events: none;
+      }
+
+      .hero-inner {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        align-items: center;
+        gap: 35px;
+        width: 100%;
+        max-width: 1250px;
         margin: auto;
-        padding: 115px 22px 100px;
-        text-align: center;
+      }
+
+      .hero-content {
+        max-width: 680px;
       }
 
       .tag {
-        display: inline-block;
-        border: 1px solid #5548a9;
-        color: #b9aaff;
-        padding: 9px 16px;
-        border-radius: 30px;
-        font-size: 12px;
-        letter-spacing: 1px;
-        margin-bottom: 28px;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 10px 16px;
+        margin-bottom: 27px;
+        border: 1px solid rgba(163, 139, 255, 0.42);
+        border-radius: 40px;
+        color: #c5b6ff;
+        background: rgba(112, 78, 222, 0.12);
+        font-size: 11px;
+        font-weight: bold;
+        letter-spacing: 1.8px;
+        box-shadow: 0 0 25px rgba(117, 79, 255, 0.08);
+      }
+
+      .tag-dot {
+        width: 7px;
+        height: 7px;
+        background: #a88aff;
+        border-radius: 50%;
+        box-shadow: 0 0 12px #a88aff;
       }
 
       h1 {
-        font-size: clamp(42px, 7vw, 72px);
-        line-height: 1.1;
-        letter-spacing: -2px;
-        margin-bottom: 25px;
+        font-size: clamp(43px, 6.2vw, 76px);
+        line-height: 1.08;
+        letter-spacing: -3px;
+        margin-bottom: 24px;
+        font-weight: 900;
       }
 
-      h1 span { color: #9685ff; }
+      h1 span {
+        display: block;
+        color: #a993ff;
+        text-shadow: 0 0 35px rgba(137, 103, 255, 0.30);
+      }
 
-      .hero p {
-        color: #aab2c6;
-        font-size: 17px;
+      .hero-description {
+        max-width: 600px;
+        color: #b6b7d0;
+        font-size: 16px;
         line-height: 1.9;
-        max-width: 680px;
-        margin: 0 auto 35px;
+        margin-bottom: 32px;
+      }
+
+      .hero-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 15px;
       }
 
       .cta {
-        display: inline-block;
-        background: #7965f5;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 25px;
+        border-radius: 9px;
+        background: linear-gradient(110deg, #7959ed, #a06bfa);
         color: white;
-        padding: 16px 27px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: bold;
+        box-shadow: 0 8px 30px rgba(119, 82, 239, 0.28);
+        transition: transform 0.25s, box-shadow 0.25s;
+      }
+
+      .cta:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(119, 82, 239, 0.45);
+      }
+
+      .secondary-cta {
+        color: #d0c9f5;
+        padding: 15px 20px;
+        border: 1px solid rgba(177, 161, 255, 0.25);
         border-radius: 9px;
         text-decoration: none;
-        font-weight: bold;
+        font-size: 14px;
         transition: background 0.2s;
       }
 
-      .cta:hover { background: #6651e6; }
+      .secondary-cta:hover {
+        background: rgba(145, 117, 255, 0.12);
+      }
+
+      /* HERO VISUAL */
+
+      .hero-art {
+        position: relative;
+        min-height: 410px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .art-orbit {
+        position: absolute;
+        width: 340px;
+        height: 340px;
+        border: 1px solid rgba(168, 146, 255, 0.24);
+        border-radius: 50%;
+        box-shadow:
+          0 0 45px rgba(119, 84, 240, 0.10),
+          inset 0 0 45px rgba(119, 84, 240, 0.08);
+      }
+
+      .art-orbit::before,
+      .art-orbit::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        border: 1px solid rgba(119, 162, 255, 0.17);
+      }
+
+      .art-orbit::before {
+        inset: 25px -25px;
+        transform: rotate(35deg);
+      }
+
+      .art-orbit::after {
+        inset: -25px 25px;
+        transform: rotate(-35deg);
+      }
+
+      .art-core {
+        position: relative;
+        width: 245px;
+        height: 325px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 26px;
+        overflow: hidden;
+        border: 1px solid rgba(192, 174, 255, 0.42);
+        border-radius: 18px;
+        background:
+          radial-gradient(ellipse at 50% 25%, rgba(177, 127, 255, 0.52), transparent 45%),
+          linear-gradient(145deg, #31205d, #151a3c 55%, #101126);
+        box-shadow:
+          0 0 70px rgba(119, 84, 240, 0.27),
+          0 25px 70px rgba(0, 0, 0, 0.4);
+        transform: rotate(5deg);
+        transition: transform 0.4s;
+      }
+
+      .hero-art:hover .art-core {
+        transform: rotate(0deg) translateY(-7px);
+      }
+
+      .art-core::before {
+        content: "";
+        position: absolute;
+        width: 190px;
+        height: 190px;
+        top: 28px;
+        left: 28px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(206, 179, 255, 0.9), rgba(138, 91, 255, 0.35) 45%, transparent 72%);
+        filter: blur(5px);
+      }
+
+      .art-character {
+        position: absolute;
+        top: 48px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 170px;
+        border-radius: 48% 48% 18% 18%;
+        background: linear-gradient(160deg, #c5b4ff 0%, #7963c7 28%, #25264f 75%);
+        clip-path: polygon(50% 0%, 85% 12%, 100% 45%, 80% 100%, 20% 100%, 0% 45%, 15% 12%);
+        filter: drop-shadow(0 0 22px rgba(184, 148, 255, 0.6));
+        opacity: 0.9;
+      }
+
+      .art-character::after {
+        content: "";
+        position: absolute;
+        top: 48px;
+        left: 25px;
+        width: 50px;
+        height: 6px;
+        background: #d8c9ff;
+        border-radius: 50%;
+        box-shadow: 0 0 15px #c7adff;
+      }
+
+      .art-label {
+        position: relative;
+        z-index: 2;
+        color: #b9a6ff;
+        font-size: 10px;
+        letter-spacing: 3px;
+        margin-bottom: 10px;
+      }
+
+      .art-core h2 {
+        position: relative;
+        z-index: 2;
+        font-size: 25px;
+        line-height: 1.15;
+        letter-spacing: 1px;
+      }
+
+      .art-core p {
+        position: relative;
+        z-index: 2;
+        color: #c0bddb;
+        font-size: 11px;
+        margin-top: 10px;
+      }
+
+      .floating-card {
+        position: absolute;
+        z-index: 3;
+        padding: 13px 16px;
+        border: 1px solid rgba(180, 161, 255, 0.3);
+        border-radius: 11px;
+        background: rgba(18, 19, 48, 0.82);
+        backdrop-filter: blur(15px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        color: #ded7ff;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      .floating-one {
+        top: 55px;
+        right: 2%;
+      }
+
+      .floating-two {
+        bottom: 55px;
+        left: 0;
+      }
+
+      .floating-three {
+        top: 48%;
+        right: -5%;
+        color: #9fd7ff;
+      }
+
+      /* SECTION */
 
       .section {
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 35px 22px 85px;
+        max-width: 1180px;
+        margin: auto;
+        padding: 100px 25px;
       }
 
       .section-heading {
         text-align: center;
-        margin-bottom: 35px;
+        margin-bottom: 45px;
+      }
+
+      .eyebrow {
+        color: #a78cff;
+        font-size: 11px;
+        font-weight: bold;
+        letter-spacing: 2.5px;
+        margin-bottom: 15px;
       }
 
       .section-heading h2 {
-        font-size: 30px;
-        margin-bottom: 13px;
+        font-size: clamp(28px, 4vw, 40px);
+        margin-bottom: 14px;
+        letter-spacing: -1px;
       }
 
       .section-heading p {
-        color: #aab2c6;
-        line-height: 1.7;
+        color: #a9a9c3;
+        line-height: 1.8;
         font-size: 15px;
       }
+
+      /* TOOLS */
 
       .tools-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
+        gap: 22px;
       }
 
       .tool-card {
+        position: relative;
         display: block;
-        background: #111a2c;
-        border: 1px solid #293650;
-        border-radius: 15px;
-        padding: 28px;
-        text-decoration: none;
+        min-height: 275px;
+        padding: 30px;
+        overflow: hidden;
+        border: 1px solid rgba(151, 132, 255, 0.19);
+        border-radius: 17px;
+        background:
+          linear-gradient(145deg, rgba(27, 27, 58, 0.92), rgba(14, 19, 39, 0.96));
         color: white;
-        transition: transform 0.2s, border-color 0.2s;
+        text-decoration: none;
+        transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+      }
+
+      .tool-card::before {
+        content: "";
+        position: absolute;
+        width: 180px;
+        height: 180px;
+        top: -100px;
+        right: -75px;
+        border-radius: 50%;
+        background: rgba(126, 92, 255, 0.18);
+        filter: blur(35px);
+        transition: opacity 0.3s;
       }
 
       .tool-card:hover {
-        transform: translateY(-5px);
-        border-color: #7965f5;
+        transform: translateY(-8px);
+        border-color: rgba(165, 137, 255, 0.7);
+        box-shadow: 0 15px 40px rgba(78, 53, 168, 0.18);
       }
 
       .tool-icon {
-        font-size: 30px;
-        margin-bottom: 20px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 57px;
+        height: 57px;
+        margin-bottom: 25px;
+        border-radius: 15px;
+        background: rgba(139, 109, 255, 0.17);
+        border: 1px solid rgba(168, 142, 255, 0.3);
+        font-size: 26px;
       }
 
       .tool-card h3 {
-        font-size: 20px;
-        margin-bottom: 13px;
+        position: relative;
+        font-size: 19px;
+        margin-bottom: 14px;
       }
 
       .tool-card p {
-        color: #aab2c6;
-        font-size: 14px;
-        line-height: 1.8;
-        margin-bottom: 20px;
+        position: relative;
+        color: #aaaac5;
+        font-size: 13px;
+        line-height: 1.85;
+        margin-bottom: 22px;
       }
 
       .tool-link {
-        color: #a99aff;
+        position: relative;
+        color: #b6a1ff;
         font-size: 13px;
         font-weight: bold;
       }
 
+      /* ABOUT */
+
       .about {
-        max-width: 850px;
-        margin: 0 auto 80px;
-        padding: 40px 25px;
+        position: relative;
+        max-width: 1050px;
+        margin: 0 auto 100px;
+        padding: 65px 35px;
         text-align: center;
-        background: #111a2c;
-        border: 1px solid #293650;
-        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(151, 132, 255, 0.22);
+        border-radius: 22px;
+        background:
+          radial-gradient(ellipse at 50% 0%, rgba(117, 78, 218, 0.2), transparent 65%),
+          linear-gradient(135deg, #17152f, #10192d);
       }
 
       .about h2 {
-        font-size: 27px;
-        margin-bottom: 17px;
+        font-size: 31px;
+        margin-bottom: 20px;
       }
 
       .about p {
-        color: #aab2c6;
-        font-size: 15px;
-        line-height: 1.9;
+        max-width: 760px;
+        margin: auto;
+        color: #b4b4cd;
+        font-size: 14px;
+        line-height: 2;
       }
 
       .articles-link {
         display: inline-block;
-        margin-top: 22px;
-        color: #b9aaff;
+        margin-top: 26px;
+        color: #bbaaff;
         text-decoration: none;
-        font-weight: bold;
         font-size: 14px;
+        font-weight: bold;
       }
 
-      @media (max-width: 750px) {
+      .articles-link:hover {
+        color: white;
+      }
+
+      /* RESPONSIVE */
+
+      @media (max-width: 900px) {
         header {
-          padding: 20px;
+          padding: 20px 5%;
+        }
+
+        nav {
+          gap: 15px;
+        }
+
+        .hero {
+          padding: 75px 6%;
+        }
+
+        .hero-inner {
+          grid-template-columns: 1fr 0.8fr;
+          gap: 10px;
+        }
+
+        .hero-art {
+          transform: scale(0.85);
+        }
+
+        .tools-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 680px) {
+        header {
           flex-direction: column;
-          gap: 18px;
+          gap: 19px;
+          padding: 20px 15px;
         }
 
         nav {
           justify-content: center;
-          gap: 15px;
+          gap: 13px 18px;
         }
 
-        nav a { font-size: 12px; }
+        nav a {
+          font-size: 12px;
+        }
 
-        .hero { padding: 85px 22px 75px; }
+        .hero {
+          min-height: auto;
+          padding: 75px 22px 65px;
+        }
 
-        .tools-grid { grid-template-columns: 1fr; }
+        .hero-inner {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
 
-        .section-heading h2 { font-size: 25px; }
+        .hero-content {
+          margin: auto;
+        }
+
+        .hero-description {
+          font-size: 14px;
+        }
+
+        .hero-buttons {
+          justify-content: center;
+        }
+
+        h1 {
+          font-size: clamp(39px, 11vw, 57px);
+          letter-spacing: -2px;
+        }
+
+        .hero-art {
+          min-height: 370px;
+          margin-top: 15px;
+          transform: scale(0.85);
+        }
+
+        .art-orbit {
+          width: 290px;
+          height: 290px;
+        }
+
+        .art-core {
+          width: 215px;
+          height: 290px;
+        }
+
+        .floating-one {
+          right: -2%;
+        }
+
+        .floating-three {
+          right: -5%;
+        }
+
+        .section {
+          padding: 75px 20px;
+        }
+
+        .tools-grid {
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+
+        .tool-card {
+          min-height: 240px;
+        }
+
+        .about {
+          margin: 0 17px 75px;
+          padding: 45px 23px;
+        }
+
+        .about h2 {
+          font-size: 26px;
+        }
+      }
+
+      @media (max-width: 380px) {
+        nav {
+          gap: 12px;
+        }
+
+        nav a {
+          font-size: 11px;
+        }
+
+        .hero-art {
+          transform: scale(0.72);
+          margin: -10px -25px;
+        }
+
+        .cta,
+        .secondary-cta {
+          padding: 14px 17px;
+          font-size: 12px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+
+        *,
+        *::before,
+        *::after {
+          transition-duration: 0.01ms !important;
+        }
       }
     </style>
   </head>
@@ -232,7 +709,7 @@ const description =
     <header>
       <a class="logo" href="/">BEZELS<span>.</span></a>
 
-      <nav>
+      <nav aria-label="Main navigation">
         <a href="/">Home</a>
         <a href="/find-anime/">Find Anime</a>
         <a href="/anime-quiz/">Anime Quiz</a>
@@ -243,25 +720,68 @@ const description =
 
     <main>
       <section class="hero">
-        <div class="tag">YOUR NEXT ANIME STARTS HERE</div>
+        <div class="hero-inner">
+          <div class="hero-content">
+            <div class="tag">
+              <span class="tag-dot"></span>
+              YOUR NEXT ANIME ADVENTURE STARTS HERE
+            </div>
 
-        <h1>Discover Your Next <span>Favourite Anime.</span></h1>
+            <h1>
+              Enter the World of
+              <span>Anime Discovery.</span>
+            </h1>
 
-        <p>
-          Not sure what to watch next? Explore anime based on your
-          favourite genres, mood and storytelling preferences.
-          Take our anime quiz, discover new series and keep your
-          watchlist organised — all in one place.
-        </p>
+            <p class="hero-description">
+              Searching for something worth watching? Discover anime
+              that matches your taste, explore different genres and
+              find stories you might never have discovered otherwise.
+              Your next favourite anime could be one click away.
+            </p>
 
-        <a class="cta" href="/find-anime/">Find Your Next Anime</a>
+            <div class="hero-buttons">
+              <a class="cta" href="/find-anime/">
+                Discover Anime <span>→</span>
+              </a>
+
+              <a class="secondary-cta" href="/anime-quiz/">
+                Take Anime Quiz
+              </a>
+            </div>
+          </div>
+
+          <div class="hero-art" aria-hidden="true">
+            <div class="art-orbit"></div>
+
+            <div class="art-core">
+              <div class="art-character"></div>
+              <span class="art-label">BEYOND THE SCREEN</span>
+              <h2>YOUR NEXT<br />GREAT STORY.</h2>
+              <p>Explore. Discover. Experience.</p>
+            </div>
+
+            <div class="floating-card floating-one">
+              ✦ Discover New Worlds
+            </div>
+
+            <div class="floating-card floating-two">
+              ◈ Find Your Next Favourite
+            </div>
+
+            <div class="floating-card floating-three">
+              ✧ Anime Universe
+            </div>
+          </div>
+        </div>
       </section>
 
       <section class="section">
         <div class="section-heading">
-          <h2>Explore Bezels Tools</h2>
+          <div class="eyebrow">EXPLORE THE UNIVERSE</div>
+          <h2>Your Anime Journey Starts Here</h2>
           <p>
-            Everything you need to discover and organise your next anime.
+            Discover new stories, find your next watch and organise
+            your anime collection with Bezels.
           </p>
         </div>
 
@@ -270,8 +790,8 @@ const description =
             <div class="tool-icon">🎯</div>
             <h3>Quick Anime Finder</h3>
             <p>
-              Choose genres, moods and episode preferences to
-              discover anime that match your interests.
+              Choose your favourite genres, moods and episode
+              preferences to discover anime that match your interests.
             </p>
             <span class="tool-link">Explore Finder →</span>
           </a>
@@ -280,8 +800,8 @@ const description =
             <div class="tool-icon">🧩</div>
             <h3>Anime Recommendation Quiz</h3>
             <p>
-              Answer a series of questions about your anime taste
-              and get recommendations based on your choices.
+              Answer questions about your anime taste and discover
+              recommendations based on your preferences.
             </p>
             <span class="tool-link">Take the Quiz →</span>
           </a>
@@ -299,7 +819,8 @@ const description =
       </section>
 
       <section class="about">
-        <h2>Welcome to Bezels</h2>
+        <div class="eyebrow">WELCOME TO BEZELS</div>
+        <h2>Made for Anime Fans.</h2>
         <p>
           Bezels is an anime discovery platform built to make finding
           your next series easier. Whether you enjoy action, fantasy,
