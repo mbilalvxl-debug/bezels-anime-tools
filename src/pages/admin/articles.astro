@@ -1,4 +1,3 @@
-
 ---
 import ArticleEditor from "../../components/ArticleEditor.astro";
 
@@ -124,9 +123,26 @@ const title = "Article Manager | Bezels";
           <span id="article-total" class="total-count">0 Articles</span>
         </div>
 
+        <div class="article-toolbar">
+          <input
+            id="article-search"
+            class="article-search"
+            type="search"
+            placeholder="Search by title..."
+            aria-label="Search articles by title"
+          />
+          <span id="article-range" class="article-range">Loading articles...</span>
+        </div>
+
         <div id="article-list" class="article-list">
           <p class="empty-state">Loading articles...</p>
         </div>
+
+        <nav id="pagination" class="pagination" aria-label="Article pages" hidden>
+          <button type="button" id="previous-page" class="page-button">← Previous</button>
+          <div id="page-numbers" class="page-numbers"></div>
+          <button type="button" id="next-page" class="page-button">Next →</button>
+        </nav>
       </section>
     </main>
   </div>
@@ -136,10 +152,28 @@ const title = "Article Manager | Bezels";
 <script>
   import { supabase } from "../../lib/supabase";
 
+  type ArticleRecord = {
+    id: string;
+    title: string;
+    slug: string;
+    category: string | null;
+    status: string;
+    published_at: string | null;
+    created_at: string;
+  };
+
+  const PAGE_SIZE = 10;
+
   const message = document.querySelector<HTMLElement>("#page-message");
   const form = document.querySelector<HTMLFormElement>("#article-form");
   const articleList = document.querySelector<HTMLElement>("#article-list");
   const articleTotal = document.querySelector<HTMLElement>("#article-total");
+  const articleRange = document.querySelector<HTMLElement>("#article-range");
+  const articleSearch = document.querySelector<HTMLInputElement>("#article-search");
+  const pagination = document.querySelector<HTMLElement>("#pagination");
+  const pageNumbers = document.querySelector<HTMLElement>("#page-numbers");
+  const previousPageButton = document.querySelector<HTMLButtonElement>("#previous-page");
+  const nextPageButton = document.querySelector<HTMLButtonElement>("#next-page");
   const formHeading = document.querySelector<HTMLElement>("#form-heading");
 
   const titleInput = document.querySelector<HTMLInputElement>("#article-title");
@@ -159,6 +193,11 @@ const title = "Article Manager | Bezels";
 
   let editingId: string | null = null;
   let isAdmin = false;
+  let currentPage = 1;
+  let totalArticles = 0;
+  let totalPages = 1;
+  let currentArticles: ArticleRecord[] = [];
+  let searchTimer: ReturnType<typeof setTimeout> | undefined;
 
   function showMessage(text: string, type = "info") {
     if (!message) return;
@@ -203,9 +242,7 @@ const title = "Article Manager | Bezels";
     if (publishButton) publishButton.textContent = "Publish Article";
     if (cancelButton) cancelButton.hidden = true;
 
-    if (slugInput) {
-      slugInput.dataset.manuallyEdited = "";
-    }
+    if (slugInput) slugInput.dataset.manuallyEdited = "";
 
     window.dispatchEvent(
       new CustomEvent("bezels-set-article-content", {
@@ -214,13 +251,13 @@ const title = "Article Manager | Bezels";
     );
   }
 
-  function renderArticles(articles: any[]) {
-    if (!articleList || !articleTotal) return;
+  function renderArticles(articles: ArticleRecord[]) {
+    if (!articleList) return;
 
-    articleTotal.textContent = `${articles.length} Article${articles.length === 1 ? "" : "s"}`;
+    currentArticles = articles;
 
     if (articles.length === 0) {
-      articleList.innerHTML = '<p class="empty-state">No articles yet. Create your first article above.</p>';
+      articleList.innerHTML = '<p class="empty-state">No articles found. Create your first article above.</p>';
       return;
     }
 
@@ -251,18 +288,101 @@ const title = "Article Manager | Bezels";
     }).join("");
   }
 
+  function renderPagination() {
+    if (!pagination || !pageNumbers || !previousPageButton || !nextPageButton || !articleRange) return;
+
+    totalPages = Math.max(1, Math.ceil(totalArticles / PAGE_SIZE));
+
+    const firstItem = totalArticles === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1;
+    const lastItem = Math.min(currentPage * PAGE_SIZE, totalArticles);
+
+    if (articleRange) {
+      articleRange.textContent = totalArticles === 0
+        ? "No articles to display"
+        : `Showing ${firstItem}–${lastItem} of ${totalArticles} articles`;
+    }
+
+    pagination.hidden = totalPages <= 1;
+    previousPageButton.disabled = currentPage <= 1;
+    nextPageButton.disabled = currentPage >= totalPages;
+
+    const pages = new Set<number>();
+    pages.add(1);
+    pages.add(totalPages);
+
+    for (let page = Math.max(1, currentPage - 2); page <= Math.min(totalPages, currentPage + 2); page++) {
+      pages.add(page);
+    }
+
+    const sortedPages = [...pages].sort((a, b) => a - b);
+    let html = "";
+    let previous = 0;
+
+    for (const page of sortedPages) {
+      if (previous && page - previous > 1) {
+        html += '<span class="page-ellipsis">…</span>';
+      }
+
+      html += `
+        <button
+          type="button"
+          class="page-number ${page === currentPage ? "active" : ""}"
+          data-page="${page}"
+          ${page === currentPage ? 'aria-current="page"' : ""}
+        >${page}</button>
+      `;
+
+      previous = page;
+    }
+
+    pageNumbers.innerHTML = html;
+  }
+
   async function loadArticles() {
-    const { data, error } = await supabase
+    if (!isAdmin || !articleList) return;
+
+    articleList.innerHTML = '<p class="empty-state">Loading articles...</p>';
+    if (articleRange) articleRange.textContent = "Loading articles...";
+
+    const from = (currentPage - 1) * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+    const searchTerm = articleSearch?.value.trim() ?? "";
+
+    let query = supabase
       .from("articles")
-      .select("*")
-      .order("created_at", { ascending: false });
+      .select("*", { count: "exact" });
+
+    if (searchTerm) {
+      query = query.ilike("title", `%${searchTerm}%`);
+    }
+
+    const { data, error, count } = await query
+      .order("created_at", { ascending: false })
+      .range(from, to);
 
     if (error) {
       showMessage(`Could not load articles: ${error.message}`, "error");
+      articleList.innerHTML = '<p class="empty-state">Articles could not be loaded.</p>';
+      if (articleRange) articleRange.textContent = "Unable to load articles";
       return;
     }
 
-    renderArticles(data ?? []);
+    totalArticles = count ?? 0;
+    totalPages = Math.max(1, Math.ceil(totalArticles / PAGE_SIZE));
+
+    if (currentPage > totalPages) {
+      currentPage = totalPages;
+      await loadArticles();
+      return;
+    }
+
+    renderArticles((data ?? []) as ArticleRecord[]);
+
+    if (articleTotal) {
+      articleTotal.textContent = `${totalArticles} Article${totalArticles === 1 ? "" : "s"}`;
+    }
+
+    renderPagination();
   }
 
   async function verifyAdmin() {
@@ -337,32 +457,40 @@ const title = "Article Manager | Bezels";
 
     if (draftButton) draftButton.disabled = true;
     if (publishButton) publishButton.disabled = true;
+    if (activeButton) activeButton.textContent = "Saving...";
 
-    if (activeButton) {
-      activeButton.textContent = "Saving...";
+    try {
+      const result = editingId
+        ? await supabase.from("articles").update(record).eq("id", editingId)
+        : await supabase.from("articles").insert(record);
+
+      if (result.error) throw result.error;
+
+      showMessage(
+        status === "published" ? "Article published successfully!" : "Draft saved successfully!",
+        "success"
+      );
+
+      const wasEditing = Boolean(editingId);
+      resetForm();
+
+      if (!wasEditing) currentPage = 1;
+      await loadArticles();
+    } catch (error) {
+      showMessage(
+        `Save failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+        "error"
+      );
+    } finally {
+      if (draftButton) {
+        draftButton.disabled = false;
+        draftButton.textContent = editingId ? "Update Draft" : "Save Draft";
+      }
+      if (publishButton) {
+        publishButton.disabled = false;
+        publishButton.textContent = editingId ? "Update & Publish" : "Publish Article";
+      }
     }
-
-    const result = editingId
-      ? await supabase.from("articles").update(record).eq("id", editingId)
-      : await supabase.from("articles").insert(record);
-
-    if (draftButton) draftButton.disabled = false;
-    if (publishButton) publishButton.disabled = false;
-    if (draftButton) draftButton.textContent = "Save Draft";
-    if (publishButton) publishButton.textContent = "Publish Article";
-
-    if (result.error) {
-      showMessage(`Save failed: ${result.error.message}`, "error");
-      return;
-    }
-
-    showMessage(
-      status === "published" ? "Article published successfully!" : "Draft saved successfully!",
-      "success"
-    );
-
-    resetForm();
-    await loadArticles();
   }
 
   form?.addEventListener("submit", async (event) => {
@@ -452,7 +580,41 @@ const title = "Article Manager | Bezels";
     }
   });
 
+  articleSearch?.addEventListener("input", () => {
+    if (searchTimer) clearTimeout(searchTimer);
+
+    searchTimer = setTimeout(() => {
+      currentPage = 1;
+      void loadArticles();
+    }, 300);
+  });
+
+  previousPageButton?.addEventListener("click", () => {
+    if (currentPage <= 1) return;
+    currentPage -= 1;
+    void loadArticles();
+  });
+
+  nextPageButton?.addEventListener("click", () => {
+    if (currentPage >= totalPages) return;
+    currentPage += 1;
+    void loadArticles();
+  });
+
+  pageNumbers?.addEventListener("click", (event) => {
+    const target = event.target as HTMLElement;
+    const button = target.closest<HTMLButtonElement>("[data-page]");
+    const page = Number(button?.dataset.page);
+
+    if (!Number.isInteger(page) || page < 1 || page > totalPages || page === currentPage) return;
+
+    currentPage = page;
+    void loadArticles();
+  });
+
   logoutButton?.addEventListener("click", async () => {
+    if (!logoutButton) return;
+
     logoutButton.disabled = true;
     logoutButton.textContent = "Signing out...";
 
@@ -726,7 +888,9 @@ const title = "Article Manager | Bezels";
   .primary-button,
   .secondary-button,
   .edit-button,
-  .delete-button {
+  .delete-button,
+  .page-button,
+  .page-number {
     padding: 12px 17px;
     border: 1px solid #65418a;
     border-radius: 8px;
@@ -745,18 +909,52 @@ const title = "Article Manager | Bezels";
 
   .primary-button:hover,
   .secondary-button:hover,
-  .edit-button:hover {
+  .edit-button:hover,
+  .page-button:not(:disabled):hover,
+  .page-number:hover {
     filter: brightness(1.2);
   }
 
   button:disabled {
     opacity: 0.6;
-    cursor: wait;
+    cursor: not-allowed;
   }
 
   .total-count {
     color: #c18bff;
     font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .article-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin: -7px 0 18px;
+  }
+
+  .article-search {
+    width: 100%;
+    max-width: 340px;
+    padding: 12px 14px;
+    border: 1px solid #49325e;
+    border-radius: 8px;
+    outline: none;
+    background: #0e0a16;
+    color: #f4eaff;
+    font: inherit;
+    font-size: 13px;
+  }
+
+  .article-search:focus {
+    border-color: #b987f0;
+    box-shadow: 0 0 0 3px rgba(185, 135, 240, 0.1);
+  }
+
+  .article-range {
+    color: #a99bb9;
+    font-size: 11px;
     white-space: nowrap;
   }
 
@@ -839,6 +1037,48 @@ const title = "Article Manager | Bezels";
     font-size: 13px;
   }
 
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 24px;
+  }
+
+  .pagination[hidden] {
+    display: none;
+  }
+
+  .page-button {
+    padding: 10px 13px;
+  }
+
+  .page-numbers {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .page-number {
+    min-width: 38px;
+    padding: 10px;
+  }
+
+  .page-number.active {
+    border-color: #b987f0;
+    background: #7440a5;
+    color: #fff;
+    cursor: default;
+  }
+
+  .page-ellipsis {
+    padding: 0 3px;
+    color: #9c8eac;
+  }
+
   @media (max-width: 850px) {
     .sidebar {
       width: 205px;
@@ -896,9 +1136,26 @@ const title = "Article Manager | Bezels";
       grid-column: auto;
     }
 
+    .article-toolbar {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .article-search {
+      max-width: none;
+    }
+
     .article-row {
       align-items: flex-start;
       flex-direction: column;
+    }
+
+    .pagination {
+      gap: 6px;
+    }
+
+    .page-button {
+      padding: 9px 10px;
     }
   }
 </style>
