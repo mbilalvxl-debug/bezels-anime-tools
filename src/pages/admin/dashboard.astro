@@ -18,13 +18,11 @@ const title = "Admin Dashboard | Bezels";
       <a href="/" class="brand">BEZELS<span>.</span></a>
 
       <div class="sidebar-label">MAIN MENU</div>
-
       <a href="/admin/dashboard/" class="nav-link active">
         <span>▦</span> Dashboard
       </a>
 
       <div class="sidebar-label">CONTENT</div>
-
       <a href="/admin/anime/" class="nav-link">
         <span>◈</span> Anime Manager
       </a>
@@ -154,6 +152,9 @@ const title = "Admin Dashboard | Bezels";
         return;
       }
 
+      // Dashboard sirf verified admin ko dikhaya jayega.
+      document.body.classList.add("auth-verified");
+
       if (message) {
         message.textContent = `Admin verified: ${user.email}`;
         message.className = "dashboard-message success";
@@ -190,6 +191,9 @@ const title = "Admin Dashboard | Bezels";
   }
 
   logoutButton?.addEventListener("click", async () => {
+    // Logout ke waqt dashboard foran hide kar do.
+    document.body.classList.remove("auth-verified");
+
     logoutButton.disabled = true;
     logoutButton.textContent = "Signing out...";
 
@@ -197,12 +201,18 @@ const title = "Admin Dashboard | Bezels";
 
     if (error) {
       alert("Logout failed. Please try again.");
+      document.body.classList.add("auth-verified");
       logoutButton.disabled = false;
       logoutButton.textContent = "↪ Logout";
       return;
     }
 
     window.location.replace("/admin/login/");
+  });
+
+  // Browser back/forward cache se dashboard flash nahi hoga.
+  window.addEventListener("pagehide", () => {
+    document.body.classList.remove("auth-verified");
   });
 
   loadDashboard();
@@ -218,6 +228,11 @@ const title = "Admin Dashboard | Bezels";
     background: #0b0713;
     color: #f7f1ff;
     font-family: Arial, sans-serif;
+    visibility: hidden;
+  }
+
+  body.auth-verified {
+    visibility: visible;
   }
 
   .admin-layout {
