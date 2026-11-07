@@ -1,0 +1,227 @@
+
+---
+import Watchlist from "../components/Watchlist.astro";
+
+const title = "My Anime Watchlist | Bezels";
+const description =
+  "Manage your personal anime watchlist. Keep track of anime you want to watch and the shows you have completed.";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: #090d18;
+        color: #f4f6ff;
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 22px 8%;
+        border-bottom: 1px solid #20283b;
+      }
+
+      .logo {
+        font-size: 27px;
+        font-weight: 800;
+        color: white;
+        text-decoration: none;
+      }
+
+      .logo span {
+        color: #8b7cff;
+      }
+
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 22px;
+      }
+
+      nav a {
+        color: #b9bfd1;
+        text-decoration: none;
+        font-size: 14px;
+      }
+
+      nav a:hover,
+      nav a.active {
+        color: #a99aff;
+      }
+
+      .page-intro {
+        max-width: 850px;
+        margin: 0 auto;
+        padding: 65px 22px 10px;
+        text-align: center;
+      }
+
+      .eyebrow {
+        color: #a99aff;
+        font-size: 12px;
+        letter-spacing: 2px;
+      }
+
+      h1 {
+        font-size: clamp(36px, 6vw, 55px);
+        margin: 18px 0;
+      }
+
+      h1 span {
+        color: #9685ff;
+      }
+
+      .page-intro p {
+        color: #aab2c6;
+        line-height: 1.8;
+        font-size: 16px;
+      }
+
+      .article {
+        max-width: 850px;
+        margin: 65px auto;
+        padding: 0 22px;
+        color: #c5ccdc;
+        line-height: 1.9;
+      }
+
+      .article h2 {
+        color: white;
+        font-size: 25px;
+        margin: 35px 0 12px;
+      }
+
+      .article p {
+        margin-bottom: 16px;
+      }
+
+      footer {
+        text-align: center;
+        border-top: 1px solid #20283b;
+        padding: 28px;
+        color: #828da5;
+        font-size: 13px;
+      }
+
+      @media (max-width: 650px) {
+        header {
+          padding: 20px;
+          flex-direction: column;
+          gap: 18px;
+        }
+
+        nav {
+          justify-content: center;
+          gap: 14px;
+        }
+
+        nav a {
+          font-size: 12px;
+        }
+
+        .page-intro {
+          padding-top: 50px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <a class="logo" href="/">BEZELS<span>.</span></a>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/find-anime/">Find Anime</a>
+        <a href="/anime-quiz/">Anime Quiz</a>
+        <a href="/watchlist/" class="active">My Watchlist</a>
+        <a href="/articles/">Articles</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-intro">
+        <span class="eyebrow">YOUR PERSONAL COLLECTION</span>
+        <h1>My Anime <span>Watchlist.</span></h1>
+        <p>
+          Keep your anime collection organised. Save the shows
+          you want to watch, mark completed series and manage
+          your personal watching list.
+        </p>
+      </section>
+
+      <Watchlist />
+
+      <article class="article">
+        <h2>What Is an Anime Watchlist?</h2>
+
+        <p>
+          An anime watchlist is a personal collection of shows
+          you plan to watch or have already completed. It helps
+          you keep track of interesting titles instead of trying
+          to remember every recommendation you discover.
+        </p>
+
+        <h2>Why Keep an Anime Watchlist?</h2>
+
+        <p>
+          With so many anime series available, it is easy to lose
+          track of shows you want to explore. A watchlist gives
+          you one convenient place to organise those titles and
+          decide what to watch next.
+        </p>
+
+        <h2>Want to Watch and Watched Categories</h2>
+
+        <p>
+          Separating planned shows from completed ones makes
+          your collection easier to manage. Use the Want to Watch
+          category for future viewing and mark a series as Watched
+          when you finish it.
+        </p>
+
+        <h2>How to Add Anime to Your Watchlist</h2>
+
+        <p>
+          Explore recommendations using the Bezels Quick Finder
+          or Anime Quiz. When you find a title that interests you,
+          use its Save to Watchlist option. The title will then
+          appear in your personal collection.
+        </p>
+
+        <h2>Managing Your Collection</h2>
+
+        <p>
+          You can change an anime's watched status whenever you
+          need to. You can also remove titles that are no longer
+          relevant to your viewing plans.
+        </p>
+
+        <h2>Keep Discovering New Anime</h2>
+
+        <p>
+          Your watchlist can grow as you explore different genres
+          and recommendations. Visit the Bezels Anime Finder and
+          Anime Quiz to discover more titles for your collection.
+        </p>
+      </article>
+    </main>
+
+    <footer>© 2026 Bezels. Made for anime fans.</footer>
+  </body>
+</html>
