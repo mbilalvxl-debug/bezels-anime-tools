@@ -1,5 +1,7 @@
 
 ---
+import Footer from "../components/Footer.astro";
+
 const title = "Contact Us | Bezels";
 const description =
   "Get in touch with Bezels for questions, feedback, suggestions or website-related enquiries.";
@@ -133,20 +135,6 @@ const email = "mbilalvxl@gmail.com";
         line-height: 1.8;
       }
 
-      footer {
-        text-align: center;
-        border-top: 1px solid #20283b;
-        padding: 28px 20px;
-        color: #828da5;
-        font-size: 13px;
-      }
-
-      footer a {
-        color: #a99aff;
-        text-decoration: none;
-        margin: 0 8px;
-      }
-
       @media (max-width: 650px) {
         header {
           padding: 20px;
@@ -212,13 +200,6 @@ const email = "mbilalvxl@gmail.com";
       </p>
     </main>
 
-    <footer>
-      <p>© 2026 Bezels. Made for anime fans.</p>
-      <p style="margin-top: 12px;">
-        <a href="/about/">About</a>
-        <a href="/articles/">Articles</a>
-        <a href="/privacy-policy/">Privacy Policy</a>
-      </p>
-    </footer>
+    <Footer />
   </body>
 </html>
