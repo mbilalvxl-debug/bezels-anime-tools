@@ -14,141 +14,15 @@ const description =
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#090713" />
     <title>{title}</title>
-    <style>
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-
-      body {
-        background: #090d18;
-        color: #f4f6ff;
-        font-family: Arial, sans-serif;
-        min-height: 100vh;
-      }
-
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 22px 8%;
-        border-bottom: 1px solid #20283b;
-      }
-
-      .logo {
-        font-size: 27px;
-        font-weight: 800;
-        color: white;
-        text-decoration: none;
-      }
-
-      .logo span {
-        color: #8b7cff;
-      }
-
-      nav {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 22px;
-      }
-
-      nav a {
-        color: #b9bfd1;
-        text-decoration: none;
-        font-size: 14px;
-      }
-
-      nav a:hover,
-      nav a.active {
-        color: #a99aff;
-      }
-
-      .page-intro {
-        max-width: 850px;
-        margin: 0 auto;
-        padding: 75px 22px 35px;
-        text-align: center;
-      }
-
-      .eyebrow {
-        color: #a99aff;
-        font-size: 12px;
-        letter-spacing: 2px;
-      }
-
-      h1 {
-        font-size: clamp(36px, 6vw, 55px);
-        margin: 18px 0;
-      }
-
-      h1 span {
-        color: #9685ff;
-      }
-
-      .page-intro p {
-        color: #aab2c6;
-        line-height: 1.8;
-        font-size: 16px;
-      }
-
-      .article {
-        max-width: 850px;
-        margin: 60px auto;
-        padding: 0 22px;
-        color: #c5ccdc;
-        line-height: 1.9;
-      }
-
-      .article h2 {
-        color: white;
-        font-size: 25px;
-        margin: 35px 0 12px;
-      }
-
-      .article h3 {
-        color: #e6e2ff;
-        font-size: 19px;
-        margin: 25px 0 10px;
-      }
-
-      .article p {
-        margin-bottom: 16px;
-      }
-
-      .article ul {
-        padding-left: 24px;
-        margin-bottom: 20px;
-      }
-
-      @media (max-width: 650px) {
-        header {
-          padding: 20px;
-          flex-direction: column;
-          gap: 18px;
-        }
-
-        nav {
-          justify-content: center;
-          gap: 14px;
-        }
-
-        nav a {
-          font-size: 12px;
-        }
-
-        .page-intro {
-          padding-top: 55px;
-        }
-      }
-    </style>
   </head>
 
   <body>
-    <header>
+    <header class="site-header">
       <a class="logo" href="/">BEZELS<span>.</span></a>
-      <nav>
+
+      <nav aria-label="Main navigation">
         <a href="/">Home</a>
         <a href="/find-anime/" class="active">Find Anime</a>
         <a href="/anime-quiz/">Anime Quiz</a>
@@ -159,81 +33,464 @@ const description =
 
     <main>
       <section class="page-intro">
-        <span class="eyebrow">BEZELS ANIME FINDER</span>
-        <h1>Find Your Next <span>Anime.</span></h1>
-        <p>
-          Not sure what to watch next? Use our anime finder to explore
-          recommendations based on genres, moods, episode counts and story
-          preferences.
-        </p>
+        <div class="intro-glow"></div>
+        <div class="intro-grid"></div>
+
+        <div class="intro-content">
+          <span class="eyebrow">
+            <span class="eyebrow-dot"></span>
+            BEZELS ANIME FINDER
+          </span>
+
+          <h1>
+            Find Your Next
+            <span>Anime.</span>
+          </h1>
+
+          <p>
+            Not sure what to watch next? Explore anime recommendations
+            based on your favourite genres, moods, episode counts and
+            storytelling preferences.
+          </p>
+
+          <div class="intro-bottom">
+            <span>✦ Discover something new</span>
+            <span>✦ Find your next favourite</span>
+          </div>
+        </div>
       </section>
 
-      <AnimeFinder />
+      <section class="finder-section">
+        <div class="finder-heading">
+          <span class="section-label">PERSONALISED DISCOVERY</span>
+          <h2>Explore Your <span>Anime Matches.</span></h2>
+          <p>
+            Adjust your preferences and let Bezels help you find
+            something worth watching.
+          </p>
+        </div>
+
+        <div class="finder-wrapper">
+          <AnimeFinder />
+        </div>
+      </section>
 
       <article class="article">
-        <h2>How to Find Anime That Matches Your Interests</h2>
+        <div class="article-inner">
+          <div class="article-heading">
+            <span class="section-label">ANIME DISCOVERY GUIDE</span>
+            <h2>How to Find Anime That <span>Matches Your Interests</span></h2>
+            <p class="article-lead">
+              A useful starting point for discovering anime based on
+              the genres, stories and viewing experiences you enjoy.
+            </p>
+          </div>
 
-        <p>
-          Choosing a new anime can be difficult, especially when there are
-          hundreds of different shows available. Some viewers enjoy action
-          and adventure, while others prefer emotional stories, mystery,
-          comedy or fantasy.
-        </p>
+          <h2>How to Find Anime That Matches Your Interests</h2>
 
-        <p>
-          The Bezels Anime Finder helps make that decision easier by letting
-          you explore anime using preferences that matter to you. Instead of
-          browsing random titles, you can narrow down your choices and
-          discover shows that match your interests.
-        </p>
+          <p>
+            Choosing a new anime can be difficult, especially when there are
+            hundreds of different shows available. Some viewers enjoy action
+            and adventure, while others prefer emotional stories, mystery,
+            comedy or fantasy.
+          </p>
 
-        <h2>Choose Your Favourite Genres</h2>
+          <p>
+            The Bezels Anime Finder helps make that decision easier by letting
+            you explore anime using preferences that matter to you. Instead of
+            browsing random titles, you can narrow down your choices and
+            discover shows that match your interests.
+          </p>
 
-        <p>
-          Genres are a useful starting point when searching for anime.
-          Action, romance, fantasy, thriller, comedy and science fiction
-          offer very different viewing experiences. Selecting genres you
-          enjoy helps the finder identify more relevant recommendations.
-        </p>
+          <h2>Choose Your Favourite Genres</h2>
 
-        <h2>Find Anime Based on Your Mood</h2>
+          <p>
+            Genres are a useful starting point when searching for anime.
+            Action, romance, fantasy, thriller, comedy and science fiction
+            offer very different viewing experiences. Selecting genres you
+            enjoy helps the finder identify more relevant recommendations.
+          </p>
 
-        <p>
-          Your mood can influence what kind of story you want to watch.
-          Sometimes you may want something exciting and adventurous.
-          At other times, a relaxing comedy or an emotional drama might
-          be a better choice.
-        </p>
+          <h2>Find Anime Based on Your Mood</h2>
 
-        <h2>Consider the Episode Count</h2>
+          <p>
+            Your mood can influence what kind of story you want to watch.
+            Sometimes you may want something exciting and adventurous.
+            At other times, a relaxing comedy or an emotional drama might
+            be a better choice.
+          </p>
 
-        <p>
-          The length of an anime series is another important factor.
-          Shorter shows can be convenient when you have limited time,
-          while longer series offer more room for extended stories
-          and character development.
-        </p>
+          <h2>Consider the Episode Count</h2>
 
-        <h2>Explore Stories Beyond Popular Titles</h2>
+          <p>
+            The length of an anime series is another important factor.
+            Shorter shows can be convenient when you have limited time,
+            while longer series offer more room for extended stories
+            and character development.
+          </p>
 
-        <p>
-          Popular anime are not the only shows worth watching. Exploring
-          different genres, storytelling styles and types of protagonists
-          can help you discover series you might otherwise overlook.
-          Try different preferences and use the recommendations as a
-          starting point for your next watch.
-        </p>
+          <h2>Explore Stories Beyond Popular Titles</h2>
 
-        <h2>Start Discovering Anime</h2>
+          <p>
+            Popular anime are not the only shows worth watching. Exploring
+            different genres, storytelling styles and types of protagonists
+            can help you discover series you might otherwise overlook.
+            Try different preferences and use the recommendations as a
+            starting point for your next watch.
+          </p>
 
-        <p>
-          Use the Bezels Anime Finder above to explore titles that fit
-          your preferences. You can experiment with different filters
-          whenever you want to discover something new.
-        </p>
+          <h2>Start Discovering Anime</h2>
+
+          <p>
+            Use the Bezels Anime Finder above to explore titles that fit
+            your preferences. You can experiment with different filters
+            whenever you want to discover something new.
+          </p>
+        </div>
       </article>
     </main>
 
     <Footer />
   </body>
 </html>
+
+<style is:global>
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    background: #090713;
+    color: #f8f6ff;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow-x: hidden;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  /* NAVIGATION */
+
+  .site-header {
+    position: relative;
+    z-index: 10;
+    min-height: 78px;
+    padding: 0 7%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    background: rgba(10, 7, 20, 0.96);
+    border-bottom: 1px solid rgba(151, 105, 255, 0.15);
+  }
+
+  .logo {
+    color: #fff;
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-shadow: 0 0 18px rgba(153, 104, 255, 0.55);
+  }
+
+  .logo span {
+    color: #a77aff;
+  }
+
+  .site-header nav {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 28px;
+  }
+
+  .site-header nav a {
+    color: #aaa3bd;
+    font-size: 13px;
+    transition: 0.25s;
+  }
+
+  .site-header nav a:hover,
+  .site-header nav a.active {
+    color: #c4a6ff;
+    text-shadow: 0 0 12px rgba(169, 113, 255, 0.7);
+  }
+
+  /* PAGE INTRO */
+
+  .page-intro {
+    position: relative;
+    min-height: 380px;
+    padding: 85px 22px 75px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse at 50% 45%, rgba(104, 48, 190, 0.22), transparent 55%),
+      #090713;
+    border-bottom: 1px solid rgba(157, 109, 255, 0.13);
+  }
+
+  .intro-glow {
+    position: absolute;
+    width: 600px;
+    height: 300px;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #7c35ff;
+    opacity: 0.13;
+    filter: blur(130px);
+    pointer-events: none;
+  }
+
+  .intro-grid {
+    position: absolute;
+    inset: 0;
+    opacity: 0.12;
+    background-image:
+      linear-gradient(rgba(174, 126, 255, 0.12) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(174, 126, 255, 0.12) 1px, transparent 1px);
+    background-size: 65px 65px;
+    mask-image: linear-gradient(to bottom, transparent, black, transparent);
+    pointer-events: none;
+  }
+
+  .intro-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 17px;
+    color: #c8aaff;
+    background: rgba(140, 82, 255, 0.09);
+    border: 1px solid rgba(173, 124, 255, 0.28);
+    border-radius: 30px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+
+  .eyebrow-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #b58aff;
+    box-shadow: 0 0 12px #a36aff;
+  }
+
+  .page-intro h1 {
+    margin: 25px 0 18px;
+    font-size: clamp(42px, 7vw, 68px);
+    line-height: 1.12;
+    letter-spacing: -2px;
+    font-weight: 900;
+  }
+
+  .page-intro h1 span {
+    color: #b48aff;
+    text-shadow:
+      0 0 15px rgba(168, 105, 255, 0.65),
+      0 0 45px rgba(126, 60, 255, 0.35);
+  }
+
+  .page-intro p {
+    max-width: 660px;
+    margin: auto;
+    color: #aaa3bc;
+    font-size: 15px;
+    line-height: 1.9;
+  }
+
+  .intro-bottom {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 25px;
+    margin-top: 28px;
+    color: #9286a9;
+    font-size: 11px;
+  }
+
+  .intro-bottom span {
+    color: #b99aff;
+  }
+
+  /* FINDER */
+
+  .finder-section {
+    position: relative;
+    padding: 75px 7% 90px;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(108, 53, 182, 0.09), transparent 55%),
+      #0e0b19;
+  }
+
+  .finder-heading {
+    max-width: 750px;
+    margin: 0 auto 35px;
+    text-align: center;
+  }
+
+  .section-label {
+    color: #b28aff;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2.5px;
+  }
+
+  .finder-heading h2 {
+    margin: 16px 0 12px;
+    color: #f8f6ff;
+    font-size: clamp(27px, 4vw, 39px);
+    letter-spacing: -1px;
+  }
+
+  .finder-heading h2 span {
+    color: #b18aff;
+    text-shadow: 0 0 20px rgba(150, 90, 255, 0.3);
+  }
+
+  .finder-heading p {
+    color: #91899f;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .finder-wrapper {
+    max-width: 1120px;
+    margin: auto;
+    padding: 25px;
+    border: 1px solid rgba(153, 112, 224, 0.22);
+    border-radius: 16px;
+    background: linear-gradient(145deg, rgba(25, 19, 38, 0.95), rgba(17, 14, 28, 0.95));
+    box-shadow:
+      0 0 35px rgba(111, 49, 196, 0.09),
+      inset 0 0 30px rgba(140, 85, 220, 0.025);
+  }
+
+  /* ARTICLE */
+
+  .article {
+    padding: 85px 22px 100px;
+    background: #090713;
+  }
+
+  .article-inner {
+    max-width: 850px;
+    margin: auto;
+    padding: 45px;
+    border: 1px solid rgba(153, 112, 224, 0.17);
+    border-radius: 15px;
+    background: linear-gradient(145deg, #151020, #100d19);
+  }
+
+  .article-heading {
+    padding-bottom: 30px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid rgba(163, 127, 216, 0.17);
+  }
+
+  .article-heading h2 {
+    margin: 17px 0 12px;
+    color: white;
+    font-size: clamp(27px, 4vw, 36px);
+    line-height: 1.3;
+  }
+
+  .article-heading h2 span {
+    color: #b18aff;
+  }
+
+  .article-lead {
+    color: #aaa0bd;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  .article-inner > h2 {
+    margin: 35px 0 13px;
+    color: #c6a5ff;
+    font-size: 21px;
+    line-height: 1.4;
+  }
+
+  .article-inner > h2:first-of-type {
+    margin-top: 0;
+  }
+
+  .article-inner > p {
+    margin: 0 0 18px;
+    color: #aaa3b9;
+    font-size: 14px;
+    line-height: 2;
+  }
+
+  @media (max-width: 850px) {
+    .site-header {
+      padding: 18px 5%;
+      flex-direction: column;
+    }
+
+    .site-header nav {
+      justify-content: center;
+      gap: 17px;
+    }
+
+    .finder-section {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .site-header nav {
+      gap: 12px 16px;
+    }
+
+    .site-header nav a {
+      font-size: 12px;
+    }
+
+    .page-intro {
+      min-height: 350px;
+      padding: 70px 20px;
+    }
+
+    .page-intro h1 {
+      letter-spacing: -1.5px;
+    }
+
+    .page-intro p {
+      font-size: 14px;
+    }
+
+    .intro-bottom {
+      gap: 12px;
+    }
+
+    .finder-wrapper {
+      padding: 12px;
+    }
+
+    .article {
+      padding: 65px 16px;
+    }
+
+    .article-inner {
+      padding: 25px 20px;
+    }
+  }
+</style>
