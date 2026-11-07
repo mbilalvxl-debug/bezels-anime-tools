@@ -1,669 +1,375 @@
 
 ---
 import Footer from "../components/Footer.astro";
-import animeData from "../data/anime.json";
 
 const title = "Bezels — Discover Your Next Favourite Anime";
 const description =
-  "Discover anime recommendations, explore popular anime, take a personalised quiz and organise your watchlist with Bezels.";
-
-const allAnime = animeData.anime;
-
-const featuredIds = [
-  "attack-on-titan",
-  "death-note",
-  "demon-slayer",
-  "jujutsu-kaisen",
-  "solo-leveling",
-  "one-piece",
-  "naruto",
-  "frieren-beyond-journeys-end"
-];
-
-const featuredAnime = featuredIds
-  .map((id) => allAnime.find((anime) => anime.id === id))
-  .filter((anime) => anime && anime.poster);
-
-const genres = [
-  { name: "Action", icon: "⚔️" },
-  { name: "Fantasy", icon: "✨" },
-  { name: "Romance", icon: "💜" },
-  { name: "Mystery", icon: "🔍" },
-  { name: "Sports", icon: "🏆" },
-  { name: "Sci-Fi", icon: "🚀" },
-  { name: "Comedy", icon: "🎭" },
-  { name: "Adventure", icon: "🌌" }
-];
+  "Find your next favourite anime with Bezels. Explore anime recommendations, take a personalised quiz and organise your watchlist.";
 ---
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content={description} />
-  <meta name="theme-color" content="#08091c" />
-  <title>{title}</title>
-
-  <style is:global>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      background: #08091c;
-      color: #f7f5ff;
-      font-family: Arial, sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    a {
-      color: inherit;
-    }
-
-    .site-header {
-      position: relative;
-      z-index: 10;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 6%;
-      background: rgba(8, 9, 28, 0.94);
-      border-bottom: 1px solid rgba(153, 113, 255, 0.2);
-    }
-
-    .logo {
-      font-size: 29px;
-      font-weight: 900;
-      letter-spacing: -1.5px;
-      text-decoration: none;
-    }
-
-    .logo span {
-      color: #a45cff;
-    }
-
-    .main-nav {
-      display: flex;
-      align-items: center;
-      gap: 27px;
-    }
-
-    .main-nav a {
-      color: #c3bfd8;
-      text-decoration: none;
-      font-size: 14px;
-      transition: color 0.2s;
-    }
-
-    .main-nav a:hover {
-      color: #bd8aff;
-    }
-
-    .hero {
-      position: relative;
-      min-height: 490px;
-      display: flex;
-      align-items: center;
-      padding: 85px 7%;
-      overflow: hidden;
-      background:
-        radial-gradient(ellipse at 78% 35%, rgba(123, 48, 255, 0.36), transparent 34%),
-        radial-gradient(ellipse at 95% 90%, rgba(36, 92, 255, 0.23), transparent 35%),
-        linear-gradient(110deg, #08091c 15%, #15103b 60%, #100d2c);
-      border-bottom: 1px solid #28204d;
-    }
-
-    .hero::before {
-      content: "";
-      position: absolute;
-      width: 390px;
-      height: 390px;
-      right: 12%;
-      top: 45px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(190, 139, 255, 0.34), rgba(112, 61, 224, 0.08) 55%, transparent 70%);
-      filter: blur(10px);
-    }
-
-    .hero::after {
-      content: "✦  ✧  ·  ✦  ·  ✧";
-      position: absolute;
-      right: 8%;
-      top: 17%;
-      color: rgba(211, 179, 255, 0.7);
-      font-size: 25px;
-      letter-spacing: 35px;
-      transform: rotate(-15deg);
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 2;
-      max-width: 690px;
-    }
-
-    .hero-tag {
-      display: inline-block;
-      padding: 9px 16px;
-      border: 1px solid #8151dc;
-      border-radius: 30px;
-      background: rgba(124, 70, 221, 0.16);
-      color: #d4b9ff;
-      font-size: 12px;
-      letter-spacing: 1.2px;
-      margin-bottom: 25px;
-    }
-
-    .hero h1 {
-      font-size: clamp(43px, 6.5vw, 76px);
-      line-height: 1.08;
-      letter-spacing: -2.5px;
-      margin-bottom: 23px;
-    }
-
-    .hero h1 span {
-      color: #b47aff;
-      text-shadow: 0 0 35px rgba(164, 92, 255, 0.4);
-    }
-
-    .hero-description {
-      max-width: 570px;
-      color: #c0bdd4;
-      font-size: 16px;
-      line-height: 1.9;
-      margin-bottom: 30px;
-    }
-
-    .hero-buttons {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 15px;
-    }
-
-    .primary-btn,
-    .secondary-btn {
-      display: inline-block;
-      padding: 15px 23px;
-      border-radius: 9px;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: bold;
-      transition: 0.25s;
-    }
-
-    .primary-btn {
-      color: white;
-      background: linear-gradient(110deg, #7939ed, #a43ff0);
-      box-shadow: 0 7px 25px rgba(132, 62, 241, 0.25);
-    }
-
-    .primary-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(132, 62, 241, 0.45);
-    }
-
-    .secondary-btn {
-      border: 1px solid #65509c;
-      color: #e2d7ff;
-      background: rgba(255,255,255,0.04);
-    }
-
-    .secondary-btn:hover {
-      background: rgba(143, 89, 255, 0.15);
-    }
-
-    .section {
-      max-width: 1250px;
-      margin: auto;
-      padding: 65px 25px;
-    }
-
-    .section-heading {
-      display: flex;
-      justify-content: space-between;
-      align-items: end;
-      gap: 15px;
-      margin-bottom: 28px;
-    }
-
-    .section-heading h2 {
-      font-size: clamp(24px, 3vw, 31px);
-      margin-bottom: 9px;
-    }
-
-    .section-heading p {
-      color: #9f9bb7;
-      font-size: 14px;
-      line-height: 1.7;
-    }
-
-    .section-link {
-      color: #bd8aff;
-      font-size: 13px;
-      font-weight: bold;
-      text-decoration: none;
-      white-space: nowrap;
-    }
-
-    .section-link:hover {
-      color: white;
-    }
-
-    .anime-grid {
-      display: grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-      gap: 17px;
-    }
-
-    .anime-card {
-      min-width: 0;
-      overflow: hidden;
-      border-radius: 12px;
-      border: 1px solid #302754;
-      background: #11132b;
-      text-decoration: none;
-      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
-    }
-
-    .anime-card:hover {
-      transform: translateY(-7px);
-      border-color: #a56bff;
-      box-shadow: 0 12px 30px rgba(112, 55, 218, 0.2);
-    }
-
-    .anime-card img {
-      display: block;
-      width: 100%;
-      aspect-ratio: 2 / 3;
-      object-fit: cover;
-      background: #1c1937;
-    }
-
-    .anime-info {
-      padding: 13px 11px 15px;
-    }
-
-    .anime-info h3 {
-      font-size: 14px;
-      line-height: 1.4;
-      margin-bottom: 6px;
-    }
-
-    .anime-year {
-      color: #9f9bb7;
-      font-size: 12px;
-      margin-bottom: 10px;
-    }
-
-    .anime-status {
-      display: inline-block;
-      color: #b6a1ff;
-      font-size: 11px;
-    }
-
-    .genres-grid {
-      display: grid;
-      grid-template-columns: repeat(8, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .genre-card {
-      display: flex;
-      min-height: 120px;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 13px;
-      padding: 15px 8px;
-      border: 1px solid #34295a;
-      border-radius: 13px;
-      background: linear-gradient(145deg, #171634, #101126);
-      text-decoration: none;
-      transition: 0.25s;
-    }
-
-    .genre-card:hover {
-      transform: translateY(-5px);
-      border-color: #a56bff;
-      background: #211744;
-      box-shadow: 0 8px 25px rgba(117, 63, 220, 0.18);
-    }
-
-    .genre-icon {
-      font-size: 29px;
-    }
-
-    .genre-card strong {
-      font-size: 13px;
-    }
-
-    .tools-section {
-      padding-top: 35px;
-    }
-
-    .tools-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 20px;
-    }
-
-    .tool-card {
-      position: relative;
-      min-height: 220px;
-      overflow: hidden;
-      padding: 28px;
-      border: 1px solid #493474;
-      border-radius: 16px;
-      background:
-        radial-gradient(circle at 90% 15%, rgba(151, 78, 255, 0.2), transparent 45%),
-        linear-gradient(135deg, #191637, #111329);
-      text-decoration: none;
-      transition: 0.25s;
-    }
-
-    .tool-card:hover {
-      transform: translateY(-6px);
-      border-color: #ae7aff;
-      box-shadow: 0 12px 30px rgba(120, 57, 235, 0.2);
-    }
-
-    .tool-icon {
-      display: block;
-      color: #b77aff;
-      font-size: 32px;
-      margin-bottom: 20px;
-    }
-
-    .tool-card h3 {
-      font-size: 20px;
-      margin-bottom: 12px;
-    }
-
-    .tool-card p {
-      max-width: 280px;
-      color: #b8b3d0;
-      font-size: 14px;
-      line-height: 1.8;
-      margin-bottom: 20px;
-    }
-
-    .tool-card span:last-child {
-      color: #c79bff;
-      font-size: 13px;
-      font-weight: bold;
-    }
-
-    .about-section {
-      position: relative;
-      max-width: 1250px;
-      margin: 25px auto 75px;
-      padding: 55px 35px;
-      overflow: hidden;
-      border: 1px solid #3b2b66;
-      border-radius: 18px;
-      background:
-        radial-gradient(ellipse at 85% 50%, rgba(120, 58, 231, 0.3), transparent 45%),
-        linear-gradient(110deg, #17132f, #0e1025);
-    }
-
-    .about-content {
-      position: relative;
-      z-index: 1;
-      max-width: 650px;
-    }
-
-    .about-section h2 {
-      font-size: 30px;
-      margin-bottom: 18px;
-    }
-
-    .about-section h2 span {
-      color: #b47aff;
-    }
-
-    .about-section p {
-      color: #c1bdd4;
-      font-size: 15px;
-      line-height: 1.9;
-      margin-bottom: 24px;
-    }
-
-    @media (max-width: 1000px) {
-      .anime-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-      }
-
-      .genres-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 750px) {
-      .site-header {
-        flex-direction: column;
-        gap: 18px;
-        padding: 18px 15px;
-      }
-
-      .main-nav {
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 13px 19px;
-      }
-
-      .main-nav a {
-        font-size: 12px;
-      }
-
-      .hero {
-        min-height: 440px;
-        padding: 75px 23px;
-      }
-
-      .hero::before {
-        right: -150px;
-        opacity: 0.6;
-      }
-
-      .section {
-        padding: 48px 17px;
-      }
-
-      .anime-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 13px;
-      }
-
-      .genres-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 10px;
-      }
-
-      .genre-card {
-        min-height: 100px;
-      }
-
-      .tools-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .about-section {
-        margin: 15px 15px 55px;
-        padding: 35px 22px;
-      }
-    }
-
-    @media (max-width: 380px) {
-      .genres-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .section-heading {
-        align-items: start;
-        flex-direction: column;
-      }
-    }
-  </style>
-</head>
-
-<body>
-  <header class="site-header">
-    <a class="logo" href="/">BEZELS<span>.</span></a>
-
-    <nav class="main-nav" aria-label="Main navigation">
-      <a href="/">Home</a>
-      <a href="/find-anime/">Find Anime</a>
-      <a href="/anime-quiz/">Anime Quiz</a>
-      <a href="/watchlist/">My Watchlist</a>
-      <a href="/articles/">Articles</a>
-    </nav>
-  </header>
-
-  <main>
-    <section class="hero">
-      <div class="hero-content">
-        <div class="hero-tag">✦ YOUR NEXT ANIME STARTS HERE ✦</div>
-
-        <h1>
-          Discover Your Next
-          <span>Favourite Anime.</span>
-        </h1>
-
-        <p class="hero-description">
-          Every anime fan has a different taste. Discover series that
-          match your favourite genres, explore new stories and find
-          something worth watching next.
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+
+  <body>
+    <header class="site-header">
+      <a href="/" class="logo">BEZELS<span>.</span></a>
+
+      <nav>
+        <a href="/">Home</a>
+        <a href="/find-anime/">Find Anime</a>
+        <a href="/anime-quiz/">Anime Quiz</a>
+        <a href="/watchlist/">My Watchlist</a>
+        <a href="/articles/">Articles</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <span class="eyebrow">YOUR ANIME DISCOVERY HUB</span>
+
+        <h1>Discover Your Next <span>Favourite Anime</span></h1>
+
+        <p>
+          Not sure what to watch next? Explore anime recommendations,
+          discover new series and build your personal watchlist with Bezels.
         </p>
 
         <div class="hero-buttons">
-          <a class="primary-btn" href="/find-anime/">
-            ✦ Find Your Next Anime →
-          </a>
-
-          <a class="secondary-btn" href="/anime-quiz/">
-            Take Anime Quiz
-          </a>
+          <a href="/find-anime/" class="primary-btn">Find Your Anime</a>
+          <a href="/anime-quiz/" class="secondary-btn">Take Anime Quiz</a>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section class="section">
-      <div class="section-heading">
-        <div>
-          <h2>🔥 Fan Favourite Anime</h2>
-          <p>Explore some popular titles from the Bezels anime collection.</p>
+      <section class="tools-section">
+        <div class="section-heading">
+          <span class="eyebrow">EXPLORE BEZELS</span>
+          <h2>What Would You Like to Do?</h2>
+          <p>Choose a tool and start exploring.</p>
         </div>
 
-        <a class="section-link" href="/find-anime/">Explore All →</a>
-      </div>
-
-      <div class="anime-grid">
-        {featuredAnime.map((anime) => (
-          <a class="anime-card" href="/find-anime/">
-            <img
-              src={anime.poster}
-              alt={`${anime.title} anime poster`}
-              loading="lazy"
-            />
-
-            <div class="anime-info">
-              <h3>{anime.title}</h3>
-              <p class="anime-year">{anime.year}</p>
-              <span class="anime-status">✦ {anime.status}</span>
-            </div>
+        <div class="tools-grid">
+          <a href="/find-anime/" class="tool-card">
+            <div class="tool-icon">⌕</div>
+            <h3>Find Anime</h3>
+            <p>
+              Discover anime based on your favourite genres, mood,
+              story preferences and episode count.
+            </p>
+            <span class="card-link">Explore Anime →</span>
           </a>
-        ))}
-      </div>
-    </section>
 
-    <section class="section">
-      <div class="section-heading">
-        <div>
-          <h2>⭐ Explore by Genre</h2>
-          <p>Find your next watch according to the stories you enjoy.</p>
-        </div>
-
-        <a class="section-link" href="/find-anime/">Explore Genres →</a>
-      </div>
-
-      <div class="genres-grid">
-        {genres.map((genre) => (
-          <a class="genre-card" href="/find-anime/">
-            <span class="genre-icon">{genre.icon}</span>
-            <strong>{genre.name}</strong>
+          <a href="/anime-quiz/" class="tool-card">
+            <div class="tool-icon">✦</div>
+            <h3>Anime Quiz</h3>
+            <p>
+              Answer a few questions about your preferences and
+              get anime recommendations that match your interests.
+            </p>
+            <span class="card-link">Take the Quiz →</span>
           </a>
-        ))}
-      </div>
-    </section>
 
-    <section class="section tools-section">
-      <div class="section-heading">
-        <div>
-          <h2>⚡ Your Anime Tools</h2>
-          <p>Discover, choose and organise anime in one place.</p>
+          <a href="/watchlist/" class="tool-card">
+            <div class="tool-icon">▤</div>
+            <h3>My Watchlist</h3>
+            <p>
+              Keep track of anime you want to watch and organise
+              the series you have already completed.
+            </p>
+            <span class="card-link">Open Watchlist →</span>
+          </a>
         </div>
-      </div>
+      </section>
 
-      <div class="tools-grid">
-        <a class="tool-card" href="/find-anime/">
-          <span class="tool-icon">⌕</span>
-          <h3>Quick Anime Finder</h3>
-          <p>
-            Select your favourite genres, moods and episode preferences
-            to discover anime that match your interests.
-          </p>
-          <span>Explore Finder →</span>
-        </a>
-
-        <a class="tool-card" href="/anime-quiz/">
-          <span class="tool-icon">✧</span>
-          <h3>Anime Recommendation Quiz</h3>
-          <p>
-            Answer questions about your anime taste and discover
-            recommendations based on your preferences.
-          </p>
-          <span>Take the Quiz →</span>
-        </a>
-
-        <a class="tool-card" href="/watchlist/">
-          <span class="tool-icon">♧</span>
-          <h3>My Anime Watchlist</h3>
-          <p>
-            Save anime for later, track completed titles and
-            organise your personal anime collection.
-          </p>
-          <span>Open Watchlist →</span>
-        </a>
-      </div>
-    </section>
-
-    <section class="about-section">
-      <div class="about-content">
-        <h2>Welcome to <span>Bezels.</span></h2>
+      <section class="about-section">
+        <span class="eyebrow">ABOUT BEZELS</span>
+        <h2>Made for Anime Fans</h2>
 
         <p>
-          Bezels is an anime discovery platform built for fans who
-          are always searching for their next great series. Whether
-          you enjoy action, fantasy, romance, mystery or something
-          completely different, our tools make exploring anime easier.
+          Bezels is an anime discovery platform designed to make
+          finding your next series easier. Whether you enjoy action,
+          fantasy, mystery, romance or something completely different,
+          our tools help you explore anime based on what you love.
         </p>
 
-        <a class="primary-btn" href="/articles/">
-          Explore Anime Articles →
-        </a>
-      </div>
-    </section>
-  </main>
+        <a href="/about/" class="about-link">Learn More About Bezels →</a>
+      </section>
 
-  <Footer />
-</body>
+      <section class="articles-section">
+        <h2>Explore Anime Guides & Articles</h2>
+        <p>
+          Read helpful anime guides, explore different genres and
+          discover more about the world of anime.
+        </p>
+        <a href="/articles/" class="primary-btn">Explore Articles</a>
+      </section>
+    </main>
+
+    <Footer />
+  </body>
 </html>
+
+<style is:global>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: #0b0d17;
+    color: #f5f5fa;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  .site-header {
+    min-height: 76px;
+    padding: 18px 7%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    border-bottom: 1px solid #222638;
+    background: #0b0d17;
+  }
+
+  .logo {
+    color: white;
+    font-size: 27px;
+    font-weight: 800;
+    letter-spacing: 1px;
+  }
+
+  .logo span {
+    color: #9682ff;
+  }
+
+  .site-header nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+  }
+
+  .site-header nav a {
+    color: #b9bed0;
+    font-size: 14px;
+    transition: color 0.2s;
+  }
+
+  .site-header nav a:hover {
+    color: #a895ff;
+  }
+
+  .hero {
+    max-width: 1050px;
+    margin: auto;
+    padding: 115px 25px 105px;
+    text-align: center;
+  }
+
+  .eyebrow {
+    color: #a895ff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+
+  .hero h1 {
+    max-width: 850px;
+    margin: 22px auto;
+    font-size: clamp(38px, 6vw, 65px);
+    line-height: 1.12;
+    font-weight: 800;
+  }
+
+  .hero h1 span {
+    color: #a895ff;
+  }
+
+  .hero > p {
+    max-width: 650px;
+    margin: 0 auto;
+    color: #aab0c3;
+    font-size: 17px;
+    line-height: 1.8;
+  }
+
+  .hero-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 32px;
+  }
+
+  .primary-btn,
+  .secondary-btn {
+    display: inline-block;
+    padding: 14px 23px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    transition: 0.2s;
+  }
+
+  .primary-btn {
+    color: white;
+    background: #7963e8;
+  }
+
+  .primary-btn:hover {
+    background: #907dff;
+    transform: translateY(-2px);
+  }
+
+  .secondary-btn {
+    color: white;
+    border: 1px solid #45415f;
+    background: #171827;
+  }
+
+  .secondary-btn:hover {
+    border-color: #a895ff;
+  }
+
+  .tools-section {
+    padding: 75px 7%;
+    background: #101321;
+  }
+
+  .section-heading {
+    margin-bottom: 38px;
+    text-align: center;
+  }
+
+  .section-heading h2,
+  .about-section h2,
+  .articles-section h2 {
+    margin: 15px 0;
+    font-size: clamp(27px, 4vw, 36px);
+  }
+
+  .section-heading p,
+  .articles-section p {
+    color: #aab0c3;
+    line-height: 1.7;
+  }
+
+  .tools-grid {
+    max-width: 1100px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+  }
+
+  .tool-card {
+    display: block;
+    padding: 30px 25px;
+    border: 1px solid #292d43;
+    border-radius: 13px;
+    background: #171a2a;
+    transition: 0.25s;
+  }
+
+  .tool-card:hover {
+    transform: translateY(-5px);
+    border-color: #8875ed;
+    background: #1c1d32;
+  }
+
+  .tool-icon {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: #292344;
+    color: #b3a4ff;
+    font-size: 27px;
+  }
+
+  .tool-card h3 {
+    margin: 22px 0 12px;
+    color: white;
+    font-size: 21px;
+  }
+
+  .tool-card p {
+    min-height: 80px;
+    color: #aab0c3;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .card-link {
+    display: inline-block;
+    margin-top: 15px;
+    color: #aa99ff;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .about-section {
+    max-width: 850px;
+    margin: auto;
+    padding: 90px 25px;
+    text-align: center;
+  }
+
+  .about-section p {
+    color: #aab0c3;
+    font-size: 15px;
+    line-height: 1.9;
+  }
+
+  .about-link {
+    display: inline-block;
+    margin-top: 15px;
+    color: #aa99ff;
+    font-weight: 700;
+  }
+
+  .articles-section {
+    padding: 65px 20px 80px;
+    text-align: center;
+    background: #101321;
+  }
+
+  .articles-section p {
+    max-width: 620px;
+    margin: 0 auto 25px;
+  }
+
+  @media (max-width: 750px) {
+    .site-header {
+      flex-direction: column;
+      padding: 18px;
+    }
+
+    .site-header nav {
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .tools-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .tool-card p {
+      min-height: auto;
+    }
+
+    .hero {
+      padding: 80px 22px;
+    }
+  }
+</style>
