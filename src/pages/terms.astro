@@ -1,0 +1,295 @@
+
+---
+const title = "Terms & Conditions | Bezels";
+const description =
+  "Read the terms and conditions for using the Bezels anime discovery website and its tools.";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        background: #090d18;
+        color: #f4f6ff;
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 22px 8%;
+        border-bottom: 1px solid #20283b;
+      }
+
+      .logo {
+        color: white;
+        font-size: 27px;
+        font-weight: 800;
+        text-decoration: none;
+      }
+
+      .logo span { color: #8b7cff; }
+
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      nav a {
+        color: #b9bfd1;
+        text-decoration: none;
+        font-size: 14px;
+      }
+
+      nav a:hover { color: #a99aff; }
+
+      main {
+        max-width: 850px;
+        margin: auto;
+        padding: 70px 22px 90px;
+      }
+
+      .eyebrow {
+        color: #a99aff;
+        font-size: 12px;
+        letter-spacing: 2px;
+      }
+
+      h1 {
+        font-size: clamp(36px, 6vw, 52px);
+        margin: 18px 0;
+      }
+
+      h1 span { color: #9685ff; }
+
+      .updated {
+        color: #828da5;
+        font-size: 13px;
+        margin-bottom: 30px;
+      }
+
+      .intro {
+        color: #b9bfd1;
+        font-size: 16px;
+        line-height: 1.9;
+        margin-bottom: 35px;
+      }
+
+      .terms-section { margin-top: 30px; }
+
+      .terms-section h2 {
+        font-size: 21px;
+        margin-bottom: 12px;
+      }
+
+      .terms-section p,
+      .terms-section li {
+        color: #aab2c6;
+        font-size: 14px;
+        line-height: 1.9;
+      }
+
+      .terms-section ul {
+        margin: 12px 0 0 22px;
+      }
+
+      .terms-section a {
+        color: #b9aaff;
+        overflow-wrap: anywhere;
+      }
+
+      footer {
+        text-align: center;
+        border-top: 1px solid #20283b;
+        padding: 28px 20px;
+        color: #828da5;
+        font-size: 13px;
+      }
+
+      footer a {
+        color: #a99aff;
+        text-decoration: none;
+        margin: 0 8px;
+      }
+
+      @media (max-width: 650px) {
+        header {
+          padding: 20px;
+          flex-direction: column;
+          gap: 18px;
+        }
+
+        nav {
+          justify-content: center;
+          gap: 13px;
+        }
+
+        nav a { font-size: 12px; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <a class="logo" href="/">BEZELS<span>.</span></a>
+
+      <nav>
+        <a href="/">Home</a>
+        <a href="/find-anime/">Find Anime</a>
+        <a href="/anime-quiz/">Anime Quiz</a>
+        <a href="/watchlist/">My Watchlist</a>
+        <a href="/articles/">Articles</a>
+      </nav>
+    </header>
+
+    <main>
+      <span class="eyebrow">WEBSITE GUIDELINES</span>
+
+      <h1>Terms & <span>Conditions.</span></h1>
+
+      <p class="updated">Last updated: November 7, 2026</p>
+
+      <p class="intro">
+        Welcome to Bezels. These Terms & Conditions explain
+        the general rules for accessing and using our website.
+        By visiting or using Bezels, you agree to follow these
+        terms. If you do not agree, please discontinue using
+        the website.
+      </p>
+
+      <section class="terms-section">
+        <h2>1. About Bezels</h2>
+        <p>
+          Bezels is an anime discovery platform that provides
+          recommendation tools, a browser-based watchlist and
+          anime-related articles. Features and content may
+          change as the website develops.
+        </p>
+      </section>
+
+      <section class="terms-section">
+        <h2>2. Acceptable Use</h2>
+        <p>
+          You agree to use Bezels responsibly and lawfully.
+          You must not:
+        </p>
+        <ul>
+          <li>Attempt to damage or disrupt the website.</li>
+          <li>Attempt unauthorised access to website systems.</li>
+          <li>Use the website for unlawful or harmful activities.</li>
+          <li>Copy or republish website content without permission.</li>
+          <li>Interfere with other visitors' use of the website.</li>
+        </ul>
+      </section>
+
+      <section class="terms-section">
+        <h2>3. Anime Recommendations</h2>
+        <p>
+          Our recommendation tools use preferences selected by
+          visitors and information in our anime database.
+          Recommendations are suggestions only. Match scores
+          do not guarantee that a particular anime will suit
+          every visitor's personal taste.
+        </p>
+      </section>
+
+      <section class="terms-section">
+        <h2>4. Watchlist and Browser Storage</h2>
+        <p>
+          The watchlist feature may store saved anime and
+          watched-status information in your browser's local
+          storage. This information is associated with the
+          browser and device being used. It may be lost if
+          browser data is cleared and is not guaranteed to
+          synchronise across devices.
+        </p>
+      </section>
+
+      <section class="terms-section">
+        <h2>5. Website Content and Intellectual Property</h2>
+        <p>
+          Original text, website design, branding and tools
+          created for Bezels belong to their respective owners
+          unless otherwise stated. You may not reproduce,
+          distribute or commercially use original Bezels
+          content without appropriate permission.
+        </p>
+        <p style="margin-top: 12px;">
+          Anime titles, characters, logos and related materials
+          may belong to their respective copyright and trademark
+          owners. Bezels does not claim ownership of third-party
+          intellectual property.
+        </p>
+      </section>
+
+      <section class="terms-section">
+        <h2>6. Third-Party Websites</h2>
+        <p>
+          Bezels may link to external websites for additional
+          information or services. We do not control those
+          websites and are not responsible for their content,
+          availability or policies.
+        </p>
+      </section>
+
+      <section class="terms-section">
+        <h2>7. Website Availability</h2>
+        <p>
+          We aim to keep Bezels available and functional, but
+          uninterrupted access cannot be guaranteed. Features
+          may occasionally be updated, changed, suspended or
+          discontinued.
+        </p>
+      </section>
+
+      <section class="terms-section">
+        <h2>8. Limitation of Responsibility</h2>
+        <p>
+          Bezels is provided for general informational and
+          entertainment purposes. To the extent permitted by
+          applicable law, we do not guarantee that all website
+          information will always be complete, accurate or
+          available. Nothing in these terms excludes rights
+          that cannot legally be excluded.
+        </p>
+      </section>
+
+      <section class="terms-section">
+        <h2>9. Changes to These Terms</h2>
+        <p>
+          We may revise these Terms & Conditions as the website
+          and its features change. Updated terms will be
+          published on this page with a revised date.
+        </p>
+      </section>
+
+      <section class="terms-section">
+        <h2>10. Contact</h2>
+        <p>
+          For questions about these terms, contact us at
+          <a href="mailto:mbilalvxl@gmail.com">mbilalvxl@gmail.com</a>.
+        </p>
+      </section>
+    </main>
+
+    <footer>
+      <p>© 2026 Bezels. Made for anime fans.</p>
+      <p style="margin-top: 12px;">
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+        <a href="/privacy-policy/">Privacy Policy</a>
+      </p>
+    </footer>
+  </body>
+</html>
