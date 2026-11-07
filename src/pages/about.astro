@@ -1,0 +1,232 @@
+
+---
+const title = "About Bezels | Anime Discovery Platform";
+const description =
+  "Learn about Bezels, an anime discovery platform designed to help fans find their next favourite anime.";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        background: #090d18;
+        color: #f4f6ff;
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 22px 8%;
+        border-bottom: 1px solid #20283b;
+      }
+
+      .logo {
+        color: white;
+        font-size: 27px;
+        font-weight: 800;
+        text-decoration: none;
+      }
+
+      .logo span { color: #8b7cff; }
+
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      nav a {
+        color: #b9bfd1;
+        text-decoration: none;
+        font-size: 14px;
+      }
+
+      nav a:hover { color: #a99aff; }
+
+      main {
+        max-width: 850px;
+        margin: auto;
+        padding: 75px 22px 90px;
+      }
+
+      .eyebrow {
+        color: #a99aff;
+        font-size: 12px;
+        letter-spacing: 2px;
+      }
+
+      h1 {
+        font-size: clamp(38px, 6vw, 55px);
+        margin: 18px 0 25px;
+      }
+
+      h1 span { color: #9685ff; }
+
+      .intro {
+        color: #b9bfd1;
+        font-size: 17px;
+        line-height: 1.9;
+        margin-bottom: 40px;
+      }
+
+      .content-section {
+        margin-top: 35px;
+      }
+
+      .content-section h2 {
+        font-size: 23px;
+        margin-bottom: 14px;
+      }
+
+      .content-section p {
+        color: #aab2c6;
+        font-size: 15px;
+        line-height: 1.9;
+      }
+
+      .feature-list {
+        margin: 15px 0 0 22px;
+        color: #aab2c6;
+        line-height: 2;
+        font-size: 15px;
+      }
+
+      .cta {
+        display: inline-block;
+        margin-top: 35px;
+        padding: 15px 23px;
+        background: #7965f5;
+        color: white;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+      }
+
+      footer {
+        text-align: center;
+        border-top: 1px solid #20283b;
+        padding: 28px 20px;
+        color: #828da5;
+        font-size: 13px;
+      }
+
+      footer a {
+        color: #a99aff;
+        text-decoration: none;
+        margin: 0 8px;
+      }
+
+      @media (max-width: 650px) {
+        header {
+          padding: 20px;
+          flex-direction: column;
+          gap: 18px;
+        }
+
+        nav {
+          justify-content: center;
+          gap: 13px;
+        }
+
+        nav a { font-size: 12px; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <a class="logo" href="/">BEZELS<span>.</span></a>
+
+      <nav>
+        <a href="/">Home</a>
+        <a href="/find-anime/">Find Anime</a>
+        <a href="/anime-quiz/">Anime Quiz</a>
+        <a href="/watchlist/">My Watchlist</a>
+        <a href="/articles/">Articles</a>
+      </nav>
+    </header>
+
+    <main>
+      <span class="eyebrow">GET TO KNOW US</span>
+
+      <h1>About <span>Bezels.</span></h1>
+
+      <p class="intro">
+        Bezels is an anime discovery platform created to help fans
+        explore new series, find recommendations and organise their
+        anime watching journey.
+      </p>
+
+      <section class="content-section">
+        <h2>Why We Created Bezels</h2>
+        <p>
+          Choosing what to watch next can sometimes be difficult.
+          With so many anime series across different genres and
+          storytelling styles, finding something that matches
+          your interests takes time.
+          <br /><br />
+          Bezels aims to make that discovery process simpler through
+          practical recommendation tools and helpful anime guides.
+        </p>
+      </section>
+
+      <section class="content-section">
+        <h2>What You Can Do on Bezels</h2>
+        <p>
+          Our platform includes features designed to make anime
+          discovery easier:
+        </p>
+
+        <ul class="feature-list">
+          <li>Find anime using quick filters and preferences.</li>
+          <li>Take a detailed quiz to explore recommendations.</li>
+          <li>Save anime to your personal watchlist.</li>
+          <li>Organise titles you want to watch and have watched.</li>
+          <li>Explore anime-related articles and guides.</li>
+        </ul>
+      </section>
+
+      <section class="content-section">
+        <h2>Our Approach</h2>
+        <p>
+          We aim to provide a simple, useful and easy-to-navigate
+          experience for anime fans. Recommendations are based
+          on the preferences selected by visitors, and our
+          platform will continue to improve as we expand its
+          anime database and content.
+        </p>
+      </section>
+
+      <section class="content-section">
+        <h2>Our Goal</h2>
+        <p>
+          Our goal is to build a helpful place where anime fans
+          can discover stories they might otherwise miss and
+          keep track of the series they enjoy.
+        </p>
+      </section>
+
+      <a class="cta" href="/find-anime/">Discover Anime</a>
+    </main>
+
+    <footer>
+      <p>© 2026 Bezels. Made for anime fans.</p>
+      <p style="margin-top: 12px;">
+        <a href="/articles/">Articles</a>
+        <a href="/contact/">Contact</a>
+        <a href="/privacy-policy/">Privacy Policy</a>
+      </p>
+    </footer>
+  </body>
+</html>
