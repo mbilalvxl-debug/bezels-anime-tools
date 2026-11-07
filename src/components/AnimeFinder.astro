@@ -1,12 +1,9 @@
 
 ---
 import animeData from "../data/anime.json";
-import {
-  getRecommendations,
-  type Anime,
-} from "../lib/recommend";
+import { getRecommendations, type Anime } from "../lib/recommend";
 
-const animeList = animeData.anime as Anime[];
+const animeList = animeData.anime as (Anime & { poster?: string })[];
 ---
 
 <section class="finder" id="anime-finder">
@@ -74,7 +71,31 @@ const animeList = animeData.anime as Anime[];
   import { getRecommendations, type Anime } from "../lib/recommend";
   import animeData from "../data/anime.json";
 
-  const animeList = animeData.anime as Anime[];
+  const animeList = animeData.anime as (Anime & { poster?: string })[];
+  const WATCHLIST_KEY = "bezels-watchlist";
+
+  function getSavedIds(): string[] {
+    try {
+      const saved = localStorage.getItem(WATCHLIST_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveAnime(id: string): boolean {
+    const savedIds = getSavedIds();
+
+    if (savedIds.includes(id)) {
+      return false;
+    }
+
+    savedIds.push(id);
+    localStorage.setItem(WATCHLIST_KEY, JSON.stringify(savedIds));
+
+    window.dispatchEvent(new CustomEvent("bezels-watchlist-updated"));
+    return true;
+  }
 
   function setupFinder() {
     const button = document.querySelector<HTMLButtonElement>("#findAnime");
@@ -132,7 +153,6 @@ const animeList = animeData.anime as Anime[];
         const card = document.createElement("article");
         card.className = "result-card";
 
-        // Poster URL comes directly from anime.json
         const posterBox = document.createElement("div");
         posterBox.className = "poster-box";
 
@@ -190,13 +210,51 @@ const animeList = animeData.anime as Anime[];
           ? `Why it matches: ${anime.reasons.join("; ")}`
           : "A possible match based on your selected preferences.";
 
-        info.append(title, meta, score, genres, reason);
+        const saveButton = document.createElement("button");
+        saveButton.className = "watchlist-button";
+
+        function updateSaveButton() {
+          const isSaved = getSavedIds().includes(anime.id);
+          saveButton.textContent = isSaved
+            ? "✓ Saved to Watchlist"
+            : "+ Save to Watchlist";
+          saveButton.classList.toggle("is-saved", isSaved);
+        }
+
+        updateSaveButton();
+
+        saveButton.addEventListener("click", () => {
+          const isSaved = getSavedIds().includes(anime.id);
+
+          if (isSaved) {
+            saveButton.textContent = "✓ Already Saved";
+            return;
+          }
+
+          saveAnime(anime.id);
+          updateSaveButton();
+        });
+
+        info.append(title, meta, score, genres, reason, saveButton);
         card.append(posterBox, info);
         grid.append(card);
       });
 
       results.append(heading, grid);
       results.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    window.addEventListener("bezels-watchlist-updated", () => {
+      results.querySelectorAll<HTMLButtonElement>(".watchlist-button").forEach((saveButton) => {
+        const card = saveButton.closest(".result-card");
+        const title = card?.querySelector(".card-title")?.textContent;
+        const anime = animeList.find((item) => item.title === title);
+
+        if (anime && getSavedIds().includes(anime.id)) {
+          saveButton.textContent = "✓ Saved to Watchlist";
+          saveButton.classList.add("is-saved");
+        }
+      });
     });
   }
 
@@ -416,6 +474,31 @@ const animeList = animeData.anime as Anime[];
     font-size: 12px;
     font-weight: 700;
     margin: 12px 0;
+  }
+
+  .finder .watchlist-button {
+    width: 100%;
+    margin-top: 12px;
+    padding: 12px;
+    border: 1px solid #7965f5;
+    border-radius: 8px;
+    background: #30285b;
+    color: white;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  .finder .watchlist-button:hover {
+    background: #5544b9;
+  }
+
+  .finder .watchlist-button.is-saved {
+    background: #183b35;
+    border-color: #3b9b7d;
+    color: #a8f0d5;
+    cursor: default;
   }
 
   @media (max-width: 600px) {
