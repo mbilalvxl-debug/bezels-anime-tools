@@ -305,13 +305,18 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
     color: white;
   }
 
+  /* Fixed card width: cards won't stretch when filters show fewer results */
   .watchlist-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(210px, 230px));
+    justify-content: start;
+    align-items: start;
     gap: 20px;
   }
 
   .watchlist-card {
+    width: 100%;
+    min-width: 0;
     overflow: hidden;
     background: #111a2c;
     border: 1px solid #293650;
@@ -420,6 +425,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
     .watchlist-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+      justify-content: start;
       gap: 12px;
     }
 
