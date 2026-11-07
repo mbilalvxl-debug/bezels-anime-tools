@@ -1,0 +1,224 @@
+
+---
+const title = "Contact Us | Bezels";
+const description =
+  "Get in touch with Bezels for questions, feedback, suggestions or website-related enquiries.";
+const email = "mbilalvxl@gmail.com";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: #090d18;
+        color: #f4f6ff;
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 22px 8%;
+        border-bottom: 1px solid #20283b;
+      }
+
+      .logo {
+        color: white;
+        font-size: 27px;
+        font-weight: 800;
+        text-decoration: none;
+      }
+
+      .logo span { color: #8b7cff; }
+
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      nav a {
+        color: #b9bfd1;
+        text-decoration: none;
+        font-size: 14px;
+      }
+
+      nav a:hover { color: #a99aff; }
+
+      main {
+        max-width: 850px;
+        margin: auto;
+        padding: 85px 22px 100px;
+        text-align: center;
+      }
+
+      .eyebrow {
+        color: #a99aff;
+        font-size: 12px;
+        letter-spacing: 2px;
+      }
+
+      h1 {
+        font-size: clamp(40px, 6vw, 58px);
+        margin: 20px 0;
+      }
+
+      h1 span { color: #9685ff; }
+
+      .intro {
+        color: #aab2c6;
+        font-size: 16px;
+        line-height: 1.9;
+        max-width: 650px;
+        margin: 0 auto 40px;
+      }
+
+      .contact-card {
+        background: #111a2c;
+        border: 1px solid #293650;
+        border-radius: 16px;
+        padding: 38px 25px;
+        max-width: 600px;
+        margin: auto;
+      }
+
+      .contact-icon {
+        font-size: 38px;
+        margin-bottom: 18px;
+      }
+
+      .contact-card h2 {
+        font-size: 23px;
+        margin-bottom: 14px;
+      }
+
+      .contact-card p {
+        color: #aab2c6;
+        font-size: 14px;
+        line-height: 1.8;
+      }
+
+      .email-link {
+        display: inline-block;
+        margin-top: 23px;
+        background: #7965f5;
+        color: white;
+        text-decoration: none;
+        padding: 15px 24px;
+        border-radius: 8px;
+        font-weight: bold;
+        overflow-wrap: anywhere;
+      }
+
+      .email-link:hover { background: #6651e6; }
+
+      .note {
+        margin-top: 28px;
+        color: #828da5;
+        font-size: 13px;
+        line-height: 1.8;
+      }
+
+      footer {
+        text-align: center;
+        border-top: 1px solid #20283b;
+        padding: 28px 20px;
+        color: #828da5;
+        font-size: 13px;
+      }
+
+      footer a {
+        color: #a99aff;
+        text-decoration: none;
+        margin: 0 8px;
+      }
+
+      @media (max-width: 650px) {
+        header {
+          padding: 20px;
+          flex-direction: column;
+          gap: 18px;
+        }
+
+        nav {
+          justify-content: center;
+          gap: 13px;
+        }
+
+        nav a { font-size: 12px; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <a class="logo" href="/">BEZELS<span>.</span></a>
+
+      <nav>
+        <a href="/">Home</a>
+        <a href="/find-anime/">Find Anime</a>
+        <a href="/anime-quiz/">Anime Quiz</a>
+        <a href="/watchlist/">My Watchlist</a>
+        <a href="/articles/">Articles</a>
+      </nav>
+    </header>
+
+    <main>
+      <span class="eyebrow">WE WOULD LOVE TO HEAR FROM YOU</span>
+
+      <h1>Contact <span>Bezels.</span></h1>
+
+      <p class="intro">
+        Have a question, suggestion, feedback or found something
+        that needs improvement? We welcome messages from our
+        visitors and anime community.
+      </p>
+
+      <section class="contact-card">
+        <div class="contact-icon">✉️</div>
+
+        <h2>Get in Touch</h2>
+
+        <p>
+          For general enquiries, website feedback, suggestions
+          or other questions, you can contact us through email.
+        </p>
+
+        <a
+          class="email-link"
+          href={`mailto:${email}?subject=${encodeURIComponent("Bezels Website Enquiry")}`}
+        >
+          {email}
+        </a>
+      </section>
+
+      <p class="note">
+        We appreciate your interest in Bezels and will do our
+        best to respond to genuine enquiries.
+      </p>
+    </main>
+
+    <footer>
+      <p>© 2026 Bezels. Made for anime fans.</p>
+      <p style="margin-top: 12px;">
+        <a href="/about/">About</a>
+        <a href="/articles/">Articles</a>
+        <a href="/privacy-policy/">Privacy Policy</a>
+      </p>
+    </footer>
+  </body>
+</html>
