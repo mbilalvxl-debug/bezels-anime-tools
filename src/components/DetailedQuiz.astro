@@ -1,7 +1,7 @@
 
 ---
 import animeData from "../data/anime.json";
-import type { Anime } from "../lib/recommend";
+import { getRecommendations, type Anime, type RecommendationPreferences } from "../lib/recommend";
 
 const animeList = animeData.anime as (Anime & { poster?: string })[];
 ---
@@ -10,7 +10,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
   <div class="quiz-heading">
     <span class="quiz-eyebrow">THE BEZELS ANIME QUIZ</span>
     <h2>Find Your <span>Perfect Anime.</span></h2>
-    <p>Answer 6 quick questions and get anime recommendations matched to your taste.</p>
+    <p>Answer 6 quick questions and discover anime matched to your taste.</p>
   </div>
 
   <div class="quiz-panel">
@@ -25,7 +25,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
     <div class="quiz-step active" data-step="0">
       <h3>What genres do you enjoy?</h3>
-      <p class="step-description">Choose as many as you like.</p>
+      <p class="step-description">Select all that you like.</p>
       <div class="quiz-options">
         {["Action", "Adventure", "Fantasy", "Comedy", "Romance", "Mystery", "Sci-Fi", "Drama", "Sports", "Horror", "Psychological", "Supernatural", "Thriller", "Slice of Life", "Historical", "Mecha", "Music"].map((item) => (
           <button type="button" class="quiz-option" data-group="genres" data-value={item}>{item}</button>
@@ -35,7 +35,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
     <div class="quiz-step" data-step="1">
       <h3>What kind of mood are you looking for?</h3>
-      <p class="step-description">Pick the vibes you want from your next anime.</p>
+      <p class="step-description">Choose the vibes you want.</p>
       <div class="quiz-options">
         {["Exciting", "Emotional", "Funny", "Dark", "Intense", "Suspenseful", "Heartwarming", "Motivational", "Relaxed", "Mind-bending", "Lighthearted", "Melancholic"].map((item) => (
           <button type="button" class="quiz-option" data-group="moods" data-value={item}>{item}</button>
@@ -45,7 +45,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
     <div class="quiz-step" data-step="2">
       <h3>What type of story interests you?</h3>
-      <p class="step-description">Choose the story elements you enjoy most.</p>
+      <p class="step-description">Select your favourite story elements.</p>
       <div class="quiz-options">
         {["Adventure", "Mystery", "Revenge", "Survival", "Time travel", "Tournament", "School life", "Coming-of-age", "War", "Friendship", "Investigation", "Mind games", "Romance", "Rebellion", "Competition", "World exploration", "Journey", "Escape"].map((item) => (
           <button type="button" class="quiz-option" data-group="storyTypes" data-value={item}>{item}</button>
@@ -55,7 +55,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
     <div class="quiz-step" data-step="3">
       <h3>What kind of main character do you prefer?</h3>
-      <p class="step-description">Select the protagonist types you enjoy watching.</p>
+      <p class="step-description">Choose the protagonist types you enjoy.</p>
       <div class="quiz-options">
         {["Overpowered", "Underdog", "Intelligent", "Determined", "Unpredictable", "Kind-hearted", "Optimistic", "Strategic", "Conflicted", "Funny", "Introverted", "Mysterious", "Relatable", "Evolving", "Protective", "Competitive"].map((item) => (
           <button type="button" class="quiz-option" data-group="protagonistTypes" data-value={item}>{item}</button>
@@ -65,38 +65,32 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
     <div class="quiz-step" data-step="4">
       <h3>How long should the anime be?</h3>
-      <p class="step-description">Choose the episode count that suits you.</p>
+      <p class="step-description">Choose your preferred episode count.</p>
       <div class="quiz-options vertical-options">
         <button type="button" class="quiz-option single-option" data-group="episodeLength" data-value="short">
-          <strong>Short</strong>
-          <small>13 episodes or less</small>
+          <strong>Short</strong><small>13 episodes or less</small>
         </button>
         <button type="button" class="quiz-option single-option" data-group="episodeLength" data-value="medium">
-          <strong>Medium</strong>
-          <small>14 to 26 episodes</small>
+          <strong>Medium</strong><small>14 to 26 episodes</small>
         </button>
         <button type="button" class="quiz-option single-option" data-group="episodeLength" data-value="long">
-          <strong>Long</strong>
-          <small>More than 26 episodes</small>
+          <strong>Long</strong><small>More than 26 episodes</small>
         </button>
       </div>
     </div>
 
     <div class="quiz-step" data-step="5">
       <h3>Which anime era do you prefer?</h3>
-      <p class="step-description">Choose the release period you want to explore.</p>
+      <p class="step-description">Choose the release period.</p>
       <div class="quiz-options vertical-options">
         <button type="button" class="quiz-option single-option" data-group="releasePeriod" data-value="classic">
-          <strong>Classic anime</strong>
-          <small>Before 2010</small>
+          <strong>Classic anime</strong><small>Before 2010</small>
         </button>
         <button type="button" class="quiz-option single-option" data-group="releasePeriod" data-value="2010s">
-          <strong>2010s anime</strong>
-          <small>2010 to 2019</small>
+          <strong>2010s anime</strong><small>2010 to 2019</small>
         </button>
         <button type="button" class="quiz-option single-option" data-group="releasePeriod" data-value="2020s">
-          <strong>Modern anime</strong>
-          <small>2020 onwards</small>
+          <strong>Modern anime</strong><small>2020 onwards</small>
         </button>
       </div>
     </div>
@@ -132,6 +126,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
     const percentLabel = root.querySelector<HTMLElement>("#quizProgressPercent");
     const error = root.querySelector<HTMLElement>("#quizError");
     const results = root.querySelector<HTMLElement>("#quizResults");
+    const panel = root.querySelector<HTMLElement>(".quiz-panel");
 
     if (!nextButton || !backButton || !progress || !stepLabel || !percentLabel || !error || !results) return;
 
@@ -181,6 +176,8 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
           button.classList.toggle("selected", answers[group].includes(value));
         }
+
+        error.textContent = "";
       });
     });
 
@@ -210,13 +207,11 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
         moods: answers.moods,
         storyTypes: answers.storyTypes,
         protagonistTypes: answers.protagonistTypes,
-        episodeLength: answers.episodeLength[0] as "short" | "medium" | "long" | undefined,
-        releasePeriod: answers.releasePeriod[0] as "classic" | "2010s" | "2020s" | undefined
+        episodeLength: answers.episodeLength[0] as RecommendationPreferences["episodeLength"],
+        releasePeriod: answers.releasePeriod[0] as RecommendationPreferences["releasePeriod"]
       };
 
-      const recommendations = getRecommendations(animeList, preferences, 10)
-        .filter((anime) => anime.matchScore > 0);
-
+      const recommendations = getRecommendations(animeList, preferences, 10);
       showResults(recommendations);
     });
 
@@ -227,15 +222,15 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
       const description = document.createElement("p");
       description.className = "quiz-results-description";
-      description.textContent = "Based on your answers, here are the anime that best match your preferences.";
+      description.textContent = "Here are the anime that best match your answers.";
 
       const grid = document.createElement("div");
       grid.className = "quiz-result-grid";
 
-      if (!recommendations.length) {
+      if (!recommendations.length || recommendations[0].matchScore === 0) {
         const message = document.createElement("p");
         message.className = "quiz-no-results";
-        message.textContent = "We couldn't find a close match. Try changing a few answers and take the quiz again.";
+        message.textContent = "We couldn't find a close match. Try changing your answers and take the quiz again.";
         results.replaceChildren(heading, description, message);
       } else {
         recommendations.forEach((anime) => {
@@ -245,9 +240,11 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
           const posterBox = document.createElement("div");
           posterBox.className = "quiz-poster-box";
 
-          if (anime.poster) {
+          const posterUrl = animeList.find((item) => item.id === anime.id)?.poster;
+
+          if (posterUrl) {
             const poster = document.createElement("img");
-            poster.src = anime.poster;
+            poster.src = posterUrl;
             poster.alt = `${anime.title} anime poster`;
             poster.loading = "lazy";
             poster.onerror = () => {
@@ -281,7 +278,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
           reason.className = "quiz-reason";
           reason.textContent = anime.reasons.length
             ? `Why it matches: ${anime.reasons.join("; ")}`
-            : "A possible match based on your preferences.";
+            : "This anime matches some of your selected preferences.";
 
           info.append(title, meta, score, genres, reason);
           card.append(posterBox, info);
@@ -291,8 +288,8 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
         results.replaceChildren(heading, description, grid);
       }
 
+      panel?.classList.add("quiz-completed");
       results.scrollIntoView({ behavior: "smooth", block: "start" });
-      root.querySelector(".quiz-panel")?.classList.add("quiz-completed");
     }
 
     updateStep();
