@@ -119,6 +119,12 @@ const title = "Anime Manager | Bezels Admin";
 
       <p id="list-message" role="status">Checking admin access...</p>
       <div id="anime-list" class="anime-grid"></div>
+      <nav id="pagination" class="pagination" aria-label="Anime pages" hidden>
+        <button type="button" id="prev-page" class="page-button">← Previous</button>
+        <div id="page-numbers" class="page-numbers"></div>
+        <button type="button" id="next-page" class="page-button">Next →</button>
+      </nav>
+      <p id="page-info" class="page-info" aria-live="polite"></p>
     </section>
   </main>
 </body>
@@ -142,6 +148,8 @@ const title = "Anime Manager | Bezels Admin";
     poster: string | null;
   };
 
+  const PAGE_SIZE = 20;
+
   const form = document.querySelector<HTMLFormElement>("#anime-form");
   const list = document.querySelector<HTMLDivElement>("#anime-list");
   const formMessage = document.querySelector<HTMLElement>("#form-message");
@@ -151,10 +159,20 @@ const title = "Anime Manager | Bezels Admin";
   const saveButton = document.querySelector<HTMLButtonElement>("#save-button");
   const formHeading = document.querySelector<HTMLElement>("#form-heading");
   const cancelButton = document.querySelector<HTMLButtonElement>("#cancel-button");
+  const pagination = document.querySelector<HTMLElement>("#pagination");
+  const pageNumbers = document.querySelector<HTMLElement>("#page-numbers");
+  const pageInfo = document.querySelector<HTMLElement>("#page-info");
+  const prevButton = document.querySelector<HTMLButtonElement>("#prev-page");
+  const nextButton = document.querySelector<HTMLButtonElement>("#next-page");
 
   let animeRecords: AnimeRecord[] = [];
   let editingId: string | null = null;
   let authorized = false;
+  let currentPage = 1;
+  let totalPages = 1;
+  let totalRecords = 0;
+  let loading = false;
+  let searchTimer: number | undefined;
 
   const getInput = (name: string) =>
     form?.elements.namedItem(name) as HTMLInputElement | HTMLTextAreaElement | null;
@@ -198,7 +216,7 @@ const title = "Anime Manager | Bezels Admin";
   function renderAnime(records: AnimeRecord[]) {
     if (!list || !totalCount) return;
 
-    totalCount.textContent = String(animeRecords.length);
+    totalCount.textContent = String(totalRecords);
 
     if (!records.length) {
       list.innerHTML = '<div class="empty">No anime found. Add your first anime using the form above.</div>';
@@ -227,34 +245,94 @@ const title = "Anime Manager | Bezels Admin";
     }).join("");
   }
 
-  function filterAnime() {
-    const query = searchInput?.value.trim().toLowerCase() ?? "";
-    const filtered = animeRecords.filter((anime) =>
-      anime.title.toLowerCase().includes(query) ||
-      anime.id.toLowerCase().includes(query)
-    );
-    renderAnime(filtered);
+  function renderPagination() {
+    if (!pagination || !pageNumbers || !pageInfo || !prevButton || !nextButton) return;
+
+    pagination.hidden = totalPages <= 1;
+    pageInfo.textContent = totalRecords === 0
+      ? "No records to display."
+      : `Showing ${(currentPage - 1) * PAGE_SIZE + 1}–${Math.min(currentPage * PAGE_SIZE, totalRecords)} of ${totalRecords} anime`;
+
+    prevButton.disabled = loading || currentPage <= 1;
+    nextButton.disabled = loading || currentPage >= totalPages;
+
+    const pages = new Set<number>([
+      1,
+      totalPages,
+      currentPage - 1,
+      currentPage,
+      currentPage + 1,
+    ]);
+
+    const sortedPages = [...pages]
+      .filter((page) => page >= 1 && page <= totalPages)
+      .sort((a, b) => a - b);
+
+    let html = "";
+    let previous = 0;
+
+    for (const page of sortedPages) {
+      if (previous && page - previous > 1) {
+        html += '<span class="page-ellipsis">…</span>';
+      }
+
+      html += `<button type="button" class="page-number${page === currentPage ? " active" : ""}" data-page="${page}" ${page === currentPage ? 'aria-current="page"' : ""}>${page}</button>`;
+      previous = page;
+    }
+
+    pageNumbers.innerHTML = html;
   }
 
   async function loadAnime() {
-    if (!listMessage) return;
+    if (!listMessage || loading) return;
 
+    loading = true;
     listMessage.textContent = "Loading anime...";
-    const { data, error } = await supabase
+    listMessage.className = "";
+    renderPagination();
+
+    const query = searchInput?.value.trim() ?? "";
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const end = start + PAGE_SIZE - 1;
+
+    let request = supabase
       .from("anime")
-      .select("*")
+      .select("*", { count: "exact" })
       .order("title", { ascending: true });
+
+    if (query) {
+      const safeQuery = query.replace(/[,%()]/g, " ").trim();
+      if (safeQuery) {
+        request = request.or(`title.ilike.%${safeQuery}%,id.ilike.%${safeQuery}%`);
+      }
+    }
+
+    const { data, error, count } = await request.range(start, end);
+
+    loading = false;
 
     if (error) {
       listMessage.textContent = `Could not load anime: ${error.message}`;
       listMessage.className = "error";
+      renderPagination();
+      return;
+    }
+
+    totalRecords = count ?? 0;
+    totalPages = Math.max(1, Math.ceil(totalRecords / PAGE_SIZE));
+
+    // If the last item on the current page was deleted, move back one page.
+    if (currentPage > totalPages) {
+      currentPage = totalPages;
+      await loadAnime();
       return;
     }
 
     animeRecords = (data ?? []) as AnimeRecord[];
-    listMessage.textContent = `${animeRecords.length} anime loaded from Supabase.`;
+    listMessage.textContent = `${totalRecords} anime found. Showing ${animeRecords.length} on this page.`;
     listMessage.className = "success";
-    filterAnime();
+    renderAnime(animeRecords);
+    renderPagination();
   }
 
   function startEditing(id: string) {
@@ -368,14 +446,17 @@ const title = "Anime Manager | Bezels Admin";
     saveButton.textContent = editingId ? "Updating..." : "Saving...";
 
     try {
+      const wasEditing = Boolean(editingId);
       const result = editingId
         ? await supabase.from("anime").update(record).eq("id", editingId)
         : await supabase.from("anime").insert(record);
 
       if (result.error) throw result.error;
 
-      showMessage(editingId ? "Anime updated successfully!" : "Anime added successfully!");
+      showMessage(wasEditing ? "Anime updated successfully!" : "Anime added successfully!");
       resetForm();
+
+      if (!wasEditing) currentPage = 1;
       await loadAnime();
     } catch (error) {
       showMessage(
@@ -401,7 +482,39 @@ const title = "Anime Manager | Bezels Admin";
     if (action === "delete") await deleteAnime(id);
   });
 
-  searchInput?.addEventListener("input", filterAnime);
+  searchInput?.addEventListener("input", () => {
+    currentPage = 1;
+    window.clearTimeout(searchTimer);
+    searchTimer = window.setTimeout(() => {
+      void loadAnime();
+    }, 250);
+  });
+
+  prevButton?.addEventListener("click", () => {
+    if (currentPage <= 1 || loading) return;
+    currentPage -= 1;
+    void loadAnime();
+  });
+
+  nextButton?.addEventListener("click", () => {
+    if (currentPage >= totalPages || loading) return;
+    currentPage += 1;
+    void loadAnime();
+  });
+
+  pageNumbers?.addEventListener("click", (event) => {
+    const target = event.target as HTMLElement;
+    const button = target.closest<HTMLButtonElement>("button[data-page]");
+    const page = Number(button?.dataset.page);
+
+    if (!Number.isInteger(page) || page < 1 || page > totalPages || page === currentPage || loading) {
+      return;
+    }
+
+    currentPage = page;
+    void loadAnime();
+  });
+
   document.querySelector("#reset-button")?.addEventListener("click", resetForm);
   cancelButton?.addEventListener("click", resetForm);
 
@@ -777,5 +890,63 @@ const title = "Anime Manager | Bezels Admin";
     .anime-grid {
       grid-template-columns: 1fr;
     }
+  }
+
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 28px;
+  }
+
+  .pagination[hidden] {
+    display: none;
+  }
+
+  .page-button,
+  .page-number {
+    min-width: 38px;
+    min-height: 36px;
+    padding: 8px 12px;
+    border: 1px solid #51376c;
+    border-radius: 8px;
+    background: #1b1426;
+    color: #d9c4f2;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .page-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .page-number.active {
+    border-color: #a66aff;
+    background: linear-gradient(100deg, #8744d7, #b66dff);
+    color: #fff;
+  }
+
+  .page-numbers {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .page-ellipsis {
+    color: #a99bb9;
+    padding: 0 2px;
+  }
+
+  .page-info {
+    margin: 12px 0 0;
+    color: #a99bb9;
+    font-size: 11px;
+    text-align: center;
   }
 </style>
