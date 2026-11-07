@@ -1,5 +1,7 @@
 
 ---
+import Footer from "../components/Footer.astro";
+
 const title = "Disclaimer | Bezels";
 const description =
   "Read the Bezels disclaimer covering anime recommendations, website information, third-party content and external links.";
@@ -102,20 +104,6 @@ const description =
       .disclaimer-section a {
         color: #b9aaff;
         overflow-wrap: anywhere;
-      }
-
-      footer {
-        text-align: center;
-        border-top: 1px solid #20283b;
-        padding: 28px 20px;
-        color: #828da5;
-        font-size: 13px;
-      }
-
-      footer a {
-        color: #a99aff;
-        text-decoration: none;
-        margin: 0 8px;
       }
 
       @media (max-width: 650px) {
@@ -262,13 +250,6 @@ const description =
       </section>
     </main>
 
-    <footer>
-      <p>© 2026 Bezels. Made for anime fans.</p>
-      <p style="margin-top: 12px;">
-        <a href="/about/">About</a>
-        <a href="/contact/">Contact</a>
-        <a href="/privacy-policy/">Privacy Policy</a>
-      </p>
-    </footer>
+    <Footer />
   </body>
 </html>
