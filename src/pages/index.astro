@@ -1,841 +1,669 @@
 
 ---
 import Footer from "../components/Footer.astro";
+import animeData from "../data/anime.json";
 
 const title = "Bezels — Discover Your Next Favourite Anime";
 const description =
-  "Find your next favourite anime with Bezels. Explore anime recommendations, take a personalised quiz and organise your watchlist.";
+  "Discover anime recommendations, explore popular anime, take a personalised quiz and organise your watchlist with Bezels.";
+
+const allAnime = animeData.anime;
+
+const featuredIds = [
+  "attack-on-titan",
+  "death-note",
+  "demon-slayer",
+  "jujutsu-kaisen",
+  "solo-leveling",
+  "one-piece",
+  "naruto",
+  "frieren-beyond-journeys-end"
+];
+
+const featuredAnime = featuredIds
+  .map((id) => allAnime.find((anime) => anime.id === id))
+  .filter((anime) => anime && anime.poster);
+
+const genres = [
+  { name: "Action", icon: "⚔️" },
+  { name: "Fantasy", icon: "✨" },
+  { name: "Romance", icon: "💜" },
+  { name: "Mystery", icon: "🔍" },
+  { name: "Sports", icon: "🏆" },
+  { name: "Sci-Fi", icon: "🚀" },
+  { name: "Comedy", icon: "🎭" },
+  { name: "Adventure", icon: "🌌" }
+];
 ---
 
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
-    <meta name="theme-color" content="#080916" />
-    <title>{title}</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content={description} />
+  <meta name="theme-color" content="#08091c" />
+  <title>{title}</title>
 
-    <style>
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
+  <style is:global>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: #08091c;
+      color: #f7f5ff;
+      font-family: Arial, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .site-header {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 6%;
+      background: rgba(8, 9, 28, 0.94);
+      border-bottom: 1px solid rgba(153, 113, 255, 0.2);
+    }
+
+    .logo {
+      font-size: 29px;
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      text-decoration: none;
+    }
+
+    .logo span {
+      color: #a45cff;
+    }
+
+    .main-nav {
+      display: flex;
+      align-items: center;
+      gap: 27px;
+    }
+
+    .main-nav a {
+      color: #c3bfd8;
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+
+    .main-nav a:hover {
+      color: #bd8aff;
+    }
+
+    .hero {
+      position: relative;
+      min-height: 490px;
+      display: flex;
+      align-items: center;
+      padding: 85px 7%;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 78% 35%, rgba(123, 48, 255, 0.36), transparent 34%),
+        radial-gradient(ellipse at 95% 90%, rgba(36, 92, 255, 0.23), transparent 35%),
+        linear-gradient(110deg, #08091c 15%, #15103b 60%, #100d2c);
+      border-bottom: 1px solid #28204d;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      width: 390px;
+      height: 390px;
+      right: 12%;
+      top: 45px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(190, 139, 255, 0.34), rgba(112, 61, 224, 0.08) 55%, transparent 70%);
+      filter: blur(10px);
+    }
+
+    .hero::after {
+      content: "✦  ✧  ·  ✦  ·  ✧";
+      position: absolute;
+      right: 8%;
+      top: 17%;
+      color: rgba(211, 179, 255, 0.7);
+      font-size: 25px;
+      letter-spacing: 35px;
+      transform: rotate(-15deg);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 690px;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      padding: 9px 16px;
+      border: 1px solid #8151dc;
+      border-radius: 30px;
+      background: rgba(124, 70, 221, 0.16);
+      color: #d4b9ff;
+      font-size: 12px;
+      letter-spacing: 1.2px;
+      margin-bottom: 25px;
+    }
+
+    .hero h1 {
+      font-size: clamp(43px, 6.5vw, 76px);
+      line-height: 1.08;
+      letter-spacing: -2.5px;
+      margin-bottom: 23px;
+    }
+
+    .hero h1 span {
+      color: #b47aff;
+      text-shadow: 0 0 35px rgba(164, 92, 255, 0.4);
+    }
+
+    .hero-description {
+      max-width: 570px;
+      color: #c0bdd4;
+      font-size: 16px;
+      line-height: 1.9;
+      margin-bottom: 30px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+      display: inline-block;
+      padding: 15px 23px;
+      border-radius: 9px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: bold;
+      transition: 0.25s;
+    }
+
+    .primary-btn {
+      color: white;
+      background: linear-gradient(110deg, #7939ed, #a43ff0);
+      box-shadow: 0 7px 25px rgba(132, 62, 241, 0.25);
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(132, 62, 241, 0.45);
+    }
+
+    .secondary-btn {
+      border: 1px solid #65509c;
+      color: #e2d7ff;
+      background: rgba(255,255,255,0.04);
+    }
+
+    .secondary-btn:hover {
+      background: rgba(143, 89, 255, 0.15);
+    }
+
+    .section {
+      max-width: 1250px;
+      margin: auto;
+      padding: 65px 25px;
+    }
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 15px;
+      margin-bottom: 28px;
+    }
+
+    .section-heading h2 {
+      font-size: clamp(24px, 3vw, 31px);
+      margin-bottom: 9px;
+    }
+
+    .section-heading p {
+      color: #9f9bb7;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .section-link {
+      color: #bd8aff;
+      font-size: 13px;
+      font-weight: bold;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .section-link:hover {
+      color: white;
+    }
+
+    .anime-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 17px;
+    }
+
+    .anime-card {
+      min-width: 0;
+      overflow: hidden;
+      border-radius: 12px;
+      border: 1px solid #302754;
+      background: #11132b;
+      text-decoration: none;
+      transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+    }
+
+    .anime-card:hover {
+      transform: translateY(-7px);
+      border-color: #a56bff;
+      box-shadow: 0 12px 30px rgba(112, 55, 218, 0.2);
+    }
+
+    .anime-card img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 2 / 3;
+      object-fit: cover;
+      background: #1c1937;
+    }
+
+    .anime-info {
+      padding: 13px 11px 15px;
+    }
+
+    .anime-info h3 {
+      font-size: 14px;
+      line-height: 1.4;
+      margin-bottom: 6px;
+    }
+
+    .anime-year {
+      color: #9f9bb7;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .anime-status {
+      display: inline-block;
+      color: #b6a1ff;
+      font-size: 11px;
+    }
+
+    .genres-grid {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .genre-card {
+      display: flex;
+      min-height: 120px;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 13px;
+      padding: 15px 8px;
+      border: 1px solid #34295a;
+      border-radius: 13px;
+      background: linear-gradient(145deg, #171634, #101126);
+      text-decoration: none;
+      transition: 0.25s;
+    }
+
+    .genre-card:hover {
+      transform: translateY(-5px);
+      border-color: #a56bff;
+      background: #211744;
+      box-shadow: 0 8px 25px rgba(117, 63, 220, 0.18);
+    }
+
+    .genre-icon {
+      font-size: 29px;
+    }
+
+    .genre-card strong {
+      font-size: 13px;
+    }
+
+    .tools-section {
+      padding-top: 35px;
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .tool-card {
+      position: relative;
+      min-height: 220px;
+      overflow: hidden;
+      padding: 28px;
+      border: 1px solid #493474;
+      border-radius: 16px;
+      background:
+        radial-gradient(circle at 90% 15%, rgba(151, 78, 255, 0.2), transparent 45%),
+        linear-gradient(135deg, #191637, #111329);
+      text-decoration: none;
+      transition: 0.25s;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-6px);
+      border-color: #ae7aff;
+      box-shadow: 0 12px 30px rgba(120, 57, 235, 0.2);
+    }
+
+    .tool-icon {
+      display: block;
+      color: #b77aff;
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
+
+    .tool-card h3 {
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+
+    .tool-card p {
+      max-width: 280px;
+      color: #b8b3d0;
+      font-size: 14px;
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    .tool-card span:last-child {
+      color: #c79bff;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .about-section {
+      position: relative;
+      max-width: 1250px;
+      margin: 25px auto 75px;
+      padding: 55px 35px;
+      overflow: hidden;
+      border: 1px solid #3b2b66;
+      border-radius: 18px;
+      background:
+        radial-gradient(ellipse at 85% 50%, rgba(120, 58, 231, 0.3), transparent 45%),
+        linear-gradient(110deg, #17132f, #0e1025);
+    }
+
+    .about-content {
+      position: relative;
+      z-index: 1;
+      max-width: 650px;
+    }
+
+    .about-section h2 {
+      font-size: 30px;
+      margin-bottom: 18px;
+    }
+
+    .about-section h2 span {
+      color: #b47aff;
+    }
+
+    .about-section p {
+      color: #c1bdd4;
+      font-size: 15px;
+      line-height: 1.9;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 1000px) {
+      .anime-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
       }
 
-      html {
-        scroll-behavior: smooth;
+      .genres-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 750px) {
+      .site-header {
+        flex-direction: column;
+        gap: 18px;
+        padding: 18px 15px;
       }
 
-      body {
-        background: #080916;
-        color: #f5f4ff;
-        font-family: Arial, sans-serif;
-        min-height: 100vh;
-        overflow-x: hidden;
-      }
-
-      body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        z-index: -2;
-        pointer-events: none;
-        background:
-          radial-gradient(ellipse at 15% 15%, rgba(92, 55, 190, 0.15), transparent 35%),
-          radial-gradient(ellipse at 85% 35%, rgba(34, 91, 190, 0.13), transparent 38%),
-          radial-gradient(ellipse at 50% 90%, rgba(116, 49, 180, 0.10), transparent 40%);
-      }
-
-      a {
-        -webkit-tap-highlight-color: transparent;
-      }
-
-      /* NAVBAR */
-
-      header {
-        position: relative;
-        z-index: 10;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 21px 7%;
-        background: rgba(8, 9, 22, 0.78);
-        border-bottom: 1px solid rgba(151, 132, 255, 0.13);
-        backdrop-filter: blur(18px);
-      }
-
-      .logo {
-        color: white;
-        font-size: 28px;
-        font-weight: 900;
-        letter-spacing: 2px;
-        text-decoration: none;
-      }
-
-      .logo span {
-        color: #9c83ff;
-        text-shadow: 0 0 15px rgba(156, 131, 255, 0.8);
-      }
-
-      nav {
-        display: flex;
+      .main-nav {
+        justify-content: center;
         flex-wrap: wrap;
-        align-items: center;
-        gap: 27px;
+        gap: 13px 19px;
       }
 
-      nav a {
-        color: #b9b8d0;
-        text-decoration: none;
-        font-size: 13px;
-        transition: color 0.25s;
+      .main-nav a {
+        font-size: 12px;
       }
-
-      nav a:hover {
-        color: #b5a2ff;
-      }
-
-      /* HERO */
 
       .hero {
-        position: relative;
-        min-height: 650px;
-        display: flex;
-        align-items: center;
-        overflow: hidden;
-        padding: 90px 8%;
-        background:
-          linear-gradient(90deg, rgba(8, 9, 22, 0.98) 0%, rgba(8, 9, 22, 0.87) 48%, rgba(8, 9, 22, 0.42) 100%),
-          radial-gradient(ellipse at 78% 45%, rgba(101, 67, 225, 0.30), transparent 45%),
-          linear-gradient(135deg, #11102c, #101b37 55%, #17102b);
-        border-bottom: 1px solid rgba(151, 132, 255, 0.14);
+        min-height: 440px;
+        padding: 75px 23px;
       }
 
       .hero::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        opacity: 0.16;
-        background-image:
-          linear-gradient(rgba(170, 153, 255, 0.12) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(170, 153, 255, 0.12) 1px, transparent 1px);
-        background-size: 55px 55px;
-        mask-image: linear-gradient(to right, transparent, black);
+        right: -150px;
+        opacity: 0.6;
       }
-
-      .hero::after {
-        content: "";
-        position: absolute;
-        width: 480px;
-        height: 480px;
-        right: 7%;
-        top: 50%;
-        transform: translateY(-50%);
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(117, 79, 255, 0.24), rgba(48, 100, 222, 0.09) 45%, transparent 70%);
-        filter: blur(8px);
-        pointer-events: none;
-      }
-
-      .hero-inner {
-        position: relative;
-        z-index: 2;
-        display: grid;
-        grid-template-columns: 1.15fr 0.85fr;
-        align-items: center;
-        gap: 35px;
-        width: 100%;
-        max-width: 1250px;
-        margin: auto;
-      }
-
-      .hero-content {
-        max-width: 680px;
-      }
-
-      .tag {
-        display: inline-flex;
-        align-items: center;
-        gap: 9px;
-        padding: 10px 16px;
-        margin-bottom: 27px;
-        border: 1px solid rgba(163, 139, 255, 0.42);
-        border-radius: 40px;
-        color: #c5b6ff;
-        background: rgba(112, 78, 222, 0.12);
-        font-size: 11px;
-        font-weight: bold;
-        letter-spacing: 1.8px;
-        box-shadow: 0 0 25px rgba(117, 79, 255, 0.08);
-      }
-
-      .tag-dot {
-        width: 7px;
-        height: 7px;
-        background: #a88aff;
-        border-radius: 50%;
-        box-shadow: 0 0 12px #a88aff;
-      }
-
-      h1 {
-        font-size: clamp(43px, 6.2vw, 76px);
-        line-height: 1.08;
-        letter-spacing: -3px;
-        margin-bottom: 24px;
-        font-weight: 900;
-      }
-
-      h1 span {
-        display: block;
-        color: #a993ff;
-        text-shadow: 0 0 35px rgba(137, 103, 255, 0.30);
-      }
-
-      .hero-description {
-        max-width: 600px;
-        color: #b6b7d0;
-        font-size: 16px;
-        line-height: 1.9;
-        margin-bottom: 32px;
-      }
-
-      .hero-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 15px;
-      }
-
-      .cta {
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        gap: 10px;
-        padding: 16px 25px;
-        border-radius: 9px;
-        background: linear-gradient(110deg, #7959ed, #a06bfa);
-        color: white;
-        text-decoration: none;
-        font-size: 14px;
-        font-weight: bold;
-        box-shadow: 0 8px 30px rgba(119, 82, 239, 0.28);
-        transition: transform 0.25s, box-shadow 0.25s;
-      }
-
-      .cta:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 35px rgba(119, 82, 239, 0.45);
-      }
-
-      .secondary-cta {
-        color: #d0c9f5;
-        padding: 15px 20px;
-        border: 1px solid rgba(177, 161, 255, 0.25);
-        border-radius: 9px;
-        text-decoration: none;
-        font-size: 14px;
-        transition: background 0.2s;
-      }
-
-      .secondary-cta:hover {
-        background: rgba(145, 117, 255, 0.12);
-      }
-
-      /* HERO VISUAL */
-
-      .hero-art {
-        position: relative;
-        min-height: 410px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .art-orbit {
-        position: absolute;
-        width: 340px;
-        height: 340px;
-        border: 1px solid rgba(168, 146, 255, 0.24);
-        border-radius: 50%;
-        box-shadow:
-          0 0 45px rgba(119, 84, 240, 0.10),
-          inset 0 0 45px rgba(119, 84, 240, 0.08);
-      }
-
-      .art-orbit::before,
-      .art-orbit::after {
-        content: "";
-        position: absolute;
-        border-radius: 50%;
-        border: 1px solid rgba(119, 162, 255, 0.17);
-      }
-
-      .art-orbit::before {
-        inset: 25px -25px;
-        transform: rotate(35deg);
-      }
-
-      .art-orbit::after {
-        inset: -25px 25px;
-        transform: rotate(-35deg);
-      }
-
-      .art-core {
-        position: relative;
-        width: 245px;
-        height: 325px;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        padding: 26px;
-        overflow: hidden;
-        border: 1px solid rgba(192, 174, 255, 0.42);
-        border-radius: 18px;
-        background:
-          radial-gradient(ellipse at 50% 25%, rgba(177, 127, 255, 0.52), transparent 45%),
-          linear-gradient(145deg, #31205d, #151a3c 55%, #101126);
-        box-shadow:
-          0 0 70px rgba(119, 84, 240, 0.27),
-          0 25px 70px rgba(0, 0, 0, 0.4);
-        transform: rotate(5deg);
-        transition: transform 0.4s;
-      }
-
-      .hero-art:hover .art-core {
-        transform: rotate(0deg) translateY(-7px);
-      }
-
-      .art-core::before {
-        content: "";
-        position: absolute;
-        width: 190px;
-        height: 190px;
-        top: 28px;
-        left: 28px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(206, 179, 255, 0.9), rgba(138, 91, 255, 0.35) 45%, transparent 72%);
-        filter: blur(5px);
-      }
-
-      .art-character {
-        position: absolute;
-        top: 48px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100px;
-        height: 170px;
-        border-radius: 48% 48% 18% 18%;
-        background: linear-gradient(160deg, #c5b4ff 0%, #7963c7 28%, #25264f 75%);
-        clip-path: polygon(50% 0%, 85% 12%, 100% 45%, 80% 100%, 20% 100%, 0% 45%, 15% 12%);
-        filter: drop-shadow(0 0 22px rgba(184, 148, 255, 0.6));
-        opacity: 0.9;
-      }
-
-      .art-character::after {
-        content: "";
-        position: absolute;
-        top: 48px;
-        left: 25px;
-        width: 50px;
-        height: 6px;
-        background: #d8c9ff;
-        border-radius: 50%;
-        box-shadow: 0 0 15px #c7adff;
-      }
-
-      .art-label {
-        position: relative;
-        z-index: 2;
-        color: #b9a6ff;
-        font-size: 10px;
-        letter-spacing: 3px;
-        margin-bottom: 10px;
-      }
-
-      .art-core h2 {
-        position: relative;
-        z-index: 2;
-        font-size: 25px;
-        line-height: 1.15;
-        letter-spacing: 1px;
-      }
-
-      .art-core p {
-        position: relative;
-        z-index: 2;
-        color: #c0bddb;
-        font-size: 11px;
-        margin-top: 10px;
-      }
-
-      .floating-card {
-        position: absolute;
-        z-index: 3;
-        padding: 13px 16px;
-        border: 1px solid rgba(180, 161, 255, 0.3);
-        border-radius: 11px;
-        background: rgba(18, 19, 48, 0.82);
-        backdrop-filter: blur(15px);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-        color: #ded7ff;
-        font-size: 12px;
-        font-weight: bold;
-      }
-
-      .floating-one {
-        top: 55px;
-        right: 2%;
-      }
-
-      .floating-two {
-        bottom: 55px;
-        left: 0;
-      }
-
-      .floating-three {
-        top: 48%;
-        right: -5%;
-        color: #9fd7ff;
-      }
-
-      /* SECTION */
 
       .section {
-        max-width: 1180px;
-        margin: auto;
-        padding: 100px 25px;
+        padding: 48px 17px;
+      }
+
+      .anime-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 13px;
+      }
+
+      .genres-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .genre-card {
+        min-height: 100px;
+      }
+
+      .tools-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .about-section {
+        margin: 15px 15px 55px;
+        padding: 35px 22px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .genres-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .section-heading {
-        text-align: center;
-        margin-bottom: 45px;
+        align-items: start;
+        flex-direction: column;
       }
-
-      .eyebrow {
-        color: #a78cff;
-        font-size: 11px;
-        font-weight: bold;
-        letter-spacing: 2.5px;
-        margin-bottom: 15px;
-      }
-
-      .section-heading h2 {
-        font-size: clamp(28px, 4vw, 40px);
-        margin-bottom: 14px;
-        letter-spacing: -1px;
-      }
-
-      .section-heading p {
-        color: #a9a9c3;
-        line-height: 1.8;
-        font-size: 15px;
-      }
-
-      /* TOOLS */
-
-      .tools-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 22px;
-      }
-
-      .tool-card {
-        position: relative;
-        display: block;
-        min-height: 275px;
-        padding: 30px;
-        overflow: hidden;
-        border: 1px solid rgba(151, 132, 255, 0.19);
-        border-radius: 17px;
-        background:
-          linear-gradient(145deg, rgba(27, 27, 58, 0.92), rgba(14, 19, 39, 0.96));
-        color: white;
-        text-decoration: none;
-        transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
-      }
-
-      .tool-card::before {
-        content: "";
-        position: absolute;
-        width: 180px;
-        height: 180px;
-        top: -100px;
-        right: -75px;
-        border-radius: 50%;
-        background: rgba(126, 92, 255, 0.18);
-        filter: blur(35px);
-        transition: opacity 0.3s;
-      }
-
-      .tool-card:hover {
-        transform: translateY(-8px);
-        border-color: rgba(165, 137, 255, 0.7);
-        box-shadow: 0 15px 40px rgba(78, 53, 168, 0.18);
-      }
-
-      .tool-icon {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 57px;
-        height: 57px;
-        margin-bottom: 25px;
-        border-radius: 15px;
-        background: rgba(139, 109, 255, 0.17);
-        border: 1px solid rgba(168, 142, 255, 0.3);
-        font-size: 26px;
-      }
-
-      .tool-card h3 {
-        position: relative;
-        font-size: 19px;
-        margin-bottom: 14px;
-      }
-
-      .tool-card p {
-        position: relative;
-        color: #aaaac5;
-        font-size: 13px;
-        line-height: 1.85;
-        margin-bottom: 22px;
-      }
-
-      .tool-link {
-        position: relative;
-        color: #b6a1ff;
-        font-size: 13px;
-        font-weight: bold;
-      }
-
-      /* ABOUT */
-
-      .about {
-        position: relative;
-        max-width: 1050px;
-        margin: 0 auto 100px;
-        padding: 65px 35px;
-        text-align: center;
-        overflow: hidden;
-        border: 1px solid rgba(151, 132, 255, 0.22);
-        border-radius: 22px;
-        background:
-          radial-gradient(ellipse at 50% 0%, rgba(117, 78, 218, 0.2), transparent 65%),
-          linear-gradient(135deg, #17152f, #10192d);
-      }
-
-      .about h2 {
-        font-size: 31px;
-        margin-bottom: 20px;
-      }
-
-      .about p {
-        max-width: 760px;
-        margin: auto;
-        color: #b4b4cd;
-        font-size: 14px;
-        line-height: 2;
-      }
-
-      .articles-link {
-        display: inline-block;
-        margin-top: 26px;
-        color: #bbaaff;
-        text-decoration: none;
-        font-size: 14px;
-        font-weight: bold;
-      }
-
-      .articles-link:hover {
-        color: white;
-      }
-
-      /* RESPONSIVE */
-
-      @media (max-width: 900px) {
-        header {
-          padding: 20px 5%;
-        }
-
-        nav {
-          gap: 15px;
-        }
-
-        .hero {
-          padding: 75px 6%;
-        }
-
-        .hero-inner {
-          grid-template-columns: 1fr 0.8fr;
-          gap: 10px;
-        }
-
-        .hero-art {
-          transform: scale(0.85);
-        }
-
-        .tools-grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
-      }
-
-      @media (max-width: 680px) {
-        header {
-          flex-direction: column;
-          gap: 19px;
-          padding: 20px 15px;
-        }
-
-        nav {
-          justify-content: center;
-          gap: 13px 18px;
-        }
-
-        nav a {
-          font-size: 12px;
-        }
-
-        .hero {
-          min-height: auto;
-          padding: 75px 22px 65px;
-        }
-
-        .hero-inner {
-          grid-template-columns: 1fr;
-          text-align: center;
-        }
-
-        .hero-content {
-          margin: auto;
-        }
-
-        .hero-description {
-          font-size: 14px;
-        }
-
-        .hero-buttons {
-          justify-content: center;
-        }
-
-        h1 {
-          font-size: clamp(39px, 11vw, 57px);
-          letter-spacing: -2px;
-        }
-
-        .hero-art {
-          min-height: 370px;
-          margin-top: 15px;
-          transform: scale(0.85);
-        }
-
-        .art-orbit {
-          width: 290px;
-          height: 290px;
-        }
-
-        .art-core {
-          width: 215px;
-          height: 290px;
-        }
-
-        .floating-one {
-          right: -2%;
-        }
-
-        .floating-three {
-          right: -5%;
-        }
-
-        .section {
-          padding: 75px 20px;
-        }
-
-        .tools-grid {
-          grid-template-columns: 1fr;
-          gap: 16px;
-        }
-
-        .tool-card {
-          min-height: 240px;
-        }
-
-        .about {
-          margin: 0 17px 75px;
-          padding: 45px 23px;
-        }
-
-        .about h2 {
-          font-size: 26px;
-        }
-      }
-
-      @media (max-width: 380px) {
-        nav {
-          gap: 12px;
-        }
-
-        nav a {
-          font-size: 11px;
-        }
-
-        .hero-art {
-          transform: scale(0.72);
-          margin: -10px -25px;
-        }
-
-        .cta,
-        .secondary-cta {
-          padding: 14px 17px;
-          font-size: 12px;
-        }
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        html {
-          scroll-behavior: auto;
-        }
-
-        *,
-        *::before,
-        *::after {
-          transition-duration: 0.01ms !important;
-        }
-      }
-    </style>
-  </head>
-
-  <body>
-    <header>
-      <a class="logo" href="/">BEZELS<span>.</span></a>
-
-      <nav aria-label="Main navigation">
-        <a href="/">Home</a>
-        <a href="/find-anime/">Find Anime</a>
-        <a href="/anime-quiz/">Anime Quiz</a>
-        <a href="/watchlist/">My Watchlist</a>
-        <a href="/articles/">Articles</a>
-      </nav>
-    </header>
-
-    <main>
-      <section class="hero">
-        <div class="hero-inner">
-          <div class="hero-content">
-            <div class="tag">
-              <span class="tag-dot"></span>
-              YOUR NEXT ANIME ADVENTURE STARTS HERE
-            </div>
-
-            <h1>
-              Enter the World of
-              <span>Anime Discovery.</span>
-            </h1>
-
-            <p class="hero-description">
-              Searching for something worth watching? Discover anime
-              that matches your taste, explore different genres and
-              find stories you might never have discovered otherwise.
-              Your next favourite anime could be one click away.
-            </p>
-
-            <div class="hero-buttons">
-              <a class="cta" href="/find-anime/">
-                Discover Anime <span>→</span>
-              </a>
-
-              <a class="secondary-cta" href="/anime-quiz/">
-                Take Anime Quiz
-              </a>
-            </div>
-          </div>
-
-          <div class="hero-art" aria-hidden="true">
-            <div class="art-orbit"></div>
-
-            <div class="art-core">
-              <div class="art-character"></div>
-              <span class="art-label">BEYOND THE SCREEN</span>
-              <h2>YOUR NEXT<br />GREAT STORY.</h2>
-              <p>Explore. Discover. Experience.</p>
-            </div>
-
-            <div class="floating-card floating-one">
-              ✦ Discover New Worlds
-            </div>
-
-            <div class="floating-card floating-two">
-              ◈ Find Your Next Favourite
-            </div>
-
-            <div class="floating-card floating-three">
-              ✧ Anime Universe
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="section-heading">
-          <div class="eyebrow">EXPLORE THE UNIVERSE</div>
-          <h2>Your Anime Journey Starts Here</h2>
-          <p>
-            Discover new stories, find your next watch and organise
-            your anime collection with Bezels.
-          </p>
-        </div>
-
-        <div class="tools-grid">
-          <a class="tool-card" href="/find-anime/">
-            <div class="tool-icon">🎯</div>
-            <h3>Quick Anime Finder</h3>
-            <p>
-              Choose your favourite genres, moods and episode
-              preferences to discover anime that match your interests.
-            </p>
-            <span class="tool-link">Explore Finder →</span>
-          </a>
-
-          <a class="tool-card" href="/anime-quiz/">
-            <div class="tool-icon">🧩</div>
-            <h3>Anime Recommendation Quiz</h3>
-            <p>
-              Answer questions about your anime taste and discover
-              recommendations based on your preferences.
-            </p>
-            <span class="tool-link">Take the Quiz →</span>
-          </a>
-
-          <a class="tool-card" href="/watchlist/">
-            <div class="tool-icon">📌</div>
-            <h3>My Anime Watchlist</h3>
-            <p>
-              Save anime you want to watch, track completed titles
-              and keep your personal collection organised.
-            </p>
-            <span class="tool-link">Open Watchlist →</span>
-          </a>
-        </div>
-      </section>
-
-      <section class="about">
-        <div class="eyebrow">WELCOME TO BEZELS</div>
-        <h2>Made for Anime Fans.</h2>
-        <p>
-          Bezels is an anime discovery platform built to make finding
-          your next series easier. Whether you enjoy action, fantasy,
-          romance, mystery or something completely different, our
-          tools help you explore anime according to your preferences.
-          You can also visit our articles section for anime guides
-          and helpful information.
+    }
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <a class="logo" href="/">BEZELS<span>.</span></a>
+
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="/">Home</a>
+      <a href="/find-anime/">Find Anime</a>
+      <a href="/anime-quiz/">Anime Quiz</a>
+      <a href="/watchlist/">My Watchlist</a>
+      <a href="/articles/">Articles</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-tag">✦ YOUR NEXT ANIME STARTS HERE ✦</div>
+
+        <h1>
+          Discover Your Next
+          <span>Favourite Anime.</span>
+        </h1>
+
+        <p class="hero-description">
+          Every anime fan has a different taste. Discover series that
+          match your favourite genres, explore new stories and find
+          something worth watching next.
         </p>
 
-        <a class="articles-link" href="/articles/">
+        <div class="hero-buttons">
+          <a class="primary-btn" href="/find-anime/">
+            ✦ Find Your Next Anime →
+          </a>
+
+          <a class="secondary-btn" href="/anime-quiz/">
+            Take Anime Quiz
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading">
+        <div>
+          <h2>🔥 Fan Favourite Anime</h2>
+          <p>Explore some popular titles from the Bezels anime collection.</p>
+        </div>
+
+        <a class="section-link" href="/find-anime/">Explore All →</a>
+      </div>
+
+      <div class="anime-grid">
+        {featuredAnime.map((anime) => (
+          <a class="anime-card" href="/find-anime/">
+            <img
+              src={anime.poster}
+              alt={`${anime.title} anime poster`}
+              loading="lazy"
+            />
+
+            <div class="anime-info">
+              <h3>{anime.title}</h3>
+              <p class="anime-year">{anime.year}</p>
+              <span class="anime-status">✦ {anime.status}</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-heading">
+        <div>
+          <h2>⭐ Explore by Genre</h2>
+          <p>Find your next watch according to the stories you enjoy.</p>
+        </div>
+
+        <a class="section-link" href="/find-anime/">Explore Genres →</a>
+      </div>
+
+      <div class="genres-grid">
+        {genres.map((genre) => (
+          <a class="genre-card" href="/find-anime/">
+            <span class="genre-icon">{genre.icon}</span>
+            <strong>{genre.name}</strong>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="section tools-section">
+      <div class="section-heading">
+        <div>
+          <h2>⚡ Your Anime Tools</h2>
+          <p>Discover, choose and organise anime in one place.</p>
+        </div>
+      </div>
+
+      <div class="tools-grid">
+        <a class="tool-card" href="/find-anime/">
+          <span class="tool-icon">⌕</span>
+          <h3>Quick Anime Finder</h3>
+          <p>
+            Select your favourite genres, moods and episode preferences
+            to discover anime that match your interests.
+          </p>
+          <span>Explore Finder →</span>
+        </a>
+
+        <a class="tool-card" href="/anime-quiz/">
+          <span class="tool-icon">✧</span>
+          <h3>Anime Recommendation Quiz</h3>
+          <p>
+            Answer questions about your anime taste and discover
+            recommendations based on your preferences.
+          </p>
+          <span>Take the Quiz →</span>
+        </a>
+
+        <a class="tool-card" href="/watchlist/">
+          <span class="tool-icon">♧</span>
+          <h3>My Anime Watchlist</h3>
+          <p>
+            Save anime for later, track completed titles and
+            organise your personal anime collection.
+          </p>
+          <span>Open Watchlist →</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="about-section">
+      <div class="about-content">
+        <h2>Welcome to <span>Bezels.</span></h2>
+
+        <p>
+          Bezels is an anime discovery platform built for fans who
+          are always searching for their next great series. Whether
+          you enjoy action, fantasy, romance, mystery or something
+          completely different, our tools make exploring anime easier.
+        </p>
+
+        <a class="primary-btn" href="/articles/">
           Explore Anime Articles →
         </a>
-      </section>
-    </main>
+      </div>
+    </section>
+  </main>
 
-    <Footer />
-  </body>
+  <Footer />
+</body>
 </html>
