@@ -1,10 +1,8 @@
 
 ---
-import AnimeFinder from "../components/AnimeFinder.astro";
-import DetailedQuiz from "../components/DetailedQuiz.astro";
-import Watchlist from "../components/Watchlist.astro";
-
-const title = "Bezels — Anime Recommendation Finder";
+const title = "Bezels — Discover Your Next Favourite Anime";
+const description =
+  "Find your next favourite anime with Bezels. Explore anime recommendations, take a personalised quiz and organise your watchlist.";
 ---
 
 <!DOCTYPE html>
@@ -12,10 +10,15 @@ const title = "Bezels — Anime Recommendation Finder";
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Discover your next favourite anime with Bezels. Find anime recommendations based on your mood, genres and preferences." />
+    <meta name="description" content={description} />
     <title>{title}</title>
+
     <style>
-      * { box-sizing: border-box; margin: 0; padding: 0; }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
       body {
         background: #090d18;
@@ -28,32 +31,38 @@ const title = "Bezels — Anime Recommendation Finder";
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 25px 8%;
+        padding: 23px 8%;
         border-bottom: 1px solid #20283b;
       }
 
       .logo {
+        color: white;
         font-size: 27px;
         font-weight: 800;
-        color: #fff;
+        text-decoration: none;
       }
 
       .logo span { color: #8b7cff; }
 
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 23px;
+      }
+
       nav a {
         color: #b9bfd1;
         text-decoration: none;
-        margin-left: 25px;
         font-size: 14px;
       }
 
       nav a:hover { color: #a99aff; }
 
       .hero {
-        text-align: center;
-        padding: 115px 20px 85px;
-        max-width: 900px;
+        max-width: 950px;
         margin: auto;
+        padding: 115px 22px 100px;
+        text-align: center;
       }
 
       .tag {
@@ -62,15 +71,16 @@ const title = "Bezels — Anime Recommendation Finder";
         color: #b9aaff;
         padding: 9px 16px;
         border-radius: 30px;
-        font-size: 13px;
+        font-size: 12px;
+        letter-spacing: 1px;
         margin-bottom: 28px;
       }
 
       h1 {
-        font-size: clamp(42px, 7vw, 70px);
-        line-height: 1.08;
+        font-size: clamp(42px, 7vw, 72px);
+        line-height: 1.1;
         letter-spacing: -2px;
-        margin-bottom: 24px;
+        margin-bottom: 25px;
       }
 
       h1 span { color: #9685ff; }
@@ -78,8 +88,8 @@ const title = "Bezels — Anime Recommendation Finder";
       .hero p {
         color: #aab2c6;
         font-size: 17px;
-        line-height: 1.8;
-        max-width: 650px;
+        line-height: 1.9;
+        max-width: 680px;
         margin: 0 auto 35px;
       }
 
@@ -91,105 +101,239 @@ const title = "Bezels — Anime Recommendation Finder";
         border-radius: 9px;
         text-decoration: none;
         font-weight: bold;
+        transition: background 0.2s;
       }
 
-      .features {
+      .cta:hover { background: #6651e6; }
+
+      .section {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 35px 22px 85px;
+      }
+
+      .section-heading {
+        text-align: center;
+        margin-bottom: 35px;
+      }
+
+      .section-heading h2 {
+        font-size: 30px;
+        margin-bottom: 13px;
+      }
+
+      .section-heading p {
+        color: #aab2c6;
+        line-height: 1.7;
+        font-size: 15px;
+      }
+
+      .tools-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 20px;
-        max-width: 1050px;
-        margin: 0 auto;
-        padding: 20px 25px 80px;
       }
 
-      .feature {
+      .tool-card {
+        display: block;
         background: #111a2c;
-        border: 1px solid #25304a;
+        border: 1px solid #293650;
         border-radius: 15px;
         padding: 28px;
+        text-decoration: none;
+        color: white;
+        transition: transform 0.2s, border-color 0.2s;
       }
 
-      .feature h2 {
-        font-size: 19px;
-        margin-bottom: 12px;
+      .tool-card:hover {
+        transform: translateY(-5px);
+        border-color: #7965f5;
       }
 
-      .feature p {
+      .tool-icon {
+        font-size: 30px;
+        margin-bottom: 20px;
+      }
+
+      .tool-card h3 {
+        font-size: 20px;
+        margin-bottom: 13px;
+      }
+
+      .tool-card p {
         color: #aab2c6;
-        line-height: 1.7;
+        font-size: 14px;
+        line-height: 1.8;
+        margin-bottom: 20px;
+      }
+
+      .tool-link {
+        color: #a99aff;
+        font-size: 13px;
+        font-weight: bold;
+      }
+
+      .about {
+        max-width: 850px;
+        margin: 0 auto 80px;
+        padding: 40px 25px;
+        text-align: center;
+        background: #111a2c;
+        border: 1px solid #293650;
+        border-radius: 16px;
+      }
+
+      .about h2 {
+        font-size: 27px;
+        margin-bottom: 17px;
+      }
+
+      .about p {
+        color: #aab2c6;
+        font-size: 15px;
+        line-height: 1.9;
+      }
+
+      .articles-link {
+        display: inline-block;
+        margin-top: 22px;
+        color: #b9aaff;
+        text-decoration: none;
+        font-weight: bold;
         font-size: 14px;
       }
 
       footer {
         text-align: center;
         border-top: 1px solid #20283b;
-        padding: 28px;
+        padding: 28px 20px;
         color: #828da5;
         font-size: 13px;
       }
 
-      @media (max-width: 650px) {
-        header { padding: 20px; }
-        nav a { margin-left: 12px; font-size: 12px; }
-        .hero { padding-top: 85px; }
-        .features { grid-template-columns: 1fr; }
+      footer a {
+        color: #a99aff;
+        text-decoration: none;
+        margin: 0 8px;
+      }
+
+      @media (max-width: 750px) {
+        header {
+          padding: 20px;
+          flex-direction: column;
+          gap: 18px;
+        }
+
+        nav {
+          justify-content: center;
+          gap: 15px;
+        }
+
+        nav a { font-size: 12px; }
+
+        .hero { padding: 85px 22px 75px; }
+
+        .tools-grid { grid-template-columns: 1fr; }
+
+        .section-heading h2 { font-size: 25px; }
       }
     </style>
   </head>
 
   <body>
     <header>
-      <div class="logo">BEZELS<span>.</span></div>
+      <a class="logo" href="/">BEZELS<span>.</span></a>
+
       <nav>
-        <a href="#features">Features</a>
-        <a href="#anime-finder">Quick Finder</a>
-        <a href="#detailed-quiz">Quiz</a>
-        <a href="#watchlist">Watchlist</a>
-        <a href="#about">About</a>
+        <a href="/">Home</a>
+        <a href="/find-anime/">Find Anime</a>
+        <a href="/anime-quiz/">Anime Quiz</a>
+        <a href="/watchlist/">My Watchlist</a>
+        <a href="/articles/">Articles</a>
       </nav>
     </header>
 
     <main>
       <section class="hero">
         <div class="tag">YOUR NEXT ANIME STARTS HERE</div>
-        <h1>Find Your Next <span>Favourite Anime.</span></h1>
+
+        <h1>Discover Your Next <span>Favourite Anime.</span></h1>
+
         <p>
-          Not sure what to watch next? Discover anime that matches your mood,
-          interests and watching preferences. Your next great anime is just
-          around the corner.
+          Not sure what to watch next? Explore anime based on your
+          favourite genres, mood and storytelling preferences.
+          Take our anime quiz, discover new series and keep your
+          watchlist organised — all in one place.
         </p>
-        <a class="cta" href="#features">Explore Bezels</a>
+
+        <a class="cta" href="/find-anime/">Find Your Next Anime</a>
       </section>
 
-      <section class="features" id="features">
-        <article class="feature">
-          <h2>🎯 Quick Filters</h2>
-          <p>Find anime by genre, mood, episode count and story preferences.</p>
-        </article>
+      <section class="section">
+        <div class="section-heading">
+          <h2>Explore Bezels Tools</h2>
+          <p>
+            Everything you need to discover and organise your next anime.
+          </p>
+        </div>
 
-        <article class="feature">
-          <h2>🧩 Personalised Quiz</h2>
-          <p>Answer a few questions and discover anime suited to your taste.</p>
-        </article>
+        <div class="tools-grid">
+          <a class="tool-card" href="/find-anime/">
+            <div class="tool-icon">🎯</div>
+            <h3>Quick Anime Finder</h3>
+            <p>
+              Choose genres, moods and episode preferences to
+              discover anime that match your interests.
+            </p>
+            <span class="tool-link">Explore Finder →</span>
+          </a>
 
-        <article class="feature">
-          <h2>📌 Your Watchlist</h2>
-          <p>Keep track of anime you want to watch and titles you have completed.</p>
-        </article>
+          <a class="tool-card" href="/anime-quiz/">
+            <div class="tool-icon">🧩</div>
+            <h3>Anime Recommendation Quiz</h3>
+            <p>
+              Answer a series of questions about your anime taste
+              and get recommendations based on your choices.
+            </p>
+            <span class="tool-link">Take the Quiz →</span>
+          </a>
+
+          <a class="tool-card" href="/watchlist/">
+            <div class="tool-icon">📌</div>
+            <h3>My Anime Watchlist</h3>
+            <p>
+              Save anime you want to watch, track completed titles
+              and keep your personal collection organised.
+            </p>
+            <span class="tool-link">Open Watchlist →</span>
+          </a>
+        </div>
       </section>
 
-      <AnimeFinder />
+      <section class="about">
+        <h2>Welcome to Bezels</h2>
+        <p>
+          Bezels is an anime discovery platform built to make finding
+          your next series easier. Whether you enjoy action, fantasy,
+          romance, mystery or something completely different, our
+          tools help you explore anime according to your preferences.
+          You can also visit our articles section for anime guides
+          and helpful information.
+        </p>
 
-      <DetailedQuiz />
-
-      <Watchlist />
-
-      <section id="about" class="hero" style="padding-top:20px">
-        <h2>More Than Just Anime Recommendations</h2>
-        <p>Bezels is being built to make discovering your next anime easier.</p>
+        <a class="articles-link" href="/articles/">
+          Explore Anime Articles →
+        </a>
       </section>
     </main>
 
-    <footer>© 2026 Bezels. Made for anime fans.</footer>
+    <footer>
+      <p>© 2026 Bezels. Made for anime fans.</p>
+      <p style="margin-top: 12px;">
+        <a href="/articles/">Articles</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+      </p>
+    </footer>
   </body>
 </html>
