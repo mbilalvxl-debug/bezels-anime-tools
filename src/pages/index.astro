@@ -2,6 +2,7 @@
 ---
 import AnimeFinder from "../components/AnimeFinder.astro";
 import DetailedQuiz from "../components/DetailedQuiz.astro";
+import Watchlist from "../components/Watchlist.astro";
 
 const title = "Bezels — Anime Recommendation Finder";
 ---
@@ -45,6 +46,8 @@ const title = "Bezels — Anime Recommendation Finder";
         margin-left: 25px;
         font-size: 14px;
       }
+
+      nav a:hover { color: #a99aff; }
 
       .hero {
         text-align: center;
@@ -139,6 +142,9 @@ const title = "Bezels — Anime Recommendation Finder";
       <div class="logo">BEZELS<span>.</span></div>
       <nav>
         <a href="#features">Features</a>
+        <a href="#anime-finder">Quick Finder</a>
+        <a href="#detailed-quiz">Quiz</a>
+        <a href="#watchlist">Watchlist</a>
         <a href="#about">About</a>
       </nav>
     </header>
@@ -175,6 +181,8 @@ const title = "Bezels — Anime Recommendation Finder";
       <AnimeFinder />
 
       <DetailedQuiz />
+
+      <Watchlist />
 
       <section id="about" class="hero" style="padding-top:20px">
         <h2>More Than Just Anime Recommendations</h2>
