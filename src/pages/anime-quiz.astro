@@ -14,6 +14,7 @@ const description =
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#0c0815" />
     <title>{title}</title>
 
     <style>
@@ -23,111 +24,221 @@ const description =
         padding: 0;
       }
 
-      body {
-        background: #090d18;
-        color: #f4f6ff;
-        font-family: Arial, sans-serif;
-        min-height: 100vh;
+      html {
+        scroll-behavior: smooth;
       }
 
+      body {
+        background: #0c0815;
+        color: #f8f6ff;
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* NAVIGATION */
+
       header {
+        position: relative;
+        z-index: 10;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 22px 8%;
-        border-bottom: 1px solid #20283b;
+        padding: 21px 8%;
+        background: rgba(12, 8, 21, 0.88);
+        border-bottom: 1px solid rgba(160, 111, 255, 0.2);
+        backdrop-filter: blur(14px);
       }
 
       .logo {
         font-size: 27px;
-        font-weight: 800;
+        font-weight: 900;
         color: white;
         text-decoration: none;
+        letter-spacing: -1px;
       }
 
       .logo span {
-        color: #8b7cff;
+        color: #a66bff;
+        text-shadow: 0 0 15px rgba(166, 107, 255, 0.8);
       }
 
       nav {
         display: flex;
         flex-wrap: wrap;
-        gap: 22px;
+        gap: 25px;
       }
 
       nav a {
-        color: #b9bfd1;
+        color: #bcb1cf;
         text-decoration: none;
-        font-size: 14px;
+        font-size: 13px;
+        font-weight: 600;
+        transition: 0.2s;
       }
 
       nav a:hover,
       nav a.active {
-        color: #a99aff;
+        color: #c39aff;
+        text-shadow: 0 0 13px rgba(166, 107, 255, 0.5);
       }
 
+      /* HERO */
+
       .page-intro {
-        max-width: 850px;
+        position: relative;
+        isolation: isolate;
+        max-width: 1100px;
         margin: 0 auto;
-        padding: 75px 22px 35px;
+        padding: 100px 22px 45px;
         text-align: center;
       }
 
+      .page-intro::before {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        width: 650px;
+        height: 450px;
+        top: 5px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: radial-gradient(
+          ellipse,
+          rgba(125, 58, 221, 0.2),
+          rgba(92, 41, 155, 0.07) 45%,
+          transparent 72%
+        );
+        filter: blur(20px);
+        pointer-events: none;
+      }
+
+      .page-intro::after {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(161, 113, 255, 0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(161, 113, 255, 0.035) 1px, transparent 1px);
+        background-size: 45px 45px;
+        mask-image: linear-gradient(to bottom, black, transparent 90%);
+        pointer-events: none;
+      }
+
       .eyebrow {
-        color: #a99aff;
-        font-size: 12px;
+        display: inline-block;
+        color: #c19aff;
+        font-size: 11px;
+        font-weight: 800;
         letter-spacing: 2px;
+        padding: 10px 17px;
+        border: 1px solid rgba(174, 122, 255, 0.35);
+        border-radius: 30px;
+        background: rgba(132, 73, 214, 0.1);
+        box-shadow: 0 0 20px rgba(132, 73, 214, 0.1);
       }
 
-      h1 {
-        font-size: clamp(36px, 6vw, 55px);
-        margin: 18px 0;
+      .page-intro h1 {
+        font-size: clamp(36px, 6vw, 58px);
+        line-height: 1.15;
+        letter-spacing: -1.8px;
+        margin: 25px 0 18px;
+        color: #fff;
       }
 
-      h1 span {
-        color: #9685ff;
+      .page-intro h1 span {
+        color: #b48aff;
+        text-shadow: 0 0 25px rgba(166, 107, 255, 0.4);
       }
 
       .page-intro p {
-        color: #aab2c6;
-        line-height: 1.8;
-        font-size: 16px;
+        max-width: 700px;
+        margin: 0 auto;
+        color: #aaa0bd;
+        line-height: 1.9;
+        font-size: 15px;
       }
 
-      .article {
-        max-width: 850px;
-        margin: 60px auto;
+      /* QUIZ AREA */
+
+      .quiz-container {
+        position: relative;
+        max-width: 1150px;
+        margin: 0 auto;
         padding: 0 22px;
-        color: #c5ccdc;
+      }
+
+      /* ARTICLE */
+
+      .article {
+        position: relative;
+        max-width: 1050px;
+        margin: 55px auto 85px;
+        padding: 42px;
+        color: #c7bdd8;
         line-height: 1.9;
+        background: linear-gradient(145deg, #191326, #100c19);
+        border: 1px solid rgba(153, 112, 224, 0.23);
+        border-radius: 16px;
+        box-shadow: 0 0 35px rgba(111, 49, 196, 0.07);
+      }
+
+      .article-label {
+        display: inline-block;
+        color: #b48aff;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 2px;
+        margin-bottom: 12px;
       }
 
       .article h2 {
-        color: white;
-        font-size: 25px;
-        margin: 35px 0 12px;
+        color: #f6efff;
+        font-size: 23px;
+        line-height: 1.4;
+        margin: 30px 0 12px;
+      }
+
+      .article h2:first-of-type {
+        margin-top: 5px;
       }
 
       .article h3 {
-        color: #e6e2ff;
-        font-size: 19px;
+        color: #d9c4ff;
+        font-size: 18px;
         margin: 25px 0 10px;
       }
 
       .article p {
-        margin-bottom: 16px;
+        color: #aaa0bd;
+        font-size: 14px;
+        line-height: 1.9;
+        margin-bottom: 17px;
       }
 
-      @media (max-width: 650px) {
+      .article-divider {
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          rgba(174, 122, 255, 0.45),
+          rgba(174, 122, 255, 0.04)
+        );
+        margin: 28px 0;
+      }
+
+      /* RESPONSIVE */
+
+      @media (max-width: 750px) {
         header {
-          padding: 20px;
+          padding: 20px 5%;
           flex-direction: column;
           gap: 18px;
         }
 
         nav {
           justify-content: center;
-          gap: 14px;
+          gap: 17px;
         }
 
         nav a {
@@ -135,7 +246,34 @@ const description =
         }
 
         .page-intro {
-          padding-top: 55px;
+          padding-top: 75px;
+        }
+
+        .article {
+          margin: 40px 15px 65px;
+          padding: 28px 22px;
+        }
+      }
+
+      @media (max-width: 450px) {
+        .page-intro h1 {
+          font-size: 36px;
+        }
+
+        .page-intro p {
+          font-size: 14px;
+        }
+
+        nav {
+          gap: 13px;
+        }
+
+        nav a {
+          font-size: 11px;
+        }
+
+        .article h2 {
+          font-size: 21px;
         }
       }
     </style>
@@ -144,6 +282,7 @@ const description =
   <body>
     <header>
       <a class="logo" href="/">BEZELS<span>.</span></a>
+
       <nav>
         <a href="/">Home</a>
         <a href="/find-anime/">Find Anime</a>
@@ -155,8 +294,13 @@ const description =
 
     <main>
       <section class="page-intro">
-        <span class="eyebrow">THE BEZELS ANIME QUIZ</span>
-        <h1>Which Anime Should You <span>Watch?</span></h1>
+        <span class="eyebrow">✦ THE BEZELS ANIME QUIZ</span>
+
+        <h1>
+          Which Anime Should You
+          <span>Watch?</span>
+        </h1>
+
         <p>
           Answer a few questions about your favourite genres, moods,
           storytelling preferences and viewing habits to discover
@@ -164,9 +308,13 @@ const description =
         </p>
       </section>
 
-      <DetailedQuiz />
+      <div class="quiz-container">
+        <DetailedQuiz />
+      </div>
 
       <article class="article">
+        <span class="article-label">THE BEZELS GUIDE</span>
+
         <h2>What Is an Anime Recommendation Quiz?</h2>
 
         <p>
@@ -175,6 +323,8 @@ const description =
           of choosing a series only because it is popular, you can
           consider the genres, themes and storytelling styles you enjoy.
         </p>
+
+        <div class="article-divider"></div>
 
         <h2>How the Bezels Anime Quiz Works</h2>
 
