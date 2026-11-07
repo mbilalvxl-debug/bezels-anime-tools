@@ -100,9 +100,11 @@ const title = "Admin Login | Bezels";
         return;
       }
 
-      message.textContent = "Admin verified successfully!";
+      message.textContent = "Admin verified successfully! Redirecting...";
       message.className = "success";
       button.textContent = "Verified";
+
+      window.location.assign("/admin/dashboard/");
 
     } catch {
       message.textContent = "Something went wrong. Please try again.";
