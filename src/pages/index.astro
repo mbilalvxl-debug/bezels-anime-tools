@@ -4,7 +4,7 @@ import Footer from "../components/Footer.astro";
 
 const title = "Bezels — Discover Your Next Favourite Anime";
 const description =
-  "Find your next favourite anime with Bezels. Explore anime recommendations, take a personalised quiz and organise your watchlist.";
+  "Discover your next favourite anime with Bezels. Explore anime recommendations, take a personalised quiz and organise your watchlist.";
 ---
 
 <!DOCTYPE html>
@@ -13,6 +13,7 @@ const description =
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#090713" />
     <title>{title}</title>
   </head>
 
@@ -21,7 +22,7 @@ const description =
       <a href="/" class="logo">BEZELS<span>.</span></a>
 
       <nav>
-        <a href="/">Home</a>
+        <a href="/" class="active">Home</a>
         <a href="/find-anime/">Find Anime</a>
         <a href="/anime-quiz/">Anime Quiz</a>
         <a href="/watchlist/">My Watchlist</a>
@@ -31,82 +32,155 @@ const description =
 
     <main>
       <section class="hero">
-        <span class="eyebrow">YOUR ANIME DISCOVERY HUB</span>
+        <div class="hero-glow"></div>
+        <div class="hero-grid"></div>
 
-        <h1>Discover Your Next <span>Favourite Anime</span></h1>
+        <div class="hero-content">
+          <div class="hero-label">
+            <span class="live-dot"></span>
+            YOUR ULTIMATE ANIME DISCOVERY HUB
+          </div>
 
-        <p>
-          Not sure what to watch next? Explore anime recommendations,
-          discover new series and build your personal watchlist with Bezels.
-        </p>
+          <h1>
+            Discover Your Next
+            <span>Favourite Anime.</span>
+          </h1>
 
-        <div class="hero-buttons">
-          <a href="/find-anime/" class="primary-btn">Find Your Anime</a>
-          <a href="/anime-quiz/" class="secondary-btn">Take Anime Quiz</a>
+          <p>
+            Your next anime obsession is waiting. Explore personalised
+            recommendations, find stories that match your taste and
+            keep track of everything you want to watch.
+          </p>
+
+          <div class="hero-buttons">
+            <a href="/find-anime/" class="primary-btn">
+              Find Your Anime <span>→</span>
+            </a>
+
+            <a href="/anime-quiz/" class="secondary-btn">
+              Take the Anime Quiz
+            </a>
+          </div>
+
+          <div class="hero-note">
+            <span>✦</span> Made for anime fans, by anime fans.
+          </div>
         </div>
+
+        <div class="hero-decoration decoration-one"></div>
+        <div class="hero-decoration decoration-two"></div>
       </section>
 
       <section class="tools-section">
         <div class="section-heading">
-          <span class="eyebrow">EXPLORE BEZELS</span>
-          <h2>What Would You Like to Do?</h2>
-          <p>Choose a tool and start exploring.</p>
+          <span class="section-label">EXPLORE BEZELS</span>
+          <h2>Your Anime Journey <span>Starts Here.</span></h2>
+          <p>
+            Everything you need to discover and organise your next anime.
+          </p>
         </div>
 
         <div class="tools-grid">
           <a href="/find-anime/" class="tool-card">
-            <div class="tool-icon">⌕</div>
+            <div class="card-top">
+              <div class="tool-icon">⌕</div>
+              <span class="card-number">01</span>
+            </div>
+
             <h3>Find Anime</h3>
+
             <p>
-              Discover anime based on your favourite genres, mood,
-              story preferences and episode count.
+              Filter anime by genre, mood, story preferences and
+              episode count to discover your next watch.
             </p>
-            <span class="card-link">Explore Anime →</span>
+
+            <div class="card-bottom">
+              <span>Explore Anime</span>
+              <span class="arrow">↗</span>
+            </div>
           </a>
 
-          <a href="/anime-quiz/" class="tool-card">
-            <div class="tool-icon">✦</div>
+          <a href="/anime-quiz/" class="tool-card featured-card">
+            <div class="card-top">
+              <div class="tool-icon">✦</div>
+              <span class="card-number">02</span>
+            </div>
+
             <h3>Anime Quiz</h3>
+
             <p>
-              Answer a few questions about your preferences and
-              get anime recommendations that match your interests.
+              Answer a few questions about your anime taste and
+              discover recommendations that match your interests.
             </p>
-            <span class="card-link">Take the Quiz →</span>
+
+            <div class="card-bottom">
+              <span>Take the Quiz</span>
+              <span class="arrow">↗</span>
+            </div>
           </a>
 
           <a href="/watchlist/" class="tool-card">
-            <div class="tool-icon">▤</div>
+            <div class="card-top">
+              <div class="tool-icon">▤</div>
+              <span class="card-number">03</span>
+            </div>
+
             <h3>My Watchlist</h3>
+
             <p>
-              Keep track of anime you want to watch and organise
-              the series you have already completed.
+              Save anime for later, organise your collection and
+              keep track of the series you have watched.
             </p>
-            <span class="card-link">Open Watchlist →</span>
+
+            <div class="card-bottom">
+              <span>Open Watchlist</span>
+              <span class="arrow">↗</span>
+            </div>
           </a>
         </div>
       </section>
 
       <section class="about-section">
-        <span class="eyebrow">ABOUT BEZELS</span>
-        <h2>Made for Anime Fans</h2>
+        <div class="about-glow"></div>
 
-        <p>
-          Bezels is an anime discovery platform designed to make
-          finding your next series easier. Whether you enjoy action,
-          fantasy, mystery, romance or something completely different,
-          our tools help you explore anime based on what you love.
-        </p>
+        <div class="about-content">
+          <span class="section-label">THE WORLD OF BEZELS</span>
 
-        <a href="/about/" class="about-link">Learn More About Bezels →</a>
+          <h2>
+            More Than Just
+            <span>Anime Recommendations.</span>
+          </h2>
+
+          <p>
+            Finding something great to watch shouldn't feel like a
+            mission. Bezels brings anime discovery and watchlist
+            organisation together in one place. Whether you're into
+            action-packed adventures, emotional stories or mysterious
+            worlds, we're here to make your next discovery easier.
+          </p>
+
+          <a href="/about/" class="text-link">
+            Get to Know Bezels <span>→</span>
+          </a>
+        </div>
+
+        <div class="about-orbit orbit-one"></div>
+        <div class="about-orbit orbit-two"></div>
       </section>
 
       <section class="articles-section">
-        <h2>Explore Anime Guides & Articles</h2>
+        <span class="section-label">THE ANIME CORNER</span>
+
+        <h2>Explore the World of <span>Anime.</span></h2>
+
         <p>
-          Read helpful anime guides, explore different genres and
-          discover more about the world of anime.
+          Discover helpful guides, explore anime topics and find
+          something new to add to your watchlist.
         </p>
-        <a href="/articles/" class="primary-btn">Explore Articles</a>
+
+        <a href="/articles/" class="primary-btn">
+          Explore Articles <span>→</span>
+        </a>
       </section>
     </main>
 
@@ -119,11 +193,16 @@ const description =
     box-sizing: border-box;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     margin: 0;
-    background: #0b0d17;
-    color: #f5f5fa;
+    background: #090713;
+    color: #f8f6ff;
     font-family: Arial, Helvetica, sans-serif;
+    overflow-x: hidden;
   }
 
   a {
@@ -131,245 +210,536 @@ const description =
   }
 
   .site-header {
-    min-height: 76px;
-    padding: 18px 7%;
+    position: relative;
+    z-index: 10;
+    min-height: 78px;
+    padding: 0 7%;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 25px;
-    border-bottom: 1px solid #222638;
-    background: #0b0d17;
+    background: rgba(10, 7, 20, 0.96);
+    border-bottom: 1px solid rgba(151, 105, 255, 0.15);
   }
 
   .logo {
-    color: white;
-    font-size: 27px;
-    font-weight: 800;
-    letter-spacing: 1px;
+    color: #fff;
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-shadow: 0 0 18px rgba(153, 104, 255, 0.55);
   }
 
   .logo span {
-    color: #9682ff;
+    color: #a77aff;
   }
 
   .site-header nav {
     display: flex;
+    align-items: center;
     flex-wrap: wrap;
-    gap: 25px;
+    gap: 28px;
   }
 
   .site-header nav a {
-    color: #b9bed0;
-    font-size: 14px;
-    transition: color 0.2s;
+    color: #aaa3bd;
+    font-size: 13px;
+    transition: 0.25s;
   }
 
-  .site-header nav a:hover {
-    color: #a895ff;
+  .site-header nav a:hover,
+  .site-header nav a.active {
+    color: #c4a6ff;
+    text-shadow: 0 0 12px rgba(169, 113, 255, 0.7);
   }
+
+  /* HERO */
 
   .hero {
-    max-width: 1050px;
-    margin: auto;
-    padding: 115px 25px 105px;
+    min-height: 590px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 24px 95px;
     text-align: center;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse at 50% 45%, rgba(104, 48, 190, 0.22), transparent 53%),
+      radial-gradient(ellipse at 10% 80%, rgba(94, 36, 160, 0.13), transparent 40%),
+      #090713;
   }
 
-  .eyebrow {
-    color: #a895ff;
-    font-size: 12px;
+  .hero-glow {
+    position: absolute;
+    width: 650px;
+    height: 400px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #7c35ff;
+    opacity: 0.12;
+    filter: blur(150px);
+    pointer-events: none;
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    opacity: 0.12;
+    background-image:
+      linear-gradient(rgba(174, 126, 255, 0.12) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(174, 126, 255, 0.12) 1px, transparent 1px);
+    background-size: 65px 65px;
+    mask-image: linear-gradient(to bottom, transparent, black, transparent);
+    pointer-events: none;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 850px;
+  }
+
+  .hero-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 17px;
+    color: #c8aaff;
+    background: rgba(140, 82, 255, 0.09);
+    border: 1px solid rgba(173, 124, 255, 0.28);
+    border-radius: 30px;
+    font-size: 10px;
     font-weight: 700;
     letter-spacing: 2px;
+    box-shadow: 0 0 22px rgba(129, 70, 255, 0.12);
+  }
+
+  .live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #b58aff;
+    box-shadow: 0 0 12px #a36aff;
   }
 
   .hero h1 {
-    max-width: 850px;
-    margin: 22px auto;
-    font-size: clamp(38px, 6vw, 65px);
+    margin: 30px auto 22px;
+    font-size: clamp(42px, 7vw, 76px);
     line-height: 1.12;
-    font-weight: 800;
+    letter-spacing: -2.5px;
+    font-weight: 900;
   }
 
   .hero h1 span {
-    color: #a895ff;
+    display: block;
+    color: #b48aff;
+    text-shadow:
+      0 0 15px rgba(168, 105, 255, 0.65),
+      0 0 45px rgba(126, 60, 255, 0.35);
   }
 
-  .hero > p {
-    max-width: 650px;
-    margin: 0 auto;
-    color: #aab0c3;
-    font-size: 17px;
-    line-height: 1.8;
+  .hero-content > p {
+    max-width: 660px;
+    margin: auto;
+    color: #aaa3bc;
+    font-size: 16px;
+    line-height: 1.9;
   }
 
   .hero-buttons {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 14px;
-    margin-top: 32px;
+    gap: 15px;
+    margin-top: 34px;
   }
 
   .primary-btn,
   .secondary-btn {
-    display: inline-block;
-    padding: 14px 23px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 15px 23px;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
-    transition: 0.2s;
+    transition: 0.25s;
   }
 
   .primary-btn {
     color: white;
-    background: #7963e8;
+    background: linear-gradient(110deg, #7138d8, #a15dff);
+    border: 1px solid rgba(210, 179, 255, 0.35);
+    box-shadow: 0 0 25px rgba(139, 75, 255, 0.3);
   }
 
   .primary-btn:hover {
-    background: #907dff;
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: 0 0 35px rgba(157, 91, 255, 0.55);
   }
 
   .secondary-btn {
-    color: white;
-    border: 1px solid #45415f;
-    background: #171827;
+    color: #e6d9ff;
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(171, 132, 255, 0.3);
   }
 
   .secondary-btn:hover {
-    border-color: #a895ff;
+    border-color: #b48aff;
+    background: rgba(137, 76, 255, 0.1);
   }
 
+  .hero-note {
+    margin-top: 32px;
+    color: #79718c;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+  }
+
+  .hero-note span {
+    color: #b58aff;
+    margin-right: 5px;
+  }
+
+  .hero-decoration {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border: 1px solid rgba(160, 111, 255, 0.1);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .decoration-one {
+    top: -210px;
+    left: -100px;
+    box-shadow: 0 0 80px rgba(137, 70, 255, 0.08);
+  }
+
+  .decoration-two {
+    bottom: -240px;
+    right: -100px;
+    width: 400px;
+    height: 400px;
+    box-shadow: 0 0 100px rgba(137, 70, 255, 0.08);
+  }
+
+  /* TOOLS */
+
   .tools-section {
-    padding: 75px 7%;
-    background: #101321;
+    padding: 90px 7% 105px;
+    background: #0e0b19;
+    border-top: 1px solid rgba(157, 109, 255, 0.12);
+    border-bottom: 1px solid rgba(157, 109, 255, 0.12);
   }
 
   .section-heading {
-    margin-bottom: 38px;
     text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .section-label {
+    color: #b28aff;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2.5px;
   }
 
   .section-heading h2,
-  .about-section h2,
+  .about-content h2,
   .articles-section h2 {
-    margin: 15px 0;
-    font-size: clamp(27px, 4vw, 36px);
+    margin: 17px 0 13px;
+    font-size: clamp(28px, 4vw, 42px);
+    letter-spacing: -1px;
   }
 
-  .section-heading p,
-  .articles-section p {
-    color: #aab0c3;
-    line-height: 1.7;
+  .section-heading h2 span,
+  .about-content h2 span,
+  .articles-section h2 span {
+    color: #b18aff;
+    text-shadow: 0 0 20px rgba(150, 90, 255, 0.3);
   }
 
-  .tools-grid {
-    max-width: 1100px;
-    margin: auto;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 22px;
-  }
-
-  .tool-card {
-    display: block;
-    padding: 30px 25px;
-    border: 1px solid #292d43;
-    border-radius: 13px;
-    background: #171a2a;
-    transition: 0.25s;
-  }
-
-  .tool-card:hover {
-    transform: translateY(-5px);
-    border-color: #8875ed;
-    background: #1c1d32;
-  }
-
-  .tool-icon {
-    width: 48px;
-    height: 48px;
-    display: grid;
-    place-items: center;
-    border-radius: 12px;
-    background: #292344;
-    color: #b3a4ff;
-    font-size: 27px;
-  }
-
-  .tool-card h3 {
-    margin: 22px 0 12px;
-    color: white;
-    font-size: 21px;
-  }
-
-  .tool-card p {
-    min-height: 80px;
-    color: #aab0c3;
+  .section-heading > p,
+  .articles-section > p {
+    color: #91899f;
     font-size: 14px;
     line-height: 1.8;
   }
 
-  .card-link {
-    display: inline-block;
-    margin-top: 15px;
-    color: #aa99ff;
-    font-size: 14px;
+  .tools-grid {
+    max-width: 1120px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 23px;
+  }
+
+  .tool-card {
+    position: relative;
+    display: block;
+    padding: 29px 26px;
+    min-height: 260px;
+    overflow: hidden;
+    border: 1px solid rgba(153, 112, 224, 0.2);
+    border-radius: 13px;
+    background: linear-gradient(145deg, #191326, #110e1c);
+    transition: 0.3s ease;
+  }
+
+  .tool-card::before {
+    content: "";
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    right: -80px;
+    top: -80px;
+    background: #934bff;
+    opacity: 0.13;
+    filter: blur(55px);
+    transition: 0.3s;
+  }
+
+  .tool-card:hover {
+    transform: translateY(-7px);
+    border-color: rgba(181, 137, 255, 0.65);
+    box-shadow: 0 10px 35px rgba(111, 49, 196, 0.16);
+  }
+
+  .tool-card:hover::before {
+    opacity: 0.3;
+  }
+
+  .featured-card {
+    border-color: rgba(173, 123, 255, 0.48);
+    background: linear-gradient(145deg, #211535, #130e20);
+    box-shadow: 0 0 28px rgba(130, 66, 220, 0.1);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .tool-icon {
+    width: 49px;
+    height: 49px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    color: #c8aaff;
+    background: rgba(145, 86, 255, 0.13);
+    border: 1px solid rgba(174, 128, 255, 0.28);
+    font-size: 27px;
+    box-shadow: 0 0 18px rgba(133, 74, 230, 0.12);
+  }
+
+  .card-number {
+    color: #665879;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+
+  .tool-card h3 {
+    margin: 25px 0 12px;
+    color: #f5efff;
+    font-size: 21px;
+  }
+
+  .tool-card p {
+    min-height: 75px;
+    margin: 0;
+    color: #9991aa;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
+  .card-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 25px;
+    padding-top: 17px;
+    border-top: 1px solid rgba(163, 127, 216, 0.15);
+    color: #b99aff;
+    font-size: 12px;
     font-weight: 700;
   }
+
+  .arrow {
+    font-size: 19px;
+    transition: transform 0.2s;
+  }
+
+  .tool-card:hover .arrow {
+    transform: translate(3px, -3px);
+  }
+
+  /* ABOUT */
 
   .about-section {
-    max-width: 850px;
-    margin: auto;
-    padding: 90px 25px;
+    position: relative;
+    padding: 110px 24px;
+    overflow: hidden;
     text-align: center;
+    background: #090713;
   }
 
-  .about-section p {
-    color: #aab0c3;
-    font-size: 15px;
-    line-height: 1.9;
+  .about-glow {
+    position: absolute;
+    width: 500px;
+    height: 250px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: #702bce;
+    opacity: 0.12;
+    filter: blur(120px);
+    pointer-events: none;
   }
 
-  .about-link {
+  .about-content {
+    position: relative;
+    z-index: 2;
+    max-width: 780px;
+    margin: auto;
+  }
+
+  .about-content h2 {
+    line-height: 1.25;
+  }
+
+  .about-content p {
+    margin: 22px auto;
+    color: #a39bb2;
+    font-size: 14px;
+    line-height: 2;
+  }
+
+  .text-link {
     display: inline-block;
-    margin-top: 15px;
-    color: #aa99ff;
+    margin-top: 10px;
+    color: #bd9aff;
+    font-size: 13px;
     font-weight: 700;
   }
 
+  .text-link span {
+    margin-left: 5px;
+  }
+
+  .about-orbit {
+    position: absolute;
+    border: 1px solid rgba(161, 108, 255, 0.1);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .orbit-one {
+    width: 300px;
+    height: 300px;
+    left: -180px;
+    top: 20px;
+  }
+
+  .orbit-two {
+    width: 400px;
+    height: 400px;
+    right: -240px;
+    bottom: -160px;
+  }
+
+  /* ARTICLES */
+
   .articles-section {
-    padding: 65px 20px 80px;
+    padding: 75px 22px 90px;
     text-align: center;
-    background: #101321;
+    background:
+      radial-gradient(ellipse at 50% 100%, rgba(115, 52, 195, 0.16), transparent 60%),
+      #100c1b;
+    border-top: 1px solid rgba(157, 109, 255, 0.13);
   }
 
-  .articles-section p {
-    max-width: 620px;
-    margin: 0 auto 25px;
+  .articles-section h2 {
+    margin-top: 18px;
   }
 
-  @media (max-width: 750px) {
+  .articles-section > p {
+    max-width: 600px;
+    margin: 0 auto 27px;
+  }
+
+  @media (max-width: 850px) {
     .site-header {
+      padding: 18px 5%;
       flex-direction: column;
-      padding: 18px;
     }
 
     .site-header nav {
       justify-content: center;
-      gap: 15px;
+      gap: 17px;
     }
 
     .tools-grid {
       grid-template-columns: 1fr;
+      max-width: 550px;
+    }
+
+    .tool-card {
+      min-height: auto;
     }
 
     .tool-card p {
       min-height: auto;
     }
+  }
+
+  @media (max-width: 520px) {
+    .site-header nav {
+      gap: 12px 16px;
+    }
+
+    .site-header nav a {
+      font-size: 12px;
+    }
 
     .hero {
-      padding: 80px 22px;
+      min-height: 540px;
+      padding: 80px 20px;
+    }
+
+    .hero h1 {
+      letter-spacing: -1.5px;
+    }
+
+    .hero-content > p {
+      font-size: 14px;
+    }
+
+    .hero-label {
+      font-size: 9px;
+      letter-spacing: 1.3px;
+    }
+
+    .hero-buttons {
+      flex-direction: column;
+      align-items: stretch;
+      max-width: 290px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .tools-section {
+      padding: 70px 20px;
+    }
+
+    .about-section {
+      padding: 85px 22px;
     }
   }
 </style>
