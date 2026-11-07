@@ -8,14 +8,14 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
 <section class="finder" id="anime-finder">
   <div class="heading">
-    <span class="eyebrow">DISCOVER YOUR NEXT WATCH</span>
+    <span class="eyebrow">✦ DISCOVER YOUR NEXT WATCH</span>
     <h2>Find Anime That <span>Matches You.</span></h2>
     <p>Choose what you enjoy and let Bezels find your next favourite anime.</p>
   </div>
 
   <div class="filter-panel">
     <div class="filter-group">
-      <h3>1. Choose your genres</h3>
+      <h3><span class="step-number">01</span> Choose your genres</h3>
       <div class="options">
         {["Action", "Adventure", "Fantasy", "Comedy", "Romance", "Mystery", "Sci-Fi", "Drama", "Sports", "Horror", "Psychological", "Supernatural"].map((genre) => (
           <label class="choice">
@@ -27,7 +27,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
     </div>
 
     <div class="filter-group">
-      <h3>2. What's your mood?</h3>
+      <h3><span class="step-number">02</span> What's your mood?</h3>
       <div class="options">
         {["Exciting", "Emotional", "Funny", "Dark", "Suspenseful", "Heartwarming", "Motivational", "Relaxed", "Mind-bending"].map((mood) => (
           <label class="choice">
@@ -39,7 +39,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
     </div>
 
     <div class="filter-group">
-      <h3>3. How much time do you have?</h3>
+      <h3><span class="step-number">03</span> How much time do you have?</h3>
       <select id="episodeLength">
         <option value="">Any episode count</option>
         <option value="short">Short — 13 episodes or less</option>
@@ -49,7 +49,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
     </div>
 
     <div class="filter-group">
-      <h3>4. Choose your story preference</h3>
+      <h3><span class="step-number">04</span> Choose your story preference</h3>
       <div class="options">
         {["Adventure", "Coming-of-age", "Mystery", "Revenge", "Survival", "Time travel", "Tournament", "School life", "Investigation"].map((story) => (
           <label class="choice">
@@ -60,8 +60,8 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
       </div>
     </div>
 
-    <button id="findAnime" type="button">Find My Anime →</button>
-    <p class="hint">Select at least one preference to get recommendations.</p>
+    <button id="findAnime" type="button">Find My Anime <span>→</span></button>
+    <p class="hint">✦ Select at least one preference to get recommendations.</p>
   </div>
 
   <div id="results" class="results" aria-live="polite"></div>
@@ -268,9 +268,9 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 <style is:global>
   .finder {
     max-width: 1050px;
-    margin: 30px auto 90px;
-    padding: 35px 22px;
-    color: #f5f5ff;
+    margin: 0 auto;
+    padding: 15px 0 30px;
+    color: #f8f6ff;
   }
 
   .finder .heading {
@@ -279,40 +279,71 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
   }
 
   .finder .eyebrow {
-    color: #a99aff;
-    font-size: 12px;
+    color: #b28aff;
+    font-size: 11px;
+    font-weight: 800;
     letter-spacing: 2px;
   }
 
   .finder .heading h2 {
-    font-size: clamp(30px, 5vw, 43px);
-    margin: 14px 0;
+    font-size: clamp(28px, 5vw, 40px);
+    margin: 15px 0;
+    letter-spacing: -1px;
   }
 
   .finder .heading h2 span {
-    color: #9685ff;
+    color: #b48aff;
+    text-shadow: 0 0 18px rgba(168, 105, 255, 0.4);
   }
 
   .finder .heading p,
   .finder .hint {
-    color: #aab2c6;
-    line-height: 1.7;
+    color: #aaa0bd;
+    line-height: 1.8;
+    font-size: 14px;
   }
 
+  /* FILTER PANEL */
+
   .finder .filter-panel {
-    background: #111a2c;
-    border: 1px solid #25304a;
-    padding: 28px;
-    border-radius: 16px;
+    position: relative;
+    padding: 32px;
+    border: 1px solid rgba(153, 112, 224, 0.25);
+    border-radius: 15px;
+    background: linear-gradient(145deg, #191326, #110e1c);
+    box-shadow:
+      0 0 30px rgba(111, 49, 196, 0.09),
+      inset 0 0 25px rgba(140, 85, 220, 0.025);
   }
 
   .finder .filter-group {
-    margin-bottom: 30px;
+    margin-bottom: 32px;
+    padding-bottom: 27px;
+    border-bottom: 1px solid rgba(163, 127, 216, 0.14);
   }
 
   .finder .filter-group h3 {
-    font-size: 17px;
-    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #eee8ff;
+    font-size: 16px;
+    margin: 0 0 18px;
+  }
+
+  .finder .step-number {
+    display: inline-grid;
+    place-items: center;
+    width: 31px;
+    height: 31px;
+    flex-shrink: 0;
+    color: #c8aaff;
+    background: rgba(145, 86, 255, 0.13);
+    border: 1px solid rgba(174, 128, 255, 0.3);
+    border-radius: 8px;
+    font-size: 11px;
+    letter-spacing: 1px;
+    box-shadow: 0 0 13px rgba(133, 74, 230, 0.1);
   }
 
   .finder .options {
@@ -328,68 +359,98 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
   .finder .choice input {
     position: absolute;
     opacity: 0;
+    width: 1px;
+    height: 1px;
   }
 
   .finder .choice span {
     display: block;
     padding: 10px 15px;
-    background: #1b2740;
-    border: 1px solid #34415e;
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(163, 127, 216, 0.23);
     border-radius: 8px;
-    color: #d4daeb;
+    color: #c5bbd8;
     font-size: 13px;
     transition: 0.2s;
   }
 
-  .finder .choice input:checked + span {
-    background: #5544b9;
-    border-color: #a394ff;
+  .finder .choice:hover span {
     color: white;
+    border-color: rgba(180, 138, 255, 0.65);
+    background: rgba(137, 76, 255, 0.1);
+  }
+
+  .finder .choice input:checked + span {
+    background: linear-gradient(110deg, #7138d8, #9055e8);
+    border-color: #c09aff;
+    color: white;
+    box-shadow: 0 0 16px rgba(139, 75, 255, 0.28);
   }
 
   .finder .choice input:focus-visible + span {
     outline: 2px solid white;
+    outline-offset: 3px;
   }
 
   .finder select {
     width: 100%;
     padding: 14px;
     border-radius: 8px;
-    background: #1b2740;
-    border: 1px solid #34415e;
+    background: #21182f;
+    border: 1px solid rgba(163, 127, 216, 0.3);
     color: white;
+    font-size: 14px;
+    outline: none;
+    color-scheme: dark;
+  }
+
+  .finder select:focus {
+    border-color: #b48aff;
+    box-shadow: 0 0 15px rgba(139, 75, 255, 0.18);
   }
 
   .finder #findAnime {
     width: 100%;
     padding: 16px;
-    background: #7965f5;
-    border: 0;
+    background: linear-gradient(110deg, #7138d8, #a15dff);
+    border: 1px solid rgba(210, 179, 255, 0.35);
     border-radius: 9px;
     color: white;
     font-weight: bold;
     font-size: 15px;
     cursor: pointer;
+    box-shadow: 0 0 22px rgba(139, 75, 255, 0.23);
+    transition: 0.25s;
+  }
+
+  .finder #findAnime span {
+    margin-left: 7px;
+    font-size: 19px;
   }
 
   .finder #findAnime:hover {
-    background: #6853e6;
+    transform: translateY(-2px);
+    box-shadow: 0 0 32px rgba(157, 91, 255, 0.5);
   }
 
   .finder .hint {
     text-align: center;
     font-size: 12px;
-    margin-top: 13px;
+    margin-top: 15px;
   }
 
+  /* RESULTS */
+
   .finder .results {
-    margin-top: 35px;
+    margin-top: 42px;
     scroll-margin-top: 30px;
   }
 
   .finder .results-heading {
-    font-size: 24px;
-    margin-bottom: 20px;
+    font-size: 25px;
+    margin-bottom: 23px;
+    color: #f7f1ff;
+    text-shadow: 0 0 17px rgba(150, 90, 255, 0.2);
   }
 
   .finder .result-grid {
@@ -400,22 +461,23 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
   .finder .result-card {
     overflow: hidden;
-    background: #111a2c;
-    border: 1px solid #293650;
-    border-radius: 14px;
-    transition: transform 0.2s, border-color 0.2s;
+    background: linear-gradient(145deg, #191326, #110e1c);
+    border: 1px solid rgba(153, 112, 224, 0.22);
+    border-radius: 13px;
+    transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
   }
 
   .finder .result-card:hover {
-    transform: translateY(-4px);
-    border-color: #7965f5;
+    transform: translateY(-5px);
+    border-color: rgba(181, 137, 255, 0.7);
+    box-shadow: 0 10px 30px rgba(111, 49, 196, 0.2);
   }
 
   .finder .poster-box {
     position: relative;
     width: 100%;
     aspect-ratio: 2 / 3;
-    background: #1b2740;
+    background: #1b1429;
     overflow: hidden;
   }
 
@@ -426,7 +488,11 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
     object-fit: cover;
     object-position: center;
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: opacity 0.3s, transform 0.4s;
+  }
+
+  .finder .result-card:hover .anime-poster {
+    transform: scale(1.035);
   }
 
   .finder .anime-poster.loaded {
@@ -440,9 +506,10 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
     align-items: center;
     justify-content: center;
     text-align: center;
-    color: #aab2c6;
+    color: #b99aff;
     font-size: 13px;
     padding: 15px;
+    background: radial-gradient(circle, #35234f, #171020);
   }
 
   .finder .card-info {
@@ -450,7 +517,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
   }
 
   .finder .card-title {
-    color: white;
+    color: #f7f1ff;
     font-size: 18px;
     line-height: 1.4;
     margin: 0 0 9px;
@@ -459,7 +526,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
   .finder .meta,
   .finder .genres,
   .finder .reason {
-    color: #aab2c6;
+    color: #aaa0bd;
     font-size: 13px;
     line-height: 1.7;
     margin: 7px 0;
@@ -467,23 +534,25 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
   .finder .score {
     display: inline-block;
-    color: #c2b7ff;
-    background: #30285b;
+    color: #d6c1ff;
+    background: rgba(145, 86, 255, 0.16);
+    border: 1px solid rgba(174, 128, 255, 0.3);
     padding: 7px 11px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: 700;
     margin: 12px 0;
+    box-shadow: 0 0 12px rgba(133, 74, 230, 0.1);
   }
 
   .finder .watchlist-button {
     width: 100%;
     margin-top: 12px;
     padding: 12px;
-    border: 1px solid #7965f5;
+    border: 1px solid rgba(174, 128, 255, 0.45);
     border-radius: 8px;
-    background: #30285b;
-    color: white;
+    background: rgba(145, 86, 255, 0.13);
+    color: #d6c1ff;
     font-size: 13px;
     font-weight: bold;
     cursor: pointer;
@@ -491,23 +560,27 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
   }
 
   .finder .watchlist-button:hover {
-    background: #5544b9;
+    background: #7138d8;
+    border-color: #c09aff;
+    color: white;
+    box-shadow: 0 0 18px rgba(139, 75, 255, 0.22);
   }
 
   .finder .watchlist-button.is-saved {
-    background: #183b35;
-    border-color: #3b9b7d;
+    background: rgba(31, 105, 82, 0.2);
+    border-color: #398d71;
     color: #a8f0d5;
     cursor: default;
+    box-shadow: none;
   }
 
   @media (max-width: 600px) {
     .finder {
-      padding: 25px 15px;
+      padding: 5px 0 20px;
     }
 
     .finder .filter-panel {
-      padding: 20px 15px;
+      padding: 22px 16px;
     }
 
     .finder .result-grid {
@@ -521,6 +594,11 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
     .finder .card-title {
       font-size: 15px;
+    }
+
+    .finder .choice span {
+      padding: 9px 12px;
+      font-size: 12px;
     }
   }
 
