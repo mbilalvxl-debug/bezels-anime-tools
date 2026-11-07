@@ -1,0 +1,243 @@
+
+---
+import DetailedQuiz from "../components/DetailedQuiz.astro";
+
+const title = "Anime Quiz | Find Your Perfect Anime - Bezels";
+const description =
+  "Take the Bezels Anime Quiz and discover anime recommendations based on your genres, mood, story preferences and viewing interests.";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: #090d18;
+        color: #f4f6ff;
+        font-family: Arial, sans-serif;
+        min-height: 100vh;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 22px 8%;
+        border-bottom: 1px solid #20283b;
+      }
+
+      .logo {
+        font-size: 27px;
+        font-weight: 800;
+        color: white;
+        text-decoration: none;
+      }
+
+      .logo span {
+        color: #8b7cff;
+      }
+
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 22px;
+      }
+
+      nav a {
+        color: #b9bfd1;
+        text-decoration: none;
+        font-size: 14px;
+      }
+
+      nav a:hover,
+      nav a.active {
+        color: #a99aff;
+      }
+
+      .page-intro {
+        max-width: 850px;
+        margin: 0 auto;
+        padding: 75px 22px 35px;
+        text-align: center;
+      }
+
+      .eyebrow {
+        color: #a99aff;
+        font-size: 12px;
+        letter-spacing: 2px;
+      }
+
+      h1 {
+        font-size: clamp(36px, 6vw, 55px);
+        margin: 18px 0;
+      }
+
+      h1 span {
+        color: #9685ff;
+      }
+
+      .page-intro p {
+        color: #aab2c6;
+        line-height: 1.8;
+        font-size: 16px;
+      }
+
+      .article {
+        max-width: 850px;
+        margin: 60px auto;
+        padding: 0 22px;
+        color: #c5ccdc;
+        line-height: 1.9;
+      }
+
+      .article h2 {
+        color: white;
+        font-size: 25px;
+        margin: 35px 0 12px;
+      }
+
+      .article h3 {
+        color: #e6e2ff;
+        font-size: 19px;
+        margin: 25px 0 10px;
+      }
+
+      .article p {
+        margin-bottom: 16px;
+      }
+
+      footer {
+        text-align: center;
+        border-top: 1px solid #20283b;
+        padding: 28px;
+        color: #828da5;
+        font-size: 13px;
+      }
+
+      @media (max-width: 650px) {
+        header {
+          padding: 20px;
+          flex-direction: column;
+          gap: 18px;
+        }
+
+        nav {
+          justify-content: center;
+          gap: 14px;
+        }
+
+        nav a {
+          font-size: 12px;
+        }
+
+        .page-intro {
+          padding-top: 55px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <a class="logo" href="/">BEZELS<span>.</span></a>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/find-anime/">Find Anime</a>
+        <a href="/anime-quiz/" class="active">Anime Quiz</a>
+        <a href="/watchlist/">My Watchlist</a>
+        <a href="/articles/">Articles</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-intro">
+        <span class="eyebrow">THE BEZELS ANIME QUIZ</span>
+        <h1>Which Anime Should You <span>Watch?</span></h1>
+        <p>
+          Answer a few questions about your favourite genres, moods,
+          storytelling preferences and viewing habits to discover
+          anime that may be right for you.
+        </p>
+      </section>
+
+      <DetailedQuiz />
+
+      <article class="article">
+        <h2>What Is an Anime Recommendation Quiz?</h2>
+
+        <p>
+          An anime recommendation quiz is a simple way to discover
+          shows based on your personal viewing preferences. Instead
+          of choosing a series only because it is popular, you can
+          consider the genres, themes and storytelling styles you enjoy.
+        </p>
+
+        <h2>How the Bezels Anime Quiz Works</h2>
+
+        <p>
+          The Bezels Anime Quiz uses your answers to compare your
+          preferences with information in its anime collection.
+          It then ranks available titles according to how closely
+          they match your selections.
+        </p>
+
+        <h2>Choose Genres You Enjoy</h2>
+
+        <p>
+          Your favourite genres provide a useful starting point.
+          Whether you enjoy action, fantasy, romance, mystery,
+          comedy or drama, your selections help narrow down
+          the available recommendations.
+        </p>
+
+        <h2>Think About the Stories You Like</h2>
+
+        <p>
+          Two anime can share the same genre but offer completely
+          different experiences. Some focus on adventure and
+          exploration, while others centre on character development,
+          competition, mystery or personal challenges.
+        </p>
+
+        <h2>Consider Your Preferred Main Characters</h2>
+
+        <p>
+          The main character can strongly influence the way a story
+          feels. You might enjoy determined heroes, clever strategists,
+          underdogs or characters who grow through difficult situations.
+          Your preferences can help identify stories with similar leads.
+        </p>
+
+        <h2>Does a Higher Match Score Guarantee You Will Like an Anime?</h2>
+
+        <p>
+          No. A match score is a guide based on the preferences you
+          selected, not a guarantee of personal enjoyment. Ratings,
+          animation style, pacing and individual taste can all affect
+          whether a particular series is right for you.
+        </p>
+
+        <h2>Discover Your Next Anime</h2>
+
+        <p>
+          Complete the quiz above and explore the recommendations.
+          You can try different answers whenever your mood or
+          viewing preferences change.
+        </p>
+      </article>
+    </main>
+
+    <footer>© 2026 Bezels. Made for anime fans.</footer>
+  </body>
+</html>
