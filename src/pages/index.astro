@@ -1,5 +1,7 @@
 
 ---
+import Footer from "../components/Footer.astro";
+
 const title = "Bezels — Discover Your Next Favourite Anime";
 const description =
   "Find your next favourite anime with Bezels. Explore anime recommendations, take a personalised quiz and organise your watchlist.";
@@ -203,20 +205,6 @@ const description =
         font-size: 14px;
       }
 
-      footer {
-        text-align: center;
-        border-top: 1px solid #20283b;
-        padding: 28px 20px;
-        color: #828da5;
-        font-size: 13px;
-      }
-
-      footer a {
-        color: #a99aff;
-        text-decoration: none;
-        margin: 0 8px;
-      }
-
       @media (max-width: 750px) {
         header {
           padding: 20px;
@@ -327,13 +315,6 @@ const description =
       </section>
     </main>
 
-    <footer>
-      <p>© 2026 Bezels. Made for anime fans.</p>
-      <p style="margin-top: 12px;">
-        <a href="/articles/">Articles</a>
-        <a href="/about/">About</a>
-        <a href="/contact/">Contact</a>
-      </p>
-    </footer>
+    <Footer />
   </body>
 </html>
