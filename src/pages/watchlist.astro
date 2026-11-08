@@ -2,6 +2,7 @@
 ---
 import Watchlist from "../components/Watchlist.astro";
 import Footer from "../components/Footer.astro";
+import SEO from "../components/SEO.astro";
 
 const title = "My Anime Watchlist | Bezels";
 const description =
@@ -11,10 +12,7 @@ const description =
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
-    <title>{title}</title>
+    <SEO title={title} description={description} />
 
     <style>
       * {

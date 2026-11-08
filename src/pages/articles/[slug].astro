@@ -1,10 +1,8 @@
 
 ---
 import Footer from "../../components/Footer.astro";
-import {
-  getPublishedArticles,
-  getPublishedArticleBySlug
-} from "../../lib/articles";
+import SEO from "../../components/SEO.astro";
+import { getPublishedArticles } from "../../lib/articles";
 
 export async function getStaticPaths() {
   const articles = await getPublishedArticles();
@@ -23,6 +21,11 @@ const description =
   article.excerpt ||
   "Read the latest anime guide on Bezels.";
 
+const canonicalURL = new URL(
+  `/articles/${article.slug}/`,
+  Astro.site
+).toString();
+
 const articleDate = article.published_at
   ? new Date(article.published_at).toLocaleDateString("en", {
       year: "numeric",
@@ -31,6 +34,28 @@ const articleDate = article.published_at
       timeZone: "UTC"
     })
   : "";
+
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: article.title,
+  description,
+  mainEntityOfPage: {
+    "@type": "WebPage",
+    "@id": canonicalURL
+  },
+  publisher: {
+    "@type": "Organization",
+    name: "Bezels",
+    url: "https://bezels.site/"
+  },
+  ...(article.featured_image
+    ? { image: [article.featured_image] }
+    : {}),
+  ...(article.published_at
+    ? { datePublished: new Date(article.published_at).toISOString() }
+    : {})
+};
 
 function renderNode(node: any): string {
   if (!node) return "";
@@ -87,20 +112,28 @@ const contentHtml = renderNode(article.content);
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title} | Bezels</title>
-    <meta name="description" content={description} />
-    <link
-      rel="canonical"
-      href={`https://bezels.site/articles/${article.slug}/`}
+    <SEO
+      title={`${title} | Bezels`}
+      description={description}
+      type="article"
     />
-    <meta property="og:type" content="article" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    {article.featured_image && (
-      <meta property="og:image" content={article.featured_image} />
-    )}
+
+    <meta property="og:image" content={article.featured_image || ""} />
+    <meta
+      property="og:image:alt"
+      content={article.title}
+    />
+
+    <meta
+      name="twitter:card"
+      content={article.featured_image ? "summary_large_image" : "summary"}
+    />
+    <meta name="twitter:image" content={article.featured_image || ""} />
+
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(articleSchema)}
+    />
 
     <style>
       * {
@@ -286,7 +319,11 @@ const contentHtml = renderNode(article.content);
         <span class="category">{article.category || "Anime Guide"}</span>
         <h1>{article.title}</h1>
         {article.excerpt && <p class="excerpt">{article.excerpt}</p>}
-        {articleDate && <time class="date">{articleDate}</time>}
+        {articleDate && (
+          <time class="date" datetime={article.published_at}>
+            {articleDate}
+          </time>
+        )}
       </section>
 
       {article.featured_image && (
