@@ -123,7 +123,6 @@ const description =
         border-color: #a58aff;
       }
 
-      /* Fixed image area for every article card */
       .article-image-wrap {
         width: 100%;
         height: 175px;
@@ -190,6 +189,52 @@ const description =
         line-height: 1.8;
       }
 
+      /* Pagination */
+      .pagination {
+        display: none;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-top: 42px;
+      }
+
+      .pagination button {
+        min-width: 42px;
+        height: 42px;
+        padding: 0 13px;
+        border: 1px solid #38275e;
+        border-radius: 9px;
+        background: #17112b;
+        color: #d8cafa;
+        font-size: 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      .pagination button:hover:not(:disabled) {
+        border-color: #a58aff;
+        color: white;
+      }
+
+      .pagination button.active {
+        background: #8b68df;
+        border-color: #a58aff;
+        color: white;
+      }
+
+      .pagination button:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+
+      .pagination-info {
+        text-align: center;
+        color: #9187a8;
+        font-size: 12px;
+        margin-top: 15px;
+      }
+
       @media (max-width: 650px) {
         header {
           padding: 20px;
@@ -207,6 +252,17 @@ const description =
 
         .article-image-wrap {
           height: 190px;
+        }
+
+        .pagination {
+          gap: 6px;
+        }
+
+        .pagination button {
+          min-width: 37px;
+          height: 38px;
+          padding: 0 9px;
+          font-size: 13px;
         }
       }
     </style>
@@ -239,52 +295,62 @@ const description =
         <h2>Latest Articles</h2>
 
         {articles.length > 0 ? (
-          <div class="article-grid">
-            {articles.map((article) => (
-              <article class="article-card">
-                {article.featured_image && (
-                  <div class="article-image-wrap">
-                    <img
-                      class="article-image"
-                      src={article.featured_image}
-                      alt={article.title}
-                      loading="lazy"
-                    />
-                  </div>
-                )}
-
-                <div class="article-content">
-                  <span class="category">
-                    {article.category || "Anime Guide"}
-                  </span>
-
-                  <h3>{article.title}</h3>
-
-                  <p>
-                    {article.excerpt || "Explore this anime article on Bezels."}
-                  </p>
-
-                  {article.published_at && (
-                    <time class="article-date" datetime={article.published_at}>
-                      {new Date(article.published_at).toLocaleDateString("en", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                        timeZone: "UTC"
-                      })}
-                    </time>
+          <>
+            <div class="article-grid" id="article-grid">
+              {articles.map((article) => (
+                <article class="article-card">
+                  {article.featured_image && (
+                    <div class="article-image-wrap">
+                      <img
+                        class="article-image"
+                        src={article.featured_image}
+                        alt={article.title}
+                        loading="lazy"
+                      />
+                    </div>
                   )}
 
-                  <a
-                    class="read-link"
-                    href={`/articles/${article.slug}/`}
-                  >
-                    Read Article →
-                  </a>
-                </div>
-              </article>
-            ))}
-          </div>
+                  <div class="article-content">
+                    <span class="category">
+                      {article.category || "Anime Guide"}
+                    </span>
+
+                    <h3>{article.title}</h3>
+
+                    <p>
+                      {article.excerpt || "Explore this anime article on Bezels."}
+                    </p>
+
+                    {article.published_at && (
+                      <time class="article-date" datetime={article.published_at}>
+                        {new Date(article.published_at).toLocaleDateString("en", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                          timeZone: "UTC"
+                        })}
+                      </time>
+                    )}
+
+                    <a
+                      class="read-link"
+                      href={`/articles/${article.slug}/`}
+                    >
+                      Read Article →
+                    </a>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <div
+              class="pagination"
+              id="pagination"
+              aria-label="Article pagination"
+            ></div>
+
+            <p class="pagination-info" id="pagination-info"></p>
+          </>
         ) : (
           <div class="empty-state">
             <h3>No published articles yet</h3>
@@ -298,6 +364,109 @@ const description =
     </main>
 
     <Footer />
+
+    <script>
+      const articlesPerPage = 9;
+      const articleGrid = document.getElementById("article-grid");
+      const pagination = document.getElementById("pagination");
+      const paginationInfo = document.getElementById("pagination-info");
+
+      if (articleGrid && pagination && paginationInfo) {
+        const cards = Array.from(
+          articleGrid.querySelectorAll(".article-card")
+        );
+
+        const totalPages = Math.ceil(cards.length / articlesPerPage);
+
+        function renderPage(page, updateUrl = true) {
+          const currentPage = Math.min(
+            Math.max(1, page),
+            Math.max(1, totalPages)
+          );
+
+          const start = (currentPage - 1) * articlesPerPage;
+          const end = start + articlesPerPage;
+
+          cards.forEach((card, index) => {
+            card.style.display =
+              index >= start && index < end ? "" : "none";
+          });
+
+          if (totalPages <= 1) {
+            pagination.style.display = "none";
+            paginationInfo.textContent = "";
+          } else {
+            pagination.style.display = "flex";
+            pagination.innerHTML = "";
+
+            const previousButton = document.createElement("button");
+            previousButton.textContent = "Previous";
+            previousButton.disabled = currentPage === 1;
+            previousButton.addEventListener("click", () => {
+              renderPage(currentPage - 1);
+            });
+            pagination.appendChild(previousButton);
+
+            for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
+              const button = document.createElement("button");
+              button.textContent = String(pageNumber);
+
+              if (pageNumber === currentPage) {
+                button.classList.add("active");
+                button.setAttribute("aria-current", "page");
+              }
+
+              button.addEventListener("click", () => {
+                renderPage(pageNumber);
+              });
+
+              pagination.appendChild(button);
+            }
+
+            const nextButton = document.createElement("button");
+            nextButton.textContent = "Next";
+            nextButton.disabled = currentPage === totalPages;
+            nextButton.addEventListener("click", () => {
+              renderPage(currentPage + 1);
+            });
+            pagination.appendChild(nextButton);
+
+            paginationInfo.textContent =
+              `Showing ${start + 1}–${Math.min(end, cards.length)} of ${cards.length} articles`;
+          }
+
+          if (updateUrl) {
+            const url = new URL(window.location.href);
+
+            if (currentPage === 1) {
+              url.searchParams.delete("page");
+            } else {
+              url.searchParams.set("page", String(currentPage));
+            }
+
+            window.history.pushState({}, "", url);
+          }
+
+          window.scrollTo({
+            top: document.querySelector(".articles").offsetTop - 25,
+            behavior: "smooth"
+          });
+        }
+
+        const requestedPage = Number(
+          new URLSearchParams(window.location.search).get("page")
+        ) || 1;
+
+        renderPage(requestedPage, false);
+
+        window.addEventListener("popstate", () => {
+          const page = Number(
+            new URLSearchParams(window.location.search).get("page")
+          ) || 1;
+
+          renderPage(page, false);
+        });
+      }
+    </script>
   </body>
 </html>
-   
