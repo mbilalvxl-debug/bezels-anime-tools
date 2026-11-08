@@ -2,6 +2,7 @@
 ---
 import AnimeFinder from "../components/AnimeFinder.astro";
 import Footer from "../components/Footer.astro";
+import SEO from "../components/SEO.astro";
 
 const title = "Find Anime | Bezels";
 const description =
@@ -11,11 +12,7 @@ const description =
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
-    <meta name="theme-color" content="#090713" />
-    <title>{title}</title>
+    <SEO title={title} description={description} />
   </head>
 
   <body>
@@ -96,9 +93,9 @@ const description =
             If that sounds familiar, you’re not alone. The good news is that finding something you’ll actually enjoy doesn’t have to take an hour. You just need to know what you’re looking for. That’s exactly why we built the Bezels Anime Finder. It lets you pick what matters to you and shows you shows that fit, so you can skip the endless searching.
           </p>
 
-            <p>
-                 In this guide, I’ll walk you through a few simple ways to think about your next watch. 
-            </p>
+          <p>
+            In this guide, I’ll walk you through a few simple ways to think about your next watch.
+          </p>
 
           <h2>Start With the Genres You Like</h2>
 
@@ -106,10 +103,10 @@ const description =
             The easiest place to begin is genre. Think about the last anime you really enjoyed. Was it full of fights and big power-ups? Was it a slow, sweet love story? Or maybe it was a mystery that kept you guessing till the last episode?
           </p>
           <p>
-              Each genre gives you a very different feeling. Action anime is fast and exciting. Romance is warm and emotional. Fantasy takes you to new worlds with magic and strange creatures. Thriller keeps you on the edge of your seat, comedy makes you laugh, and sci-fi makes you think about the future.
+            Each genre gives you a very different feeling. Action anime is fast and exciting. Romance is warm and emotional. Fantasy takes you to new worlds with magic and strange creatures. Thriller keeps you on the edge of your seat, comedy makes you laugh, and sci-fi makes you think about the future.
           </p>
           <p>
-              You don’t have to stick to just one, either. Many of the best shows mix two or three genres together. An action show can have a lot of heart, and a comedy can have a surprisingly deep story. When you pick a few genres you like in the finder, it can suggest shows that match more closely.
+            You don’t have to stick to just one, either. Many of the best shows mix two or three genres together. An action show can have a lot of heart, and a comedy can have a surprisingly deep story. When you pick a few genres you like in the finder, it can suggest shows that match more closely.
           </p>
 
           <h2>Think About Your Mood</h2>
@@ -118,10 +115,10 @@ const description =
             This one is often ignored, but it matters a lot. The same person can want completely different things on different days.
           </p>
           <p>
-              After a long day at work or school, you might not want a heavy story that makes you cry. A light comedy or a relaxing slice-of-life show might feel much better. On a weekend when you have free time, you may want something big and exciting, with great fights and a story you can get lost in. And sometimes you just want to feel something, so you pick an emotional drama and keep tissues nearby.
+            After a long day at work or school, you might not want a heavy story that makes you cry. A light comedy or a relaxing slice-of-life show might feel much better. On a weekend when you have free time, you may want something big and exciting, with great fights and a story you can get lost in. And sometimes you just want to feel something, so you pick an emotional drama and keep tissues nearby.
           </p>
           <p>
-              There’s no right or wrong choice here. Just ask yourself, “How do I want to feel after this episode?” Your answer will usually point you in the right direction.
+            There’s no right or wrong choice here. Just ask yourself, “How do I want to feel after this episode?” Your answer will usually point you in the right direction.
           </p>
 
           <h2>Check the Episode Count</h2>
@@ -129,15 +126,15 @@ const description =
           <p>
             A lot of people forget about this until they are already hooked. Then they realise the show has 500 episodes and they only have a free week.
           </p>
-            <p>
-              Short anime, usually 12 or 13 episodes, are great when you’re busy. You can finish them in a few days and enjoy a complete story without a big commitment. They’re also perfect if you want to try a new genre and aren’t sure you’ll like it.
-            </p>
-            <p>
-                Longer series work differently. They have more time to build the world, grow the characters and tell a bigger story. If you like getting attached to characters and following them over many seasons, a long show can be very rewarding. Just make sure you have the time and patience for it.
-            </p>
-            <p>
-                So before you start, take a quick look at the episode count. It can save you from picking a show that doesn’t fit your schedule.
-            </p>
+          <p>
+            Short anime, usually 12 or 13 episodes, are great when you’re busy. You can finish them in a few days and enjoy a complete story without a big commitment. They’re also perfect if you want to try a new genre and aren’t sure you’ll like it.
+          </p>
+          <p>
+            Longer series work differently. They have more time to build the world, grow the characters and tell a bigger story. If you like getting attached to characters and following them over many seasons, a long show can be very rewarding. Just make sure you have the time and patience for it.
+          </p>
+          <p>
+            So before you start, take a quick look at the episode count. It can save you from picking a show that doesn’t fit your schedule.
+          </p>
 
           <h2>Look Beyond the Popular Titles</h2>
 
@@ -145,10 +142,10 @@ const description =
             Everyone knows the big names. They appear on every “top 10” list, and for good reason, many of them are really great. But they’re not the only good anime out there.
           </p>
           <p>
-              Some of the best shows are the ones people rarely talk about. You might find a short series with a creative idea, a quiet story with amazing characters, or a hidden gem that feels fresh because nobody spoiled it for you.
+            Some of the best shows are the ones people rarely talk about. You might find a short series with a creative idea, a quiet story with amazing characters, or a hidden gem that feels fresh because nobody spoiled it for you.
           </p>
           <p>
-              Try stepping out of your comfort zone now and then. If you usually watch shounen, try a mystery. If you love romance, give a sports anime a chance. If you always follow a strong hero, try a show where the main character is more ordinary or even a bit flawed. You may be surprised by what you end up loving.
+            Try stepping out of your comfort zone now and then. If you usually watch shounen, try a mystery. If you love romance, give a sports anime a chance. If you always follow a strong hero, try a show where the main character is more ordinary or even a bit flawed. You may be surprised by what you end up loving.
           </p>
 
           <h2>Use the Recommendations as a Starting Point</h2>
@@ -157,13 +154,14 @@ const description =
             No tool can know your taste perfectly, and that’s okay. Think of the results as a friendly suggestion, not a strict rule. Read the description, watch the trailer, and maybe try the first episode or two. If it clicks, great. If not, go back and try different options.
           </p>
           <p>
-              Also, don’t be afraid to change your filters. Pick a different mood, try another genre mix, or change the episode range. Small changes can bring up completely different shows, and that’s often how you find your next favourite.
+            Also, don’t be afraid to change your filters. Pick a different mood, try another genre mix, or change the episode range. Small changes can bring up completely different shows, and that’s often how you find your next favourite.
           </p>
-        <h2>Start Discovering Anime</h2>
+
+          <h2>Start Discovering Anime</h2>
           <p>
             Ready to find your next watch? Use the Bezels Anime Finder above and choose the genres, mood and episode count that suit you. You can try it as many times as you want, so feel free to experiment whenever you’re in the mood for something new.
-            </p>
-            <p>Happy watching!</p>
+          </p>
+          <p>Happy watching!</p>
         </div>
       </article>
     </main>
