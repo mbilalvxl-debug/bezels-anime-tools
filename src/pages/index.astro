@@ -1,27 +1,24 @@
 
 ---
 import Footer from "../components/Footer.astro";
+import SEO from "../components/SEO.astro";
 
 const title = "Bezels — Discover Your Next Favourite Anime";
 const description =
-  "Discover your next favourite anime with Bezels. Explore anime recommendations, take a personalised quiz and organise your watchlist.";
+  "Discover your next favourite anime with Bezels. Explore personalised anime recommendations, take a free anime quiz and organise your watchlist.";
 ---
 
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
-    <meta name="theme-color" content="#090713" />
-    <title>{title}</title>
+    <SEO title={title} description={description} />
   </head>
 
   <body>
     <header class="site-header">
       <a href="/" class="logo">BEZELS<span>.</span></a>
 
-      <nav>
+      <nav aria-label="Main navigation">
         <a href="/" class="active">Home</a>
         <a href="/find-anime/">Find Anime</a>
         <a href="/anime-quiz/">Anime Quiz</a>
