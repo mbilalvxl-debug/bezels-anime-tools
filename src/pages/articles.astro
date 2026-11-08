@@ -106,9 +106,11 @@ const description =
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: 22px;
+        align-items: stretch;
       }
 
       .article-card {
+        min-width: 0;
         overflow: hidden;
         background: linear-gradient(145deg, #17112b, #100d1e);
         border: 1px solid #38275e;
@@ -121,12 +123,20 @@ const description =
         border-color: #a58aff;
       }
 
-      .article-image {
+      /* Fixed image area for every article card */
+      .article-image-wrap {
         width: 100%;
-        aspect-ratio: 16 / 9;
-        object-fit: cover;
-        display: block;
+        height: 175px;
+        overflow: hidden;
         background: #201638;
+      }
+
+      .article-image {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
       }
 
       .article-content {
@@ -194,6 +204,10 @@ const description =
 
         nav a { font-size: 12px; }
         .intro { padding-top: 55px; }
+
+        .article-image-wrap {
+          height: 190px;
+        }
       }
     </style>
   </head>
@@ -229,12 +243,14 @@ const description =
             {articles.map((article) => (
               <article class="article-card">
                 {article.featured_image && (
-                  <img
-                    class="article-image"
-                    src={article.featured_image}
-                    alt={article.title}
-                    loading="lazy"
-                  />
+                  <div class="article-image-wrap">
+                    <img
+                      class="article-image"
+                      src={article.featured_image}
+                      alt={article.title}
+                      loading="lazy"
+                    />
+                  </div>
                 )}
 
                 <div class="article-content">
