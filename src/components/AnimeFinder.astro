@@ -1,11 +1,4 @@
 
----
-import animeData from "../data/anime.json";
-import { getRecommendations, type Anime } from "../lib/recommend";
-
-const animeList = animeData.anime as (Anime & { poster?: string })[];
----
-
 <section class="finder" id="anime-finder">
   <div class="heading">
     <span class="eyebrow">✦ DISCOVER YOUR NEXT WATCH</span>
@@ -60,7 +53,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
       </div>
     </div>
 
-    <button id="findAnime" type="button">Find My Anime <span>→</span></button>
+    <button id="findAnime" type="button" disabled>Loading Anime Database...</button>
     <p class="hint">✦ Select at least one preference to get recommendations.</p>
   </div>
 
@@ -68,16 +61,41 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 </section>
 
 <script>
+  import { supabase } from "../lib/supabase";
   import { getRecommendations, type Anime } from "../lib/recommend";
-  import animeData from "../data/anime.json";
 
-  const animeList = animeData.anime as (Anime & { poster?: string })[];
+  type AnimeDatabaseRecord = {
+    id: string;
+    title: string;
+    year: number | null;
+    episodes: number | null;
+    status: string | null;
+    genres: string[] | null;
+    moods: string[] | null;
+    story_types: string[] | null;
+    protagonist_types: string[] | null;
+    content_notes: string[] | null;
+    poster: string | null;
+  };
+
+  type FinderAnime = Anime & {
+    poster?: string;
+  };
+
   const WATCHLIST_KEY = "bezels-watchlist";
+
+  let animeList: FinderAnime[] = [];
+  let animeReady = false;
+  let animeLoadError = "";
 
   function getSavedIds(): string[] {
     try {
       const saved = localStorage.getItem(WATCHLIST_KEY);
-      return saved ? JSON.parse(saved) : [];
+      const parsed = saved ? JSON.parse(saved) : [];
+
+      return Array.isArray(parsed)
+        ? parsed.filter((id): id is string => typeof id === "string")
+        : [];
     } catch {
       return [];
     }
@@ -97,6 +115,35 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
     return true;
   }
 
+  async function loadAnimeFromSupabase(): Promise<void> {
+    const { data, error } = await supabase
+      .from("anime")
+      .select("*")
+      .order("title", { ascending: true });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const records = (data ?? []) as AnimeDatabaseRecord[];
+
+    animeList = records.map((record) => ({
+      id: record.id,
+      title: record.title,
+      year: record.year ?? Number.NaN,
+      episodes: record.episodes ?? Number.NaN,
+      status: record.status ?? "",
+      genres: record.genres ?? [],
+      moods: record.moods ?? [],
+      storyTypes: record.story_types ?? [],
+      protagonistTypes: record.protagonist_types ?? [],
+      contentNotes: record.content_notes ?? [],
+      poster: record.poster ?? undefined,
+    }));
+
+    animeReady = true;
+  }
+
   function setupFinder() {
     const button = document.querySelector<HTMLButtonElement>("#findAnime");
     const results = document.querySelector<HTMLDivElement>("#results");
@@ -113,6 +160,13 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
     }
 
     button.addEventListener("click", () => {
+      if (!animeReady) {
+        results.textContent = animeLoadError
+          ? `Could not load the anime database: ${animeLoadError}`
+          : "Anime database is still loading. Please wait.";
+        return;
+      }
+
       const preferences = {
         genres: selectedValues("genre"),
         moods: selectedValues("mood"),
@@ -138,7 +192,9 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
       const recommendations = getRecommendations(animeList, preferences, 10);
 
       if (!recommendations.length) {
-        results.textContent = "No matches found. Try changing your preferences.";
+        results.textContent = animeList.length
+          ? "No matches found. Try changing your preferences."
+          : "No anime is currently available in the database.";
         return;
       }
 
@@ -152,6 +208,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
       recommendations.forEach((anime) => {
         const card = document.createElement("article");
         card.className = "result-card";
+        card.dataset.animeId = anime.id;
 
         const posterBox = document.createElement("div");
         posterBox.className = "poster-box";
@@ -192,9 +249,17 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
         title.className = "card-title";
         title.textContent = anime.title;
 
+        const yearText = Number.isFinite(anime.year)
+          ? String(anime.year)
+          : "Year unknown";
+
+        const episodeText = Number.isFinite(anime.episodes)
+          ? String(anime.episodes)
+          : "Unknown";
+
         const meta = document.createElement("p");
         meta.className = "meta";
-        meta.textContent = `${anime.year} • ${anime.episodes} episodes`;
+        meta.textContent = `${yearText} • ${episodeText} episodes`;
 
         const score = document.createElement("span");
         score.className = "score";
@@ -212,6 +277,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
         const saveButton = document.createElement("button");
         saveButton.className = "watchlist-button";
+        saveButton.type = "button";
 
         function updateSaveButton() {
           const isSaved = getSavedIds().includes(anime.id);
@@ -246,11 +312,10 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
     window.addEventListener("bezels-watchlist-updated", () => {
       results.querySelectorAll<HTMLButtonElement>(".watchlist-button").forEach((saveButton) => {
-        const card = saveButton.closest(".result-card");
-        const title = card?.querySelector(".card-title")?.textContent;
-        const anime = animeList.find((item) => item.title === title);
+        const card = saveButton.closest<HTMLElement>(".result-card");
+        const id = card?.dataset.animeId;
 
-        if (anime && getSavedIds().includes(anime.id)) {
+        if (id && getSavedIds().includes(id)) {
           saveButton.textContent = "✓ Saved to Watchlist";
           saveButton.classList.add("is-saved");
         }
@@ -258,10 +323,47 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
     });
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", setupFinder, { once: true });
-  } else {
+  async function initializeFinder() {
     setupFinder();
+
+    const button = document.querySelector<HTMLButtonElement>("#findAnime");
+    const results = document.querySelector<HTMLDivElement>("#results");
+
+    try {
+      await loadAnimeFromSupabase();
+
+      if (button) {
+        button.disabled = false;
+        button.textContent = "Find My Anime →";
+      }
+
+      if (results) {
+        results.textContent = "";
+      }
+    } catch (error) {
+      animeLoadError =
+        error instanceof Error ? error.message : "Unknown database error";
+
+      if (button) {
+        button.disabled = true;
+        button.textContent = "Database Unavailable";
+      }
+
+      if (results) {
+        results.textContent =
+          "We couldn't load anime recommendations right now. Please try again later.";
+      }
+
+      console.error("Bezels Anime Finder database error:", error);
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      void initializeFinder();
+    }, { once: true });
+  } else {
+    void initializeFinder();
   }
 </script>
 
@@ -302,8 +404,6 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
     line-height: 1.8;
     font-size: 14px;
   }
-
-  /* FILTER PANEL */
 
   .finder .filter-panel {
     position: relative;
@@ -423,12 +523,18 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
     transition: 0.25s;
   }
 
+  .finder #findAnime:disabled {
+    opacity: 0.65;
+    cursor: wait;
+    transform: none;
+  }
+
   .finder #findAnime span {
     margin-left: 7px;
     font-size: 19px;
   }
 
-  .finder #findAnime:hover {
+  .finder #findAnime:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 0 32px rgba(157, 91, 255, 0.5);
   }
@@ -438,8 +544,6 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
     font-size: 12px;
     margin-top: 15px;
   }
-
-  /* RESULTS */
 
   .finder .results {
     margin-top: 42px;
