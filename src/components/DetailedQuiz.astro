@@ -1,11 +1,4 @@
 
----
-import animeData from "../data/anime.json";
-import { getRecommendations, type Anime, type RecommendationPreferences } from "../lib/recommend";
-
-const animeList = animeData.anime as (Anime & { poster?: string })[];
----
-
 <section class="detail-quiz" id="detailed-quiz">
   <div class="quiz-heading">
     <span class="quiz-eyebrow">✦ THE BEZELS ANIME QUIZ</span>
@@ -95,11 +88,11 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
       </div>
     </div>
 
-    <p class="quiz-error" id="quizError" aria-live="polite"></p>
+    <p class="quiz-error" id="quizError" aria-live="polite">Loading anime database...</p>
 
     <div class="quiz-navigation">
       <button type="button" id="quizBack" class="quiz-back" disabled>← Back</button>
-      <button type="button" id="quizNext" class="quiz-next">Next Step →</button>
+      <button type="button" id="quizNext" class="quiz-next" disabled>Loading Anime...</button>
     </div>
   </div>
 
@@ -107,17 +100,24 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 </section>
 
 <script>
-  import { getRecommendations, type Anime, type RecommendationPreferences } from "../lib/recommend";
-  import animeData from "../data/anime.json";
+  import { supabase } from "../lib/supabase";
+  import {
+    getRecommendations,
+    type Anime,
+    type RecommendationPreferences
+  } from "../lib/recommend";
 
   type QuizAnime = Anime & { poster?: string };
-  const animeList = animeData.anime as QuizAnime[];
+
+  let animeList: QuizAnime[] = [];
+
   const WATCHLIST_KEY = "bezels-watchlist";
 
   function getSavedIds(): string[] {
     try {
       const saved = localStorage.getItem(WATCHLIST_KEY);
-      return saved ? JSON.parse(saved) : [];
+      const parsed = saved ? JSON.parse(saved) : [];
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
       return [];
     }
@@ -137,6 +137,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
   function setupDetailedQuiz() {
     const root = document.querySelector<HTMLElement>("#detailed-quiz");
+
     if (!root || root.dataset.ready === "true") return;
     root.dataset.ready = "true";
 
@@ -163,17 +164,71 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
       releasePeriod: []
     };
 
+    async function loadAnimeDatabase() {
+      nextButton.disabled = true;
+      nextButton.textContent = "Loading Anime...";
+      error.textContent = "Loading anime database...";
+
+      try {
+        const { data, error: fetchError } = await supabase
+          .from("anime")
+          .select("*")
+          .order("title", { ascending: true });
+
+        if (fetchError) {
+          throw fetchError;
+        }
+
+        animeList = (data ?? []).map((row) => ({
+          id: row.id,
+          title: row.title,
+          year: row.year == null ? Number.NaN : Number(row.year),
+          episodes: row.episodes == null ? Number.NaN : Number(row.episodes),
+          status: row.status ?? "Unknown",
+          genres: Array.isArray(row.genres) ? row.genres : [],
+          moods: Array.isArray(row.moods) ? row.moods : [],
+          storyTypes: Array.isArray(row.story_types) ? row.story_types : [],
+          protagonistTypes: Array.isArray(row.protagonist_types) ? row.protagonist_types : [],
+          contentNotes: Array.isArray(row.content_notes) ? row.content_notes : [],
+          poster: row.poster ?? undefined
+        }));
+
+        if (animeList.length === 0) {
+          error.textContent = "No anime found in the database. Please add anime through Anime Manager.";
+          nextButton.textContent = "Database Empty";
+          return;
+        }
+
+        error.textContent = "";
+        nextButton.disabled = false;
+        nextButton.textContent = "Next Step →";
+
+      } catch (fetchError) {
+        console.error("Anime Quiz database error:", fetchError);
+
+        error.textContent = "Unable to load anime database. Please refresh the page and try again.";
+        nextButton.textContent = "Database Error";
+      }
+    }
+
     function updateStep() {
       steps.forEach((step, index) => {
         step.classList.toggle("active", index === currentStep);
       });
 
       const percentage = Math.round(((currentStep + 1) / steps.length) * 100);
+
       progress.style.width = `${percentage}%`;
       stepLabel.textContent = `STEP ${currentStep + 1} OF ${steps.length}`;
       percentLabel.textContent = `${percentage}%`;
+
       backButton.disabled = currentStep === 0;
-      nextButton.textContent = currentStep === steps.length - 1 ? "Find My Anime →" : "Next Step →";
+
+      nextButton.textContent =
+        currentStep === steps.length - 1
+          ? "Find My Anime →"
+          : "Next Step →";
+
       error.textContent = "";
     }
 
@@ -181,13 +236,17 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
       button.addEventListener("click", () => {
         const group = button.dataset.group;
         const value = button.dataset.value;
+
         if (!group || !value) return;
 
         if (group === "episodeLength" || group === "releasePeriod") {
           answers[group] = answers[group].includes(value) ? [] : [value];
 
           root.querySelectorAll<HTMLButtonElement>(`.quiz-option[data-group="${group}"]`).forEach((option) => {
-            option.classList.toggle("selected", answers[group].includes(option.dataset.value || ""));
+            option.classList.toggle(
+              "selected",
+              answers[group].includes(option.dataset.value || "")
+            );
           });
         } else {
           if (answers[group].includes(value)) {
@@ -211,6 +270,8 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
     });
 
     nextButton.addEventListener("click", () => {
+      if (nextButton.disabled) return;
+
       if (currentStep < steps.length - 1) {
         currentStep++;
         updateStep();
@@ -234,6 +295,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
       };
 
       const recommendations = getRecommendations(animeList, preferences, 10);
+
       showResults(recommendations);
     });
 
@@ -253,6 +315,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
         const message = document.createElement("p");
         message.className = "quiz-no-results";
         message.textContent = "We couldn't find a close match. Try changing your answers and take the quiz again.";
+
         results.replaceChildren(heading, description, message);
       } else {
         recommendations.forEach((anime) => {
@@ -269,10 +332,12 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
             poster.src = posterUrl;
             poster.alt = `${anime.title} anime poster`;
             poster.loading = "lazy";
+
             poster.onerror = () => {
               poster.style.display = "none";
               posterBox.textContent = "Poster unavailable";
             };
+
             posterBox.append(poster);
           } else {
             posterBox.textContent = "Poster unavailable";
@@ -284,9 +349,17 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
           const title = document.createElement("h4");
           title.textContent = anime.title;
 
+          const yearText = Number.isFinite(anime.year)
+            ? String(anime.year)
+            : "Year unknown";
+
+          const episodeText = Number.isFinite(anime.episodes)
+            ? `${anime.episodes} episodes`
+            : "Episodes unknown";
+
           const meta = document.createElement("p");
           meta.className = "quiz-meta";
-          meta.textContent = `${anime.year} • ${anime.episodes} episodes • ${anime.status}`;
+          meta.textContent = `${yearText} • ${episodeText} • ${anime.status}`;
 
           const score = document.createElement("span");
           score.className = "quiz-score";
@@ -305,12 +378,15 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
           const saveButton = document.createElement("button");
           saveButton.type = "button";
           saveButton.className = "quiz-watchlist-button";
+          saveButton.dataset.animeId = anime.id;
 
           function updateSaveButton() {
             const isSaved = getSavedIds().includes(anime.id);
+
             saveButton.textContent = isSaved
               ? "✓ Saved to Watchlist"
               : "+ Save to Watchlist";
+
             saveButton.classList.toggle("is-saved", isSaved);
           }
 
@@ -318,7 +394,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
           saveButton.addEventListener("click", () => {
             if (getSavedIds().includes(anime.id)) {
-              saveButton.textContent = "✓ Already Saved";
+              updateSaveButton();
               return;
             }
 
@@ -340,11 +416,9 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
 
     window.addEventListener("bezels-watchlist-updated", () => {
       results.querySelectorAll<HTMLButtonElement>(".quiz-watchlist-button").forEach((button) => {
-        const card = button.closest(".quiz-result-card");
-        const title = card?.querySelector("h4")?.textContent;
-        const anime = animeList.find((item) => item.title === title);
+        const animeId = button.dataset.animeId;
 
-        if (anime && getSavedIds().includes(anime.id)) {
+        if (animeId && getSavedIds().includes(animeId)) {
           button.textContent = "✓ Saved to Watchlist";
           button.classList.add("is-saved");
         }
@@ -352,6 +426,7 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
     });
 
     updateStep();
+    loadAnimeDatabase();
   }
 
   if (document.readyState === "loading") {
@@ -398,8 +473,6 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
     line-height: 1.8;
     font-size: 14px;
   }
-
-  /* QUIZ PANEL */
 
   .quiz-panel {
     background: linear-gradient(145deg, #191326, #110e1c);
@@ -528,8 +601,6 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
     color: #e1d1ff;
   }
 
-  /* NAVIGATION */
-
   .quiz-navigation {
     display: flex;
     justify-content: space-between;
@@ -572,9 +643,14 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
     box-shadow: 0 0 18px rgba(139, 75, 255, 0.2);
   }
 
-  .quiz-next:hover {
+  .quiz-next:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 0 27px rgba(157, 91, 255, 0.4);
+  }
+
+  .quiz-next:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
   }
 
   .quiz-error {
@@ -583,8 +659,6 @@ const animeList = animeData.anime as (Anime & { poster?: string })[];
     margin-top: 15px;
     min-height: 18px;
   }
-
-  /* RESULTS */
 
   .quiz-results {
     margin-top: 45px;
