@@ -42,7 +42,11 @@ const title = "Article Manager | Bezels";
         <a href="/admin/dashboard/" class="back-link">← Dashboard</a>
       </header>
 
-      <div id="page-message" class="message" role="status">Verifying admin access...</div>
+      <div id="page-message" class="message" role="status" aria-live="polite">
+        Verifying admin access...
+      </div>
+
+      <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
       <section class="editor-panel">
         <div class="panel-heading">
@@ -166,6 +170,7 @@ const title = "Article Manager | Bezels";
   const PAGE_SIZE = 10;
 
   const message = document.querySelector<HTMLElement>("#page-message");
+  const toastContainer = document.querySelector<HTMLElement>("#toast-container");
   const form = document.querySelector<HTMLFormElement>("#article-form");
   const articleList = document.querySelector<HTMLElement>("#article-list");
   const articleTotal = document.querySelector<HTMLElement>("#article-total");
@@ -201,10 +206,98 @@ const title = "Article Manager | Bezels";
   let currentArticles: ArticleRecord[] = [];
   let searchTimer: ReturnType<typeof setTimeout> | undefined;
 
+  let toastCounter = 0;
+
+  // Floating notification system.
+  function showToast(text: string, type: "success" | "error" | "info" = "info") {
+    if (!toastContainer) return;
+
+    toastCounter += 1;
+
+    const toast = document.createElement("div");
+    toast.className = `toast toast-${type}`;
+    toast.setAttribute("role", type === "error" ? "alert" : "status");
+
+    const icons = {
+      success: "✓",
+      error: "!",
+      info: "i",
+    };
+
+    const headings = {
+      success: "Success",
+      error: "Something went wrong",
+      info: "Please wait",
+    };
+
+    const icon = document.createElement("span");
+    icon.className = "toast-icon";
+    icon.textContent = icons[type];
+
+    const content = document.createElement("div");
+    content.className = "toast-content";
+
+    const heading = document.createElement("strong");
+    heading.textContent = headings[type];
+
+    const description = document.createElement("span");
+    description.textContent = text;
+
+    content.append(heading, description);
+
+    const closeButton = document.createElement("button");
+    closeButton.type = "button";
+    closeButton.className = "toast-close";
+    closeButton.setAttribute("aria-label", "Dismiss notification");
+    closeButton.textContent = "×";
+
+    toast.append(icon, content, closeButton);
+    toastContainer.appendChild(toast);
+
+    let dismissed = false;
+
+    const dismiss = () => {
+      if (dismissed) return;
+      dismissed = true;
+      toast.classList.add("toast-leaving");
+      window.setTimeout(() => toast.remove(), 250);
+    };
+
+    closeButton.addEventListener("click", dismiss);
+
+    const duration = type === "error" ? 6500 : 4500;
+    const timer = window.setTimeout(dismiss, duration);
+
+    toast.addEventListener("mouseenter", () => {
+      window.clearTimeout(timer);
+    });
+
+    toast.addEventListener("mouseleave", () => {
+      if (!dismissed) {
+        window.setTimeout(dismiss, 1200);
+      }
+    });
+
+    // Keep the newest notifications visible.
+    while (toastContainer.children.length > 4) {
+      toastContainer.firstElementChild?.remove();
+    }
+  }
+
   function showMessage(text: string, type = "info") {
-    if (!message) return;
-    message.textContent = text;
-    message.className = `message ${type}`;
+    if (message) {
+      message.textContent = text;
+      message.className = `message ${type}`;
+    }
+
+    // Keep the persistent admin verification message quiet.
+    // Action results are shown as floating notifications instead.
+    if (type !== "info" || !text.startsWith("Admin verified:")) {
+      showToast(
+        text,
+        type === "success" ? "success" : type === "error" ? "error" : "info"
+      );
+    }
   }
 
   function escapeHtml(value: unknown): string {
@@ -225,7 +318,6 @@ const title = "Article Manager | Bezels";
       .replace(/^-+|-+$/g, "");
   }
 
-  // Trigger secure Cloudflare deployment through Supabase Edge Function.
   async function triggerWebsiteDeployment(): Promise<void> {
     const { data, error } = await supabase.functions.invoke(
       "trigger-cloudflare-deploy",
@@ -426,7 +518,11 @@ const title = "Article Manager | Bezels";
     }
 
     isAdmin = true;
-    showMessage(`Admin verified: ${user.email}`, "success");
+    if (message) {
+      message.textContent = `Admin verified: ${user.email}`;
+      message.className = "message success";
+    }
+
     await loadArticles();
   }
 
@@ -477,8 +573,6 @@ const title = "Article Manager | Bezels";
     if (activeButton) activeButton.textContent = "Saving...";
 
     try {
-      // Published article changes require a new static site build.
-      // This also covers changing a published article back to draft.
       const shouldDeploy =
         status === "published" || editingOriginalStatus === "published";
 
@@ -502,7 +596,9 @@ const title = "Article Manager | Bezels";
           await triggerWebsiteDeployment();
 
           showMessage(
-            "Article saved successfully! Website rebuild has been triggered. It may take a few minutes to appear publicly.",
+            status === "published"
+              ? "Article published/saved! Website rebuild has been triggered."
+              : "Article unpublished successfully! Website rebuild has been triggered.",
             "success"
           );
         } catch (deployError) {
@@ -608,6 +704,9 @@ const title = "Article Manager | Bezels";
 
       const wasPublished = articleBeingDeleted?.status === "published";
 
+      deleteButton.disabled = true;
+      deleteButton.textContent = "Deleting...";
+
       const { error } = await supabase
         .from("articles")
         .delete()
@@ -615,6 +714,8 @@ const title = "Article Manager | Bezels";
 
       if (error) {
         showMessage(`Delete failed: ${error.message}`, "error");
+        deleteButton.disabled = false;
+        deleteButton.textContent = "Delete";
         return;
       }
 
@@ -629,12 +730,12 @@ const title = "Article Manager | Bezels";
           await triggerWebsiteDeployment();
 
           showMessage(
-            "Article deleted successfully! Website rebuild has been triggered. It may take a few minutes for the public page to update.",
+            "Article deleted successfully! Website rebuild has been triggered.",
             "success"
           );
         } catch (deployError) {
           showMessage(
-            `Article was deleted, but website deployment could not be triggered: ${deployError instanceof Error ? deployError.message : "Unknown error"}`,
+            `Article deleted, but website deployment could not be triggered: ${deployError instanceof Error ? deployError.message : "Unknown error"}`,
             "error"
           );
         }
@@ -685,7 +786,7 @@ const title = "Article Manager | Bezels";
     const { error } = await supabase.auth.signOut();
 
     if (error) {
-      alert("Logout failed. Please try again.");
+      showMessage("Logout failed. Please try again.", "error");
       logoutButton.disabled = false;
       logoutButton.textContent = "↪ Logout";
       return;
@@ -845,6 +946,124 @@ const title = "Article Manager | Bezels";
 
   .message.error {
     color: #ff9999;
+  }
+
+  /* Floating toast notifications */
+  .toast-container {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+    width: min(390px, calc(100vw - 30px));
+    pointer-events: none;
+  }
+
+  .toast {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    border: 1px solid #49325e;
+    border-radius: 12px;
+    background: #191224;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+    pointer-events: auto;
+    animation: toast-enter 0.28s ease-out;
+  }
+
+  .toast-success {
+    border-left: 4px solid #55d991;
+  }
+
+  .toast-error {
+    border-left: 4px solid #ff7070;
+  }
+
+  .toast-info {
+    border-left: 4px solid #b987f0;
+  }
+
+  .toast-icon {
+    flex-shrink: 0;
+    width: 25px;
+    height: 25px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(185, 135, 240, 0.15);
+    color: #d6b2ff;
+    font-size: 14px;
+    font-weight: 900;
+  }
+
+  .toast-success .toast-icon {
+    background: rgba(85, 217, 145, 0.13);
+    color: #77e8a8;
+  }
+
+  .toast-error .toast-icon {
+    background: rgba(255, 112, 112, 0.13);
+    color: #ff9090;
+  }
+
+  .toast-content {
+    min-width: 0;
+    flex: 1;
+    display: grid;
+    gap: 5px;
+  }
+
+  .toast-content strong {
+    color: #f4eaff;
+    font-size: 13px;
+  }
+
+  .toast-content span {
+    color: #c1b2d0;
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+
+  .toast-close {
+    padding: 0 3px;
+    border: 0;
+    background: transparent;
+    color: #9d8cad;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .toast-close:hover {
+    color: #fff;
+  }
+
+  .toast-leaving {
+    animation: toast-exit 0.22s ease-in forwards;
+  }
+
+  @keyframes toast-enter {
+    from {
+      opacity: 0;
+      transform: translateY(15px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes toast-exit {
+    to {
+      opacity: 0;
+      transform: translateY(10px);
+    }
   }
 
   .editor-panel,
@@ -1220,6 +1439,19 @@ const title = "Article Manager | Bezels";
 
     .page-button {
       padding: 9px 10px;
+    }
+
+    .toast-container {
+      right: 15px;
+      bottom: 15px;
+      width: calc(100vw - 30px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .toast,
+    .toast-leaving {
+      animation: none;
     }
   }
 </style>
